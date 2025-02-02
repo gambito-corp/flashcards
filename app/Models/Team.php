@@ -49,10 +49,18 @@ class Team extends JetstreamTeam
         return $this->belongsTo(User::class, 'user_id');
     }
 
+
     /**
      * Relación muchos a muchos con usuarios (vía team_user).
      */
     public function users()
+    {
+        return $this->belongsToMany(User::class, 'team_user')
+            ->using(TeamUser::class)
+            ->withTimestamps();
+    }
+
+    public function editor()
     {
         return $this->belongsToMany(User::class, 'team_user')
             ->using(TeamUser::class)

@@ -1,15 +1,51 @@
 <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-    <x-application-logo class="block h-12 w-auto" />
+
+{{--    <x-application-logo class="block h-12 w-auto" />--}}
 
     <h1 class="mt-8 text-2xl font-medium text-gray-900">
-        Welcome to your Jetstream application!
+        Titulo de la Tarjeta
     </h1>
 
     <p class="mt-6 text-gray-500 leading-relaxed">
-        Laravel Jetstream provides a beautiful, robust starting point for your next Laravel application. Laravel is designed
-        to help you build your application using a development environment that is simple, powerful, and enjoyable. We believe
-        you should love expressing your creativity through programming, so we have spent time carefully crafting the Laravel
-        ecosystem to be a breath of fresh air. We hope you love it.
+        <span>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci assumenda, commodi debitis deserunt
+            doloribus excepturi maxime quaerat soluta totam ut? Consectetur pariatur totam veniam voluptatibus voluptatum! Id iusto magni quasi.
+        </span>
+        <span>
+            Facere reiciendis tempora ullam vel. Commodi dicta maxime molestias repudiandae sed soluta. A asperiores
+            consequatur dolores id in inventore nam, natus nulla odit officiis quasi quod sunt unde vel voluptates!
+        </span>
+
+    <h2 class="text-lg font-semibold text-gray-700 text-center mb-4">
+        📂 Subir Archivo CSV
+    </h2>
+    <form action="{{route('carga-csv')}}" method="post" enctype="multipart/form-data" class="space-y-4">
+        @csrf
+        <div>
+
+            <label for="instrucciones" class="block text-sm font-medium text-gray-600">Selecciona un archivo CSV:</label>
+            <input type="file" name="instrucciones" id="instrucciones" accept=".csv"
+                   class="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            @error('instrucciones')
+            <p class="text-red-500 text-xs italic">{{ $message }}</p>
+            @enderror
+            <label for="preguntas" class="block text-sm font-medium text-gray-600">Selecciona un archivo CSV:</label>
+            <input type="file" name="preguntas" id="preguntas" accept=".csv" required
+                   class="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            @error('preguntas')
+            <p class="text-red-500 text-xs italic">{{ $message }}</p>
+            @enderror
+            <label for="respuestas" class="block text-sm font-medium text-gray-600">Selecciona un archivo CSV:</label>
+            <input type="file" name="respuestas" id="respuestas" accept=".csv" required
+                   class="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            @error('respuestas')
+            <p class="text-red-500 text-xs italic">{{ $message }}</p>
+            @enderror
+        </div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition">
+            🚀 Subir Archivo
+        </button>
+    </form>
     </p>
 </div>
 
@@ -20,12 +56,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
             </svg>
             <h2 class="ml-3 text-xl font-semibold text-gray-900">
-                <a href="https://laravel.com/docs">Documentation</a>
+                <a href="https://laravel.com/docs">Primera Parte</a>
             </h2>
         </div>
 
         <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-            Laravel has wonderful documentation covering every aspect of the framework. Whether you're new to the framework or have previous experience, we recommend reading all of the documentation from beginning to end.
+            En esta parte puedes
         </p>
 
         <p class="mt-4 text-sm">
