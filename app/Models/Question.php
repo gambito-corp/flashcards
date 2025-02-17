@@ -9,63 +9,49 @@ class Question extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'questions';
-
     protected $fillable = [
+        'user_id',
         'content',
         'question_type',
-        'is_dag',
         'range_min',
         'range_max',
         'media_type',
         'media_url',
+        'media_iframe',
+        'approved',
+        'explanation'
     ];
 
-    protected $casts = [
-        'is_dag' => 'boolean',
-    ];
 
-    /**
-     * Muchas preguntas pueden ir a muchos exams (pivot exam_question).
-     */
-    public function exams()
+    public function user()
     {
-        return $this->belongsToMany(Exam::class, 'exam_question')
-            ->using(ExamQuestion::class)
-            ->withTimestamps();
+        return $this->belongsTo(User::class);
     }
 
     /**
-     * Muchas preguntas pueden tener muchas categorías (pivot category_question).
+     * Una pregunta puede pertenecer a múltiples tipos.
      */
+    public function tipos()
+    {
+        return $this->belongsToMany(Tipo::class, 'question_tipo')
+            ->withTimestamps();
+    }
+
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'category_question')
-            ->using(CategoryQuestion::class)
             ->withTimestamps();
     }
-
     /**
-     * Una pregunta tiene varias opciones (relación 1..N).
+     * Una pregunta puede pertenecer a múltiples universidades.
      */
+    public function universidades()
+    {
+        return $this->belongsToMany(Universidad::class, 'question_universidad');
+    }
+
     public function options()
     {
         return $this->hasMany(Option::class);
-    }
-
-    /**
-     * Edges de este question como "origen" en un DAG.
-     */
-    public function edgesFrom()
-    {
-        return $this->hasMany(QuestionEdge::class, 'from_question_id');
-    }
-
-    /**
-     * (Opcional) Si quieres también ver edges entrantes:
-     */
-    public function edgesTo()
-    {
-        return $this->hasMany(QuestionEdge::class, 'to_question_id');
     }
 }

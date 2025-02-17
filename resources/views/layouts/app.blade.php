@@ -16,6 +16,7 @@
 
         <!-- Styles -->
         @livewireStyles
+        @stack('styles')
     </head>
     <body class="font-sans antialiased">
         <x-banner />
@@ -37,9 +38,8 @@
                 {{ $slot }}
             </main>
         </div>
-
         @stack('modals')
-
         @livewireScripts
+        @stack('scripts')
     </body>
 </html>

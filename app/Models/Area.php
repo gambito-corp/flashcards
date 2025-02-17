@@ -16,6 +16,12 @@ class Area extends Model
         'description',
     ];
 
+    // Un área pertenece a un team (carrera)
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
     /**
      * Una area tiene muchas categorías.
      */

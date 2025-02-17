@@ -1,7 +1,12 @@
 <?php
 
+use App\Http\Controllers\CurrentTeamController;
+use App\Http\Controllers\ExamController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PreguntasController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,44 +19,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::redirect('/home', '/dashboard');
+Route::redirect('/', '/dashboard');
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-    Route::post('/carga-csv', function(Request $request){
-        $request->validate([
-            'instrucciones' => 'file|mimes:csv,txt|max:2048',
-            'preguntas' => 'required|file|mimes:csv,txt|max:2048',
-            'respuestas' => 'required|file|mimes:csv,txt|max:2048',
-        ]);
+    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
-        $file = $request->file('instrucciones');
+    Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.update');
+//    /*PREGUNTAS*/
+    Route::get('/preguntas/crear_pregunta', [PreguntasController::class, 'crearPregunta'])
+        ->middleware('role:root|admin|colab')
+        ->name('preguntas.create');
 
-        $sample = file_get_contents($file->getPathname(), false, null, 0, 1000);
+//   /*EXAMENES*/
+    Route::get('/examenes', [ExamController::class, 'index'])->name('examenes.index');
+    Route::post('/examenes', [ExamController::class, 'createExam'])->name('examenes.create');
+    Route::get('/examenes/{id}', [ExamController::class, 'showExam'])->name('examenes.show');
+    Route::post('/examenes/evaluar', [ExamController::class, 'evaluarExamen'])->name('examenes.evaluar');
 
-        $commaCount = substr_count($sample, ',');
-        $semicolonCount = substr_count($sample, ';');
-
-        $delimiter = ($semicolonCount > $commaCount) ? ';' : ',';
-
-        $csv = League\Csv\Reader::createFromPath($file->getPathname(), 'r');
-        $csv->setDelimiter($delimiter);
-        $csv->setHeaderOffset(0);
-
-        $rows = [];
-        foreach ($csv as $record) {
-            $rows[] = $record;
-        }
-
-        dd($rows, $request);
-    })->name('carga-csv');
 });

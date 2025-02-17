@@ -76,4 +76,9 @@ class Team extends JetstreamTeam
             ->using(ExamTeam::class)
             ->withTimestamps();
     }
+    // Relación para las "carreras": un team tiene muchas áreas
+    public function areas()
+    {
+        return $this->hasMany(Area::class);
+    }
 }

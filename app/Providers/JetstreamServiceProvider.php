@@ -15,7 +15,7 @@ use Laravel\Jetstream\Jetstream;
 class JetstreamServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register any application Services.
      */
     public function register(): void
     {
@@ -23,7 +23,7 @@ class JetstreamServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap any application Services.
      */
     public function boot(): void
     {

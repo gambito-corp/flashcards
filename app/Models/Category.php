@@ -34,4 +34,8 @@ class Category extends Model
             ->using(CategoryQuestion::class)
             ->withTimestamps();
     }
+    public function tipos()
+    {
+        return $this->hasMany(Tipo::class);
+    }
 }

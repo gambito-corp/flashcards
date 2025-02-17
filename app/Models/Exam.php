@@ -14,6 +14,7 @@ class Exam extends Model
     protected $fillable = [
         'title',
         'description',
+        'time_limit'
     ];
 
     /**

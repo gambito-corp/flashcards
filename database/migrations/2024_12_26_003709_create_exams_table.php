@@ -12,7 +12,7 @@ class CreateExamsTable extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-
+            $table->integer('time_limit')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
