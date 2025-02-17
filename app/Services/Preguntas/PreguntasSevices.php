@@ -17,8 +17,8 @@ class PreguntasSevices
             'approved' => $approved,
             'user_id' => auth()->id(),
         ]);
-
-        dd($pregunta->selectedTipo);
+//
+//        dd($pregunta->selectedTipo);
         foreach ($pregunta->selectedTipo as $key => $value) {
             $question->tipos()->attach($value);
         }
