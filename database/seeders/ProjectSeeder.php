@@ -28,6 +28,13 @@ class ProjectSeeder extends Seeder
             'email' => 'asesor.pedro@gmail.com',
             'password' => Hash::make('admin123'),
         ]);
+
+        $admin = User::query()->create([
+            'name' => 'administrador',
+            'email' => 'admin@flashcard.perpetuo.cloud',
+            'password' => Hash::make('admin123'),
+        ]);
+        $admin->assignRole('admin');
         $mainUser->assignRole('root');
 
         // Crear Teams (Carreras)
