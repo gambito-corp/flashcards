@@ -6,7 +6,7 @@ use App\Models\Question;
 
 class PreguntasSevices
 {
-    public function crearPregunta($pregunta, $approved) : Question
+    public function crearPregunta($pregunta, $approved, $tipos) : Question
     {
         $question = Question::query()->create([
             'content' => $pregunta->newContent,
@@ -17,10 +17,8 @@ class PreguntasSevices
             'approved' => $approved,
             'user_id' => auth()->id(),
         ]);
-//
-//        dd($pregunta->selectedTipo);
-        foreach ($pregunta->selectedTipo as $key => $value) {
-            $question->tipos()->attach($value);
+        foreach ($tipos as $key => $tipo) {
+            $question->tipos()->attach($tipo['tipo_ids'][0]);
         }
         foreach ($pregunta->selectedUniversidades as $key => $value) {
             $question->universidades()->attach($value);

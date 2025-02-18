@@ -240,13 +240,7 @@ class CreateQuestionModal extends Component
     {
         $this->validate($this->rules());
         $approved = Auth::user()->hasRole('admin') || Auth::user()->hasRole('root');
-        // Para ver lo que se envía:
-        // dd([
-        //    'selectedTipo' => $this->selectedTipo,
-        //    'selectedUniversidades' => $this->selectedUniversidades,
-        //    'addedSelections' => $this->addedSelections,
-        // ]);
-        $this->preguntasSevices->crearPregunta($this, $approved);
+        $this->preguntasSevices->crearPregunta($this, $approved, $this->addedSelections);
         session()->flash('message', 'Pregunta creada correctamente.');
         $this->showModal = false;
     }
