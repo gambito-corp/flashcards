@@ -18,6 +18,7 @@ class Index extends Component
 
     // Propiedad para controlar la visibilidad del modal de creación
     public $showModal = false;
+    public $showModal2 = false;
 
     // Propiedades para crear una nueva pregunta
     public $newContent;
@@ -65,6 +66,12 @@ class Index extends Component
             $this->newOptions = ['', ''];
         }
         $this->showModal = true;
+    }
+
+    public function openCreateModal2()
+    {
+        $this->resetValidation();
+        $this->showModal2 = true;
     }
 
     public function addNewOption()

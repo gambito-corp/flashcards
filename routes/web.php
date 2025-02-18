@@ -34,6 +34,9 @@ Route::middleware([
     Route::get('/preguntas/crear_pregunta', [PreguntasController::class, 'crearPregunta'])
         ->middleware('role:root|admin|colab')
         ->name('preguntas.create');
+    Route::get('/preguntas/download', [PreguntasController::class, 'downloadCsvModel'])
+        ->middleware('role:root|admin|colab')
+        ->name('csv-model.download');
 
 //   /*EXAMENES*/
     Route::get('/examenes', [ExamController::class, 'index'])->name('examenes.index');

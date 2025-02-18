@@ -15,4 +15,9 @@ class PreguntasController extends Controller
     {
         return view('preguntas.index');
     }
+
+    public function downloadCsvModel()
+    {
+        dd('hola mundo');
+    }
 }

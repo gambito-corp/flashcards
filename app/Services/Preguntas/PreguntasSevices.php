@@ -35,4 +35,57 @@ class PreguntasSevices
         }
         return $question;
     }
+
+    public function crearPreguntaCSV($row)
+    {
+        $approved =(auth()->user()->hasRole('admin') || auth()->user()->hasRole('root')) ? 1 : 0;
+
+        $tipoIds = array_filter(array_map('intval', explode(',', $row['tipos'])));
+        $universidadIds = array_filter(array_map('intval', explode(',', $row['universidades'])));
+        $question = Question::query()->create([
+            'content' => $row['content'],
+            'question_type' => 'multiple_choice',
+            'explanation' => $row['explicacion'],
+            'media_url' => $row['url'],
+            'media_iframe' => $row['iframe'],
+            'approved' => $approved,
+            'user_id' => auth()->id(),
+        ]);
+
+        foreach ($tipoIds as $key => $tipoId) {
+            $question->tipos()->attach($tipoId);
+        }
+        foreach ($universidadIds as $key => $universidadId) {
+            $question->universidades()->attach($universidadId);
+        }
+
+        if ($row['answer1'] != '') {
+            $question->options()->create([
+                'content' => $row['answer1'],
+                'is_correct' => ($row['is_correct1'] == '1'),
+                'points' => ($row['is_correct1'] == '1') ? 1 : 0,
+            ]);
+        }
+        if ($row['answer2'] != '') {
+            $question->options()->create([
+                'content' => $row['answer2'],
+                'is_correct' => ($row['is_correct2'] == '1'),
+                'points' => ($row['is_correct2'] == '1') ? 1 : 0,
+            ]);
+        }
+        if ($row['answer3'] != '') {
+            $question->options()->create([
+                'content' => $row['answer3'],
+                'is_correct' => ($row['is_correct3'] == '1'),
+                'points' => ($row['is_correct3'] == '1') ? 1 : 0,
+            ]);
+        }
+        if ($row['answer4'] != '') {
+            $question->options()->create([
+                'content' => $row['answer4'],
+                'is_correct' => ($row['is_correct4'] == '1'),
+                'points' => ($row['is_correct4'] == '1') ? 1 : 0,
+            ]);
+        }
+    }
 }

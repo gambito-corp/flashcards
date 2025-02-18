@@ -11,7 +11,7 @@
                 </svg>
                 Crear Pregunta
             </button>
-            <button wire:click="$emit('openCsvImportModal')"
+            <button wire:click="openCreateModal2"
                     class="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                 <!-- Ícono CSV -->
                 <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,6 +80,11 @@
     <!-- Modal personalizado para crear preguntas -->
     <x-modal wire:model="showModal">
         <livewire:preguntas.create-question-modal :question="$question" />
+    </x-modal>
+
+    <!-- Modal personalizado para crear preguntas -->
+    <x-modal wire:model="showModal2">
+        <livewire:preguntas.create-csv-questions />
     </x-modal>
 
 </div>
