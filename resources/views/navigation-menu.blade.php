@@ -43,7 +43,7 @@
                                 <div class="block px-4 py-2 text-xs text-gray-400">
                                     {{ __('Preguntas') }}
                                 </div>
-                                <x-dropdown-link href="{{ route('preguntas.create') }}" :active="request()->routeIs('preguntas.create')">
+                                <x-dropdown-link href="{{ route('preguntas.index') }}" :active="request()->routeIs('preguntas.create')">
                                     {{ __('Crear Preguntas') }}
                                 </x-dropdown-link>
                                 <!-- Puedes añadir más secciones aquí -->
@@ -160,7 +160,7 @@
                 </x-responsive-nav-link>
             @endforeach
             @if(Auth::user()->hasAnyRole(['root', 'admin', 'colab']))
-                <x-responsive-nav-link href="{{ route('preguntas.create') }}" :active="request()->routeIs('preguntas.create')">
+                <x-responsive-nav-link href="{{ route('preguntas.index') }}" :active="request()->routeIs('preguntas.create')">
                     {{ __('Crear Preguntas') }}
                 </x-responsive-nav-link>
             @endif

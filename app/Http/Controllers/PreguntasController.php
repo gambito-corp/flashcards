@@ -11,9 +11,44 @@ class PreguntasController extends Controller
         $this->middleware('role:root|admin|colab');
     }
 
-    public function crearPregunta()
+    public function index()
     {
         return view('preguntas.index');
+    }
+
+    public function create()
+    {
+        return view('preguntas.create');
+    }
+
+    public function cargar()
+    {
+        return view('preguntas.cargar');
+    }
+
+    public function carrera()
+    {
+        return view('preguntas.carrera');
+    }
+
+    public function asignatura()
+    {
+        return view('preguntas.asignatura');
+    }
+
+    public function categoria()
+    {
+        return view('preguntas.categorize');
+    }
+
+    public function tipo()
+    {
+        return view('preguntas.tipo');
+    }
+
+    public function universidad()
+    {
+        return view('preguntas.universidad');
     }
 
     public function downloadCsvModel()

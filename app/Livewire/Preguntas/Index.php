@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Preguntas;
 
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Question;
-use App\Models\Category;
 
 class Index extends Component
 {
@@ -14,120 +14,54 @@ class Index extends Component
     // Propiedades para la lista de preguntas
     public $perPage = 10;
     public $search = '';
-    public $renPag;
-
-    // Propiedad para controlar la visibilidad del modal de creación
-    public $showModal = false;
-    public $showModal2 = false;
-
-    // Propiedades para crear una nueva pregunta
-    public $newContent;
-    public $newQuestionType = 'multiple_choice';
-    public $newCategoryId;
-    public $newExplanation;
-    public $newOptions = [];
-    public $newCorrectOption = null;
-    public $categories = [];
-    public $question;
-
+    // Nuevos Modales...
+    public bool
+        $modalCreate = false,
+        $modalCsv = false,
+        $modalCarrera = false,
+        $modalArea = false,
+        $modalCategoria = false,
+        $modalTipo = false,
+        $modalUniversidad = false;
     protected $paginationTheme = 'tailwind';
 
-    public function mount()
+    public function openModal(string $type):void
     {
-        $this->categories = Category::all();
+        $this->resetModals();
+        match ($type) {
+            'create'        => $this->modalCreate = true,
+            'csv'           => $this->modalCsv = true,
+            'carrera'       => $this->modalCarrera = true,
+            'area'          => $this->modalArea = true,
+            'categoria'     => $this->modalCategoria = true,
+            'tipo'          => $this->modalTipo = true,
+            'universidad'   => $this->modalUniversidad = true,
+            default         => null,
+        };
     }
-
-    // Reglas de validación para la creación de pregunta
-    protected function rulesNewQuestion()
+    #[On('closeModal')]
+    public function closeModal(string $type)
     {
-        $rules = [
-            'newContent'       => 'required|string',
-            'newQuestionType'  => 'required|in:multiple_choice,boolean,range',
-            'newCategoryId'    => 'required|exists:categories,id',
-            'newExplanation'   => 'nullable|string',
-        ];
-
-        // Si el tipo es multiple_choice, se validan las opciones y la opción correcta
-        if ($this->newQuestionType === 'multiple_choice') {
-            $rules['newOptions'] = 'required|array|min:2';
-            $rules['newCorrectOption'] = 'required|integer|min:0';
-        }
-
-        return $rules;
+        match ($type) {
+            'create'        => $this->modalCreate = false,
+            'csv'           => $this->modalCsv = false,
+            'carrera'       => $this->modalCarrera = false,
+            'area'          => $this->modalArea = false,
+            'categoria'     => $this->modalCategoria = false,
+            'tipo'          => $this->modalTipo = false,
+            'universidad'   => $this->modalUniversidad = false,
+            default         => null,
+        };
     }
-
-    // Métodos para resetear y abrir el modal
-    public function openCreateModal()
+    private function resetModals()
     {
-        $this->resetValidation();
-        $this->reset(['newContent', 'newExplanation', 'newCategoryId', 'newOptions', 'newCorrectOption']);
-        // Por defecto, inicializamos dos opciones para multiple_choice
-        if ($this->newQuestionType === 'multiple_choice') {
-            $this->newOptions = ['', ''];
-        }
-        $this->showModal = true;
-    }
-
-    public function openCreateModal2()
-    {
-        $this->resetValidation();
-        $this->showModal2 = true;
-    }
-
-    public function addNewOption()
-    {
-        $this->newOptions[] = '';
-    }
-
-    public function removeNewOption($index)
-    {
-        unset($this->newOptions[$index]);
-        $this->newOptions = array_values($this->newOptions);
-        if ($this->newCorrectOption == $index) {
-            $this->newCorrectOption = null;
-        }
-    }
-
-    public function store()
-    {
-        $this->validate($this->rulesNewQuestion());
-
-        // Crear la pregunta
-        $question = Question::create([
-            'content'       => $this->newContent,
-            'question_type' => $this->newQuestionType,
-            'explanation'   => $this->newExplanation,
-            'approved'      => false,
-        ]);
-
-        // Asociar la pregunta a la categoría (suponiendo relación many-to-many)
-        $question->categories()->attach($this->newCategoryId);
-
-        // Si la pregunta es de tipo multiple_choice, crear las opciones
-        if ($this->newQuestionType === 'multiple_choice') {
-            foreach ($this->newOptions as $index => $optionContent) {
-                $question->options()->create([
-                    'content'    => $optionContent,
-                    'is_correct' => ($index == $this->newCorrectOption),
-                    'points'     => ($index == $this->newCorrectOption) ? 1 : 0,
-                ]);
-            }
-        }
-
-        session()->flash('message', 'Pregunta creada correctamente.');
-        $this->showModal = false;
-    }
-
-    // Métodos para la lista de preguntas
-
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingPerPage()
-    {
-        $this->resetPage();
+        $this->modalCreate = false;
+        $this->modalCsv = false;
+        $this->modalCarrera = false;
+        $this->modalArea = false;
+        $this->modalCategoria = false;
+        $this->modalTipo = false;
+        $this->modalUniversidad = false;
     }
 
     public function render()

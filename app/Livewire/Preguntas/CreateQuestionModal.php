@@ -167,15 +167,15 @@ class CreateQuestionModal extends Component
         }
     }
 
-    public function openModal()
-    {
-        $this->resetValidation();
-        $this->reset(['newContent', 'newExplanation', 'newOptions', 'newCorrectOption']);
-        if ($this->newQuestionType === 'multiple_choice') {
-            $this->newOptions = ['', ''];
-        }
-        $this->showModal = true;
-    }
+//    public function openModal()
+//    {
+//        $this->resetValidation();
+//        $this->reset(['newContent', 'newExplanation', 'newOptions', 'newCorrectOption']);
+//        if ($this->newQuestionType === 'multiple_choice') {
+//            $this->newOptions = ['', ''];
+//        }
+//        $this->showModal = true;
+//    }
 
     // Agrega la selección anidada actual al array de selecciones
     public function addTipoSelection()
@@ -243,6 +243,11 @@ class CreateQuestionModal extends Component
         $this->preguntasSevices->crearPregunta($this, $approved, $this->addedSelections);
         session()->flash('message', 'Pregunta creada correctamente.');
         $this->showModal = false;
+    }
+
+    public function close()
+    {
+        $this->dispatch('closeModal', 'create');
     }
 
     public function render()

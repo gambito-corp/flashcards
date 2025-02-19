@@ -12,6 +12,7 @@ class Area extends Model
     protected $table = 'areas';
 
     protected $fillable = [
+        'team_id',
         'name',
         'description',
     ];

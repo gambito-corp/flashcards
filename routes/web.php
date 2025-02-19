@@ -31,9 +31,33 @@ Route::middleware([
 
     Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.update');
 //    /*PREGUNTAS*/
-    Route::get('/preguntas/crear_pregunta', [PreguntasController::class, 'crearPregunta'])
+    Route::get('/preguntas', [PreguntasController::class, 'index'])
         ->middleware('role:root|admin|colab')
-        ->name('preguntas.create');
+        ->name('preguntas.index');
+    Route::get('/preguntas/create', [PreguntasController::class, 'create'])
+        ->middleware('role:root|admin|colab')
+        ->name('preguntas.crear');
+    Route::get('/preguntas/cargar', [PreguntasController::class, 'cargar'])
+        ->middleware('role:root|admin|colab')
+        ->name('preguntas.cargar');
+    Route::get('/preguntas/carrerra', [PreguntasController::class, 'carrera'])
+        ->middleware('role:root|admin')
+        ->name('preguntas.carrera');
+    Route::get('/preguntas/asignatura', [PreguntasController::class, 'asignatura'])
+        ->middleware('role:root|admin')
+        ->name('preguntas.asignatura');
+    Route::get('/preguntas/categoria', [PreguntasController::class, 'categoria'])
+        ->middleware('role:root|admin')
+        ->name('preguntas.categoria');
+    Route::get('/preguntas/tipo', [PreguntasController::class, 'tipo'])
+        ->middleware('role:root|admin')
+        ->name('preguntas.tipo');
+    Route::get('/preguntas/universidad', [PreguntasController::class, 'universidad'])
+        ->middleware('role:root|admin')
+        ->name('preguntas.universidad');
+
+
+
     Route::get('/preguntas/download', [PreguntasController::class, 'downloadCsvModel'])
         ->middleware('role:root|admin|colab')
         ->name('csv-model.download');

@@ -7,19 +7,6 @@
             <textarea wire:model="newContent" id="newContent" rows="4" class="mt-1 block w-full border-gray-300 rounded" placeholder="Escribe el enunciado..."></textarea>
             @error('newContent') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
         </div>
-        <!-- (Opcional) Tipo de pregunta, comentado por defecto -->
-        {{--
-        <div class="mb-4">
-            <label for="newQuestionType" class="block text-sm font-medium text-gray-700">Tipo de pregunta:</label>
-            <select wire:model="newQuestionType" id="newQuestionType" class="mt-1 block w-full border-gray-300 rounded">
-                <option value="multiple_choice">Multiple Choice</option>
-                <option value="boolean">Verdadero/Falso</option>
-                <option value="range">Rango</option>
-            </select>
-            @error('newQuestionType') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-        </div>
-        --}}
-        <!-- Selección anidada: Carrera, Asignatura, Categoría y Tipo(s) -->
         <div class="mb-4">
             <!-- Carrera (Team) -->
             <label class="block text-sm font-medium text-gray-700">Carrera (Team):</label>
@@ -131,7 +118,7 @@
         @endif
     </form>
     <div class="flex justify-end space-x-4 mt-4">
-        <button type="button" wire:click="$set('showModal', false)" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded">
+        <button type="button" wire:click="close" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded">
             Cancelar
         </button>
         <button type="button" wire:click="store" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
