@@ -1,11 +1,39 @@
 <div>
     <h2 class="text-xl font-bold mb-4">Crear Tipo</h2>
     <form wire:submit.prevent="store">
+        <!-- Select de Carrera (Team) -->
+        <div class="mb-4">
+            <label for="selectedTeam" class="block text-sm font-medium text-gray-700">Carrera:</label>
+            <select wire:model.live="selectedTeam" id="selectedTeam" class="mt-1 block w-full border-gray-300 rounded">
+                <option value="">Seleccione una Carrera</option>
+                @foreach($teams as $team)
+                    <option value="{{ $team->id }}">{{ $team->name }}</option>
+                @endforeach
+            </select>
+            @error('selectedTeam')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <!-- Select de Asignatura (Área) -->
+        <div class="mb-4">
+            <label for="selectedArea" class="block text-sm font-medium text-gray-700">Asignatura:</label>
+            <select wire:model.live="selectedArea" id="selectedArea" class="mt-1 block w-full border-gray-300 rounded">
+                <option value="">Seleccione una Asignatura</option>
+                @foreach($areas as $area)
+                    <option value="{{ $area->id }}">{{ $area->name }}</option>
+                @endforeach
+            </select>
+            @error('selectedArea')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+            @enderror
+        </div>
+
         <!-- Select de Categoría -->
         <div class="mb-4">
             <label for="selectedCategory" class="block text-sm font-medium text-gray-700">Categoría:</label>
-            <select wire:model="selectedCategory" id="selectedCategory" class="mt-1 block w-full border-gray-300 rounded">
-                <option value="">Seleccione una categoría</option>
+            <select wire:model.live="selectedCategory" id="selectedCategory" class="mt-1 block w-full border-gray-300 rounded">
+                <option value="">Seleccione una Categoría</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach

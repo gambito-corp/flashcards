@@ -2,12 +2,16 @@
 
 namespace App\Livewire\Preguntas;
 
+use App\Models\Team;
 use Livewire\Component;
 use App\Models\Area;
 use App\Models\Category;
 
 class CreateCategoria extends Component
 {
+    public $teams = [];
+    public $selectedTeam = null;
+
     public $areas = [];
     public $selectedArea = null;
     public $name;
@@ -21,9 +25,29 @@ class CreateCategoria extends Component
 
     public function mount()
     {
-        $this->areas = Area::all();
+        // Cargamos las carreras disponibles
+        $this->teams = Team::all();
+        if ($this->teams->isNotEmpty()) {
+            // Asignamos el ID del primer equipo, no el objeto completo
+            $this->selectedTeam = $this->teams->first()->id;
+
+            // Cargamos las áreas asociadas a la carrera seleccionada
+            $this->areas = Area::query()->where('team_id', $this->selectedTeam)->get();
+            if ($this->areas->isNotEmpty()) {
+                $this->selectedArea = $this->areas->first()->id;
+            }
+        }
+    }
+
+    public function updatedSelectedTeam($value)
+    {
+        // Actualizamos las áreas en base al ID de la carrera seleccionado
+        $this->areas = Area::query()->where('team_id', $value)->get();
         if ($this->areas->isNotEmpty()) {
+            // Asignamos el ID del primer área disponible
             $this->selectedArea = $this->areas->first()->id;
+        } else {
+            $this->selectedArea = null;
         }
     }
 
