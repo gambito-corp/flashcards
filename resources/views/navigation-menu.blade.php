@@ -4,7 +4,7 @@
         $menu = [
             ['href' => 'dashboard', 'name' => 'Dashboard', 'route' => 'dashboard'],
             ['href' => 'examenes', 'name' => 'Examenes', 'route' => 'examenes.index'],
-            ['href' => 'flashcard', 'name' => 'Flascard', 'route' => 'flashcard.index'],
+            ['href' => 'flashcard', 'name' => 'Flashcard', 'route' => 'flashcard.index'],
         ];
     @endphp
 
