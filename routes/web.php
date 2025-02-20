@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CurrentTeamController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PreguntasController;
 use Illuminate\Http\Request;
@@ -67,5 +68,9 @@ Route::middleware([
     Route::post('/examenes', [ExamController::class, 'createExam'])->name('examenes.create');
     Route::get('/examenes/{id}', [ExamController::class, 'showExam'])->name('examenes.show');
     Route::post('/examenes/evaluar', [ExamController::class, 'evaluarExamen'])->name('examenes.evaluar');
+
+    /*FLASHCARD*/
+    Route::get('/flashcard', [FlashcardController::class, 'index'])->name('flashcard.index');
+    Route::get('/flashcard/game', [FlashcardController::class, 'game'])->name('flashcard.game');
 
 });
