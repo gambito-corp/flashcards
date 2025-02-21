@@ -11,7 +11,7 @@ class CreateFcCardsTable extends Migration
         Schema::create('fc_cards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
-                ->constrained() // Asume la tabla "users"
+                ->constrained()
                 ->onDelete('cascade');
             $table->text('pregunta');
             $table->string('url')->nullable();
@@ -19,6 +19,7 @@ class CreateFcCardsTable extends Migration
             $table->text('respuesta');
             $table->string('url_respuesta')->nullable();
             $table->string('imagen_respuesta')->nullable();
+            $table->unsignedBigInteger('errors')->default(0);
             $table->timestamps();
         });
     }

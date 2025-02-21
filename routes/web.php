@@ -72,5 +72,6 @@ Route::middleware([
     /*FLASHCARD*/
     Route::get('/flashcard', [FlashcardController::class, 'index'])->name('flashcard.index');
     Route::get('/flashcard/game', [FlashcardController::class, 'game'])->name('flashcard.game');
+    Route::get('/flashcard/game/result', [FlashcardController::class, 'result'])->name('flashcard.results');
 
 });

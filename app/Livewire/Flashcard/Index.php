@@ -31,7 +31,7 @@ class Index extends Component
     {
         // Cargamos las categorías y flashcards del usuario autenticado
         $this->availableCategories = FcCategory::where('user_id', auth()->id())->get();
-        $this->cards = FcCard::where('user_id', auth()->id())->with('categories')->get();
+        $this->cards = FcCard::query()->where('user_id', auth()->id())->with('categories')->orderBy('errors', 'desc')->get();
     }
 
     // Reglas para la validación de flashcards (solo pregunta y respuesta son obligatorios)
@@ -98,13 +98,10 @@ class Index extends Component
 
     public function startGame()
     {
-        // Si no se ha seleccionado ninguna flashcard, mostramos un mensaje y detenemos la acción
         if (empty($this->selectedCards)) {
             session()->flash('message', 'Debes seleccionar al menos una flashcard para el juego.');
             return null;
         }
-
-        // Guardamos en la sesión los IDs de las flashcards seleccionadas
         session()->put('selected_cards', $this->selectedCards);
 
         // Redirigimos a la ruta del juego

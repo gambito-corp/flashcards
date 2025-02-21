@@ -121,7 +121,6 @@
                                         {{ in_array($card->id, $selectedCards) ? 'bg-green-100 border-green-400' : 'bg-white' }}"
                                     >
                                         <h2 class="font-bold text-lg">{{ $card->pregunta }}</h2>
-                                        <p class="text-sm text-gray-600 mt-1">{{ $card->respuesta }}</p>
                                     </div>
                                 @endforeach
                             </div>
@@ -167,7 +166,6 @@
                                             wire:click="toggleCard({{ $card->id }})"
                                             class="flex-shrink-0 w-64 p-4 border rounded shadow cursor-pointer transition duration-200 ease-in-out hover:shadow-lg {{ in_array($card->id, $selectedCards) ? 'bg-green-100 border-green-400' : 'bg-white' }}">
                                             <h2 class="font-bold text-lg">{{ $card->pregunta }}</h2>
-                                            <p class="text-sm text-gray-600 mt-1">{{ $card->respuesta }}</p>
                                         </div>
                                     @endforeach
                                 </div>

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Flashcard;
 
+use App\Models\FcGroupCard;
 use Livewire\Component;
 use App\Models\FcCard;
 
@@ -9,33 +10,75 @@ class Game extends Component
 {
     public $cards = [];
     public $currentIndex = 0; // Índice de la flashcard actual
+    public $showAnswer = false;
+    public $correctCount = 0; // Asegúrate de incluir esta propiedad
+    public $total = 0;
 
     public function mount()
     {
-        // Recuperamos los IDs de las flashcards seleccionadas desde la sesión
         $selectedIds = session('selected_cards', []);
-
         if (!empty($selectedIds)) {
-            // Cargamos las flashcards junto con sus categorías (si las tienen)
-            $this->cards = FcCard::whereIn('id', $selectedIds)->with('categories')->get();
+            $this->cards = FcCard::query()->whereIn('id', $selectedIds)
+                ->with('categories')
+                ->orderBy('errors', 'desc')
+                ->get();
+            $this->total = $this->cards->count();
         } else {
-            // Si no hay flashcards seleccionadas, redirigimos de vuelta al index con un mensaje
             session()->flash('message', 'No se han seleccionado flashcards para el juego.');
             return redirect()->route('flashcard.index');
         }
-        return null;
     }
 
-    // Method para pasar a la siguiente flashcard
-    public function nextCard()
+    public function revealAnswer()
     {
-        if (count($this->cards) > 0) {
-            $this->currentIndex = ($this->currentIndex + 1) % count($this->cards);
+        $this->showAnswer = true;
+    }
+
+    public function markCorrect()
+    {
+        $this->correctCount++; // Incrementamos primero
+        $this->showAnswer = false;
+        $this->nextCard();
+    }
+
+
+    public function markIncorrect()
+    {
+        $card = $this->cards[$this->currentIndex];
+
+        $card->errors++;
+        $card->save();
+
+        $this->showAnswer = false;
+        $this->nextCard();
+    }
+
+    private function nextCard()
+    {
+        $this->currentIndex++;
+        if ($this->currentIndex >= count($this->cards)) {
+            // Creamos el registro del grupo de flashcards con la puntuación
+            $group = FcGroupCard::query()->create([
+                'user_id' => auth()->id(),
+                'correct' => $this->correctCount,
+                'incorrect' => $this->total - $this->correctCount,
+                'total' => $this->total,
+            ]);
+
+            $cardIds = $this->cards->pluck('id')->toArray();
+            $group->cards()->attach($cardIds);
+            // Guardamos en sesión el ID del grupo de flashcards
+            session()->put('fc_group_card_id', $group->id);
+
+            session()->flash('message', '¡Has terminado de repasar las flashcards!');
+            return redirect()->route('flashcard.results');
         }
     }
 
+
     public function render()
     {
-        return view('livewire.flashcard.game');
+        $currentCard = $this->cards[$this->currentIndex] ?? null;
+        return view('livewire.flashcard.game', compact('currentCard'));
     }
 }
