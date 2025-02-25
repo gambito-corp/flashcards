@@ -10,14 +10,18 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
     ],
-
     theme: {
         extend: {
+            colors: {
+                tema1: '#195b81',   // Color primario (puede usarse en botones, encabezados, etc.)
+                tema2: '#5b8080',   // Color secundario (ideal para textos o acentos)
+                tema3: '#157b80',   // Color terciario (para detalles, hover, etc.)
+                footer: '#185b81',   // Color específico para el fondo del footer
+            },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
             },
         },
     },
-
     plugins: [forms, typography],
 };

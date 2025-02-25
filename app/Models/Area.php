@@ -30,4 +30,10 @@ class Area extends Model
     {
         return $this->hasMany(Category::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'area_user')->using(AreaUser::class)->withTimestamps();
+    }
+
 }

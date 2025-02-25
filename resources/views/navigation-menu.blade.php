@@ -1,23 +1,15 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    @php
-        // Enlaces generales para todos los usuarios.
-        $menu = [
-            ['href' => 'dashboard', 'name' => 'Dashboard', 'route' => 'dashboard'],
-            ['href' => 'examenes', 'name' => 'Examenes', 'route' => 'examenes.index'],
-            ['href' => 'flashcard', 'name' => 'Flashcard', 'route' => 'flashcard.index'],
-        ];
-    @endphp
-
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-mark class="block h-9 w-auto" />
-                    </a>
-                </div>
+            <!-- Logo con margen y padding a la izquierda -->
+            <div class="shrink-0 flex mr-24 pr-24">
+                <a href="{{ route('dashboard') }}">
+                    <x-application-mark class="block h-9" />
+                </a>
+            </div>
 
+            <!-- Enlaces de navegación -->
+            <div class="flex">
                 <!-- Enlaces de navegación para escritorio -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     @foreach ($menu as $item)
@@ -25,32 +17,6 @@
                             {{ __($item['name']) }}
                         </x-nav-link>
                     @endforeach
-
-                    <!-- Dropdown de Administración, solo para root, admin y colab -->
-                    @if(Auth::user()->hasAnyRole(['root', 'admin', 'colab']))
-                        <x-dropdown align="right" width="48">
-                            <x-slot name="trigger">
-                                <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
-                                    {{ __('Administración') }}
-                                    <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                    </svg>
-                                </button>
-                            </x-slot>
-
-                            <x-slot name="content">
-                                <div class="block px-4 py-2 text-xs text-gray-400">
-                                    {{ __('Preguntas') }}
-                                </div>
-                                <x-dropdown-link href="{{ route('preguntas.index') }}" :active="request()->routeIs('preguntas.create')">
-                                    {{ __('Crear Preguntas') }}
-                                </x-dropdown-link>
-                                <!-- Puedes añadir más secciones aquí -->
-                            </x-slot>
-                        </x-dropdown>
-                    @endif
                 </div>
             </div>
 
@@ -160,12 +126,36 @@
                     {{ __($item['name']) }}
                 </x-responsive-nav-link>
             @endforeach
-            @if(Auth::user()->hasAnyRole(['root', 'admin', 'colab']))
-                <x-responsive-nav-link href="{{ route('preguntas.index') }}" :active="request()->routeIs('preguntas.create')">
-                    {{ __('Crear Preguntas') }}
-                </x-responsive-nav-link>
-            @endif
         </div>
+
+        @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
+            <div x-data="{ teamOpen: false }" class="pt-2 pb-3 space-y-1">
+                <button @click="teamOpen = !teamOpen" class="w-full flex justify-between items-center px-4 py-2 text-xs text-gray-400 focus:outline-none">
+                    <span>
+                        {{ Auth::user()->currentTeam ? Auth::user()->currentTeam->name : __('Selecciona Materia') }}
+                    </span>
+                    <svg class="ml-2 h-4 w-4 transform" :class="{'rotate-180': teamOpen}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </button>
+                <div x-show="teamOpen" class="mt-2 space-y-1">
+                    @forelse (Auth::user()->teams as $team)
+                        <x-responsive-nav-link href="{{ route('current-team.update', $team) }}"
+                                               onclick="event.preventDefault(); document.getElementById('team-switch-form-mobile-{{ $team->id }}').submit();">
+                            {{ $team->name }}
+                        </x-responsive-nav-link>
+                        <form id="team-switch-form-mobile-{{ $team->id }}" action="{{ route('current-team.update', $team) }}" method="POST" class="hidden">
+                            @csrf
+                            @method('PUT')
+                        </form>
+                    @empty
+                        <x-responsive-nav-link href="#">
+                            {{ __('No hay materias') }}
+                        </x-responsive-nav-link>
+                    @endforelse
+                </div>
+            </div>
+        @endif
 
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="flex items-center px-4">

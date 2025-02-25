@@ -1,0 +1,199 @@
+<div class="m-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
+    @if (session()->has('message'))
+        <div class="mb-4 p-2 bg-green-100 text-green-700 rounded">
+            {{ session('message') }}
+        </div>
+    @endif
+
+    <form wire:submit.prevent="store">
+        <!-- SECCIÓN 1: Datos Básicos -->
+        <h2 class="text-lg font-semibold mb-2">Datos Básicos</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="name" class="block font-medium text-gray-700 mb-1">
+                    Nombre <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    wire:model.live="name"
+                    class="w-full border rounded px-3 py-2 focus:outline-none"
+                    placeholder="Ingresa el nombre del usuario"
+                />
+                @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label for="email" class="block font-medium text-gray-700 mb-1">
+                    Email <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    wire:model.live="email"
+                    class="w-full border rounded px-3 py-2 focus:outline-none"
+                    placeholder="Ingresa el correo electrónico"
+                />
+                @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: Credenciales y Foto -->
+        <h2 class="text-lg font-semibold mb-2">Credenciales y Foto</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="password" class="block font-medium text-gray-700 mb-1">
+                    Contraseña <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    wire:model.live="password"
+                    class="w-full border rounded px-3 py-2 focus:outline-none"
+                    placeholder="Ingresa la contraseña"
+                />
+                @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                <div class="mt-2 flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        id="autoPassword"
+                        name="autoPassword"
+                        wire:model.live="autoPassword"
+                        class="h-4 w-4"
+                    />
+                    <label for="autoPassword" class="text-sm text-gray-600">
+                        Generar automáticamente
+                    </label>
+                </div>
+            </div>
+            <div>
+                <label for="profile_photo" class="block font-medium text-gray-700 mb-1">
+                    Foto de Perfil (opcional)
+                </label>
+                <input
+                    type="file"
+                    id="profile_photo"
+                    name="profile_photo"
+                    wire:model.live="profile_photo"
+                    class="w-full border rounded px-3 py-2 focus:outline-none"
+                    accept="image/*"
+                />
+                @error('profile_photo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: Asignaciones -->
+        <h2 class="text-lg font-semibold mb-2">Asignaciones</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <label class="block font-medium text-gray-700 mb-1">
+                    Roles <span class="text-red-500">*</span>
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($roles as $rol)
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" value="{{ $rol->id }}" wire:model.defer="selectedRoles" class="form-checkbox text-green-500">
+                            <span class="ml-2">{{ $rol->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                @error('roles') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label class="block font-medium text-gray-700 mb-1">
+                    Teams Asignados <span class="text-red-500">*</span>
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($teams as $team)
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" value="{{ $team->id }}" wire:model.live="selectedTeams" class="form-checkbox text-green-500">
+                            <span class="ml-2">{{ $team->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                @error('teams') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: Asignaturas -->
+        <div class="mb-6">
+            <label for="subjects" class="block font-medium text-gray-700 mb-1">
+                Asignaturas <span class="text-red-500">*</span>
+            </label>
+            <div class="flex gap-4">
+                <div class="w-1/2 h-40">
+                    <select
+                        id="subjectsLeft"
+                        name="availableSubjects[]"
+                        multiple
+                        wire:model="selectedToAdd"
+                        class="w-full h-full border rounded px-3 py-2 focus:outline-none"
+                    >
+                        @forelse (collect($availableSubjects)->reject(fn($subject) => isset($selectedSubjects[$subject->id])) as $subject)
+                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                        @empty
+                            <option disabled>No hay asignaturas disponibles</option>
+                        @endforelse
+                    </select>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-2 h-40">
+                    <button type="button"
+                            wire:click="addSelected"
+                            class="w-10 h-10 bg-green-500 hover:bg-green-600 rounded flex items-center justify-center text-white"
+                            title="Agregar selección">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button type="button"
+                            wire:click="addAll"
+                            class="w-10 h-10 bg-green-500 hover:bg-green-600 rounded flex items-center justify-center text-white"
+                            title="Agregar todas">
+                        <i class="fa-solid fa-angles-right"></i>
+                    </button>
+                    <button type="button"
+                            wire:click="removeSelected"
+                            class="w-10 h-10 bg-green-500 hover:bg-green-600 rounded flex items-center justify-center text-white"
+                            title="Quitar selección">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button type="button"
+                            wire:click="removeAll"
+                            class="w-10 h-10 bg-green-500 hover:bg-green-600 rounded flex items-center justify-center text-white"
+                            title="Quitar todas">
+                        <i class="fa-solid fa-angles-left"></i>
+                    </button>
+                </div>
+                <div class="w-1/2 h-40">
+                    <div class="w-full h-full border rounded px-3 py-2 bg-gray-100 overflow-y-auto">
+                        <ul class="list-disc pl-5">
+                            @forelse($selectedSubjects as $id => $subjectName)
+                                <li class="mb-1">
+                                    <label class="inline-flex items-center cursor-pointer {{ in_array($id, $deleteAsignature) ? 'bg-blue-500 text-white rounded px-1' : '' }}"
+                                           wire:click="toggleDeleteSubject({{ $id }})">
+                                        <span>{{ $subjectName }}</span>
+                                    </label>
+                                </li>
+                            @empty
+                                <li>No hay asignaturas seleccionadas</li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-1">
+                Haz clic en una asignatura de la lista de la derecha para marcarla para eliminación, y luego presiona "Quitar selección".
+            </p>
+        </div>
+
+        <!-- Botón de enviar -->
+        <div class="flex justify-end">
+            <button
+                type="submit"
+                class="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-6 py-2 rounded shadow"
+            >
+                Crear Usuario
+            </button>
+        </div>
+    </form>
+</div>

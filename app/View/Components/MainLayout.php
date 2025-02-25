@@ -9,16 +9,22 @@ use Illuminate\View\Component;
 class MainLayout extends Component
 {
     public $title;
+    public $icon;
+
     /**
-     * Create a new component instance.
+     * Crea una nueva instancia del componente.
+     *
+     * @param  string|null  $title
+     * @param  string|null  $icon
      */
-    public function __construct($title = null)
+    public function __construct($title = null, $icon = null)
     {
         $this->title = $title;
+        $this->icon  = $icon;
     }
 
     /**
-     * Get the view / contents that represent the component.
+     * Obtiene la vista que representa el componente.
      */
     public function render(): View|Closure|string
     {

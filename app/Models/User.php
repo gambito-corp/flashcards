@@ -69,4 +69,13 @@ class User extends Authenticatable
             ->using(TeamUser::class)
             ->withTimestamps();
     }
+
+    public function areas()
+    {
+        return $this->belongsToMany(Area::class, 'area_user')
+            ->using(AreaUser::class)
+            ->withTimestamps();
+    }
+
+
 }
