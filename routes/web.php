@@ -119,18 +119,29 @@ Route::middleware([
                 });
 
             // Grupo de rutas para "carreras"
-            Route::prefix('carreras')
+            Route::prefix('teams')
                 ->as('carreras.')
                 ->middleware('role:root|admin')
                 ->group(function () {
                     Route::get('/', [CarrerasController::class, 'index'])->name('index');
+                    Route::get('/create', [CarrerasController::class, 'create'])->name('create');
+                    Route::post('/create', [CarrerasController::class, 'store'])->name('store');
+                    Route::get('/{team}', [CarrerasController::class, 'show'])->name('show');
+                    Route::get('/{team}/edit', [CarrerasController::class, 'edit'])->name('edit');
+                    Route::put('/{team}', [CarrerasController::class, 'update'])->name('update');
                 });
+
 
             Route::prefix('asignaturas')
                 ->as('asignaturas.')
                 ->middleware('role:root|admin')
                 ->group(function () {
                     Route::get('/', [AsignaturasController::class, 'index'])->name('index');
+                    Route::get('/create', [AsignaturasController::class, 'create'])->name('create');
+                    Route::post('/create', [AsignaturasController::class, 'store'])->name('store');
+                    Route::get('/{asignatura}', [AsignaturasController::class, 'show'])->name('show');
+                    Route::get('/{asignatura}/edit', [AsignaturasController::class, 'edit'])->name('edit');
+                    Route::put('/{asignatura}', [AsignaturasController::class, 'update'])->name('update');
                 });
 
             Route::prefix('categorias')
@@ -138,6 +149,11 @@ Route::middleware([
                 ->middleware('role:root|admin')
                 ->group(function () {
                     Route::get('/', [CategoriasController::class, 'index'])->name('index');
+                    Route::get('/create', [CategoriasController::class, 'create'])->name('create');
+                    Route::post('/create', [CategoriasController::class, 'store'])->name('store');
+                    Route::get('/{category}', [CategoriasController::class, 'show'])->name('show');
+                    Route::get('/{category}/edit', [CategoriasController::class, 'edit'])->name('edit');
+                    Route::put('/{category}', [CategoriasController::class, 'update'])->name('update');
                 });
 
             Route::prefix('tipos')
@@ -145,6 +161,11 @@ Route::middleware([
                 ->middleware('role:root|admin')
                 ->group(callback: function () {
                     Route::get('/', action: [TiposController::class, 'index'])->name('index');
+                    Route::get('/create', action: [TiposController::class, 'create'])->name('create');
+                    Route::post('/create', action: [TiposController::class, 'store'])->name('store');
+                    Route::get('/{tipo}', action: [TiposController::class, 'show'])->name('show');
+                    Route::get('/{tipo}/edit', action: [TiposController::class, 'edit'])->name('edit');
+                    Route::put('/{tipo}', action: [TiposController::class, 'update'])->name('update');
                 });
             Route::prefix('preguntas')
                 ->as('preguntas.')

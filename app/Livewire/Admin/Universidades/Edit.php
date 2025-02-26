@@ -15,10 +15,8 @@ class Edit extends Component
         'name' => 'required|min:3',
     ];
 
-    // Se carga la universidad a editar en el mount() mediante su ID
     public function mount($universidad)
     {
-        $this->universidadId = $universidad->id;
         $this->universidad = $universidad;
         $this->name = $universidad->name;
     }

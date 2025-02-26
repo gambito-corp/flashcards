@@ -1,3 +1,3 @@
 <x-main-layout title="Tipos">
-    <livewire:admin.tipos.index />
+    <livewire:admin.tipos.create />
 </x-main-layout>
