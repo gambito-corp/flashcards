@@ -1,2 +1,3 @@
-<x-admin-layout title="Preguntas">
-</x-admin-layout>
+<x-main-layout title="Preguntas">
+    <livewire:admin.preguntas.index />
+</x-main-layout>

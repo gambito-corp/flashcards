@@ -1,5 +1,5 @@
 <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-    <h1 class="text-2xl font-bold mb-4">Crear Nueva Pregunta</h1>
+    <h1 class="text-2xl font-bold mb-4">Editar Pregunta</h1>
 
     @if (session()->has('message'))
         <div class="mb-4 p-2 bg-green-100 text-green-700 rounded">
@@ -7,21 +7,21 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="store">
+    <form wire:submit.prevent="updateQuestion">
         <!-- Enunciado -->
         <div class="mb-4">
             <label for="newContent" class="block text-sm font-medium text-gray-700">Enunciado de la pregunta:</label>
-            <textarea wire:model="newContent" id="newContent" rows="4" class="mt-1 block w-full border-gray-300 rounded px-3 py-2 focus:outline-none" placeholder="Escribe el enunciado..."></textarea>
+            <textarea wire:model.live="newContent" id="newContent" rows="4" class="mt-1 block w-full border-gray-300 rounded px-3 py-2 focus:outline-none" placeholder="Escribe el enunciado..."></textarea>
             @error('newContent') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
         </div>
 
-        <!-- Jerarquía anidada: Carrera > Área > Categoría > Tipo -->
+        <!-- Selección Anidada: Carrera > Área > Categoría > Tipo(s) -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Jerarquía</label>
             <!-- Carrera (Team) -->
             <div class="mb-2">
                 <label for="team" class="block text-xs font-medium text-gray-600">Carrera (Team):</label>
-                <select wire:model="selectedTeam" id="team" class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
+                <select wire:model.live="selectedTeam" id="team" class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
                     <option value="" disabled>Seleccione una carrera</option>
                     @foreach($teams as $team)
                         <option value="{{ $team->id }}">{{ $team->name }}</option>
@@ -32,7 +32,7 @@
             <!-- Asignatura (Área) -->
             <div class="mb-2">
                 <label for="area" class="block text-xs font-medium text-gray-600">Asignatura (Área):</label>
-                <select wire:model="selectedArea" id="area" class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
+                <select wire:model.live="selectedArea" id="area" class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
                     <option value="" disabled>Seleccione una asignatura</option>
                     @foreach($areas as $area)
                         <option value="{{ $area->id }}">{{ $area->name }}</option>
@@ -43,7 +43,7 @@
             <!-- Categoría -->
             <div class="mb-2">
                 <label for="category" class="block text-xs font-medium text-gray-600">Categoría:</label>
-                <select wire:model="selectedCategory" id="category" class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
+                <select wire:model.live="selectedCategory" id="category" class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
                     <option value="" disabled>Seleccione una categoría</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -51,47 +51,45 @@
                 </select>
                 @error('selectedCategory') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
-            <!-- Tipo(s) -->
+            <!-- Tipo(s) (multiple select) -->
             <div class="mb-2">
                 <label for="tipo" class="block text-xs font-medium text-gray-600">Tipo (pueden seleccionar varios):</label>
-                <select wire:model="selectedTipo" id="tipo" multiple class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
+                <select wire:model.live="selectedTipo" id="tipo" multiple class="w-full border-gray-300 rounded px-3 py-2 focus:outline-none">
                     @foreach($tipos as $tipo)
                         <option value="{{ $tipo->id }}">{{ $tipo->name }}</option>
                     @endforeach
                 </select>
                 @error('selectedTipo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
-        </div>
-
-        <!-- Botón para agregar la selección anidada -->
-        <div class="mb-4">
-            <button type="button" wire:click="addTipoSelection" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                Agregar Selección
-            </button>
-        </div>
-
-        <!-- Mostrar las selecciones agregadas -->
-        @if(!empty($addedSelections))
+            <!-- Botón para agregar selección -->
             <div class="mb-4">
-                <h3 class="font-semibold text-lg">Selecciones Agregadas:</h3>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    @foreach($addedSelections as $index => $sel)
-                        <span class="bg-gray-200 text-gray-800 rounded-full px-3 py-1 text-sm flex items-center">
-                            {{ $sel['team_name'] }} > {{ $sel['area_name'] }} > {{ $sel['category_name'] }} > {{ implode(', ', $sel['tipo_names']) }}
-                            <button type="button" wire:click="removeTipoSelection({{ $index }})" class="ml-2 text-red-500">&times;</button>
-                        </span>
-                    @endforeach
-                </div>
+                <button type="button" wire:click="addTipoSelection" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    Agregar Selección
+                </button>
             </div>
-        @endif
+            <!-- Mostrar selecciones agregadas (resumen con nombres) -->
+            @if(!empty($addedSelections))
+                <div class="mb-4">
+                    <h3 class="font-semibold text-lg">Selecciones Agregadas:</h3>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        @foreach($addedSelections as $index => $sel)
+                            <span class="bg-gray-200 text-gray-800 rounded-full px-3 py-1 text-sm flex items-center">
+                                {{ $sel['team_name'] }} > {{ $sel['area_name'] }} > {{ $sel['category_name'] }} > {{ implode(', ', $sel['tipo_names']) }}
+                                <button type="button" wire:click="removeTipoSelection({{ $index }})" class="ml-2 text-red-500">&times;</button>
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
 
-        <!-- Universidades (checkboxes) -->
+        <!-- Universidades (checkbox group) -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Universidades (puedes seleccionar varias):</label>
             <div class="mt-1 flex flex-wrap gap-2">
                 @foreach($universidades as $universidad)
                     <label class="flex items-center">
-                        <input type="checkbox" wire:model="selectedUniversidades" value="{{ $universidad->id }}" class="mr-2">
+                        <input type="checkbox" wire:model.live="selectedUniversidades" value="{{ $universidad->id }}" class="mr-2">
                         <span>{{ $universidad->name }}</span>
                     </label>
                 @endforeach
@@ -102,12 +100,12 @@
         <!-- Campos para Media -->
         <div class="mb-4">
             <label for="newMediaUrl" class="block text-sm font-medium text-gray-700">URL de YouTube:</label>
-            <input type="text" wire:model="newMediaUrl" id="newMediaUrl" class="mt-1 block w-full border-gray-300 rounded px-3 py-2 focus:outline-none" placeholder="Ingresa la URL de YouTube">
+            <input type="text" wire:model.live="newMediaUrl" id="newMediaUrl" class="mt-1 block w-full border-gray-300 rounded px-3 py-2 focus:outline-none" placeholder="Ingresa la URL de YouTube">
             @error('newMediaUrl') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
         </div>
         <div class="mb-4">
             <label for="newMediaIframe" class="block text-sm font-medium text-gray-700">Iframe:</label>
-            <textarea wire:model="newMediaIframe" id="newMediaIframe" rows="3" class="mt-1 block w-full border-gray-300 rounded px-3 py-2 focus:outline-none" placeholder="Ingresa el iframe aquí..."></textarea>
+            <textarea wire:model.live="newMediaIframe" id="newMediaIframe" rows="3" class="mt-1 block w-full border-gray-300 rounded px-3 py-2 focus:outline-none" placeholder="Ingresa el iframe aquí..."></textarea>
             @error('newMediaIframe') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
         </div>
 
@@ -119,19 +117,19 @@
         </div>
 
         <!-- Opciones para preguntas de tipo Multiple Choice -->
-        @if($newQuestionType === 'multiple_choice')
+        @if($questionType  === 'multiple_choice')
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Opciones:</label>
-                @foreach($newOptions as $index => $option)
+                @foreach($newOptions as $index => $answer)
                     <div class="flex items-center mb-2">
                         <input type="radio" wire:model="newCorrectOption" value="{{ $index }}" class="mr-2" title="Marca la opción correcta">
                         <input type="text" wire:model="newOptions.{{ $index }}" class="flex-1 border rounded px-3 py-2 focus:outline-none" placeholder="Opción {{ $index + 1 }}">
-                        <button type="button" wire:click="removeNewOption({{ $index }})" class="ml-2 text-red-500" title="Eliminar opción">
+                        <button type="button" wire:click="removeAnswer({{ $index }})" class="ml-2 text-red-500" title="Eliminar opción">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
                 @endforeach
-                <button type="button" wire:click="addNewOption" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-2 rounded">
+                <button type="button" wire:click="addAnswer" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-2 rounded">
                     Agregar Opción
                 </button>
             </div>
@@ -142,7 +140,7 @@
             <button type="button" wire:click="close" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded">
                 Cancelar
             </button>
-            <button type="button" wire:click="store" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            <button type="button" wire:click="updateQuestion" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                 Guardar Pregunta
             </button>
         </div>

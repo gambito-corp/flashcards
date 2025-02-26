@@ -1,7 +1,6 @@
 <?php
 
 return [
-    // ELEMENTOS GENERALES (se muestran en ambas vistas)
     [
         'group'  => 'common',
         'name'   => 'Dashboard',
@@ -79,7 +78,7 @@ return [
     [
         'group'  => 'admin',
         'name'   => 'Preguntas',
-        'route'  => 'preguntas.index',
+        'route'  => 'admin.preguntas.index',
         'active' => 'preguntas.index',
         'roles'  => ['admin', 'root', 'colab'],
     ],

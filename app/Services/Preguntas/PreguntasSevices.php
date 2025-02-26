@@ -35,6 +35,40 @@ class PreguntasSevices
         }
         return $question;
     }
+    public function updatePregunta(Question $question, \App\Livewire\Admin\Preguntas\Edit $param, bool $approved, $addedSelections)
+    {
+
+        // Actualizar los datos básicos de la pregunta
+        $question->update([
+            'content'       => $param->newContent,
+            'question_type' => $param->questionType,
+            'explanation'   => $param->newExplanation,
+            'media_url'     => $param->newMediaUrl,
+            'media_iframe'  => $param->newMediaIframe,
+            'approved'      => $approved,
+        ]);
+
+        // Actualizar las relaciones many-to-many (Tipos y Universidades)
+        $question->tipos()->sync(collect($addedSelections)->pluck('tipo_ids')->flatten()->toArray());
+        $question->universidades()->sync($param->selectedUniversidades);
+
+        // Actualizar opciones de respuesta
+        if ($param->questionType === 'multiple_choice') {
+            // Eliminar opciones previas
+            $question->options()->delete();
+
+            // Crear nuevas opciones
+            foreach ($param->newOptions as $index => $optionContent) {
+                $question->options()->create([
+                    'content'    => $optionContent,
+                    'is_correct' => ($index == $param->newCorrectOption),
+                    'points'     => ($index == $param->newCorrectOption) ? 1 : 0,
+                ]);
+            }
+        }
+
+        return $question;
+    }
 
     public function crearPreguntaCSV($row)
     {
@@ -88,4 +122,6 @@ class PreguntasSevices
             ]);
         }
     }
+
+
 }

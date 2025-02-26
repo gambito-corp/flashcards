@@ -46,9 +46,6 @@ Route::middleware([
     Route::get('/preguntas/create', [PreguntasController::class, 'create'])
         ->middleware('role:root|admin|colab')
         ->name('preguntas.crear');
-    Route::get('/preguntas/cargar', [PreguntasController::class, 'cargar'])
-        ->middleware('role:root|admin|colab')
-        ->name('preguntas.cargar');
     Route::get('/preguntas/carrerra', [PreguntasController::class, 'carrera'])
         ->middleware('role:root|admin')
         ->name('preguntas.carrera');
@@ -172,6 +169,15 @@ Route::middleware([
                 ->middleware('role:root|admin')
                 ->group(function () {
                     Route::get('/', [AdminPreguntasController::class, 'index'])->name('index');
+                    Route::get('/create', [AdminPreguntasController::class, 'create'])->name('create');
+                    Route::post('/create', [AdminPreguntasController::class, 'store'])->name('store');
+//                    Route::get('/{pregunta}', [AdminPreguntasController::class, 'show'])->name('show');
+                    Route::get('/{pregunta}/edit', [AdminPreguntasController::class, 'edit'])->name('edit');
+                    Route::put('/{pregunta}', [AdminPreguntasController::class, 'update'])->name('update');
+                    Route::delete('/{pregunta}', [AdminPreguntasController::class, 'destroy'])->name('destroy');
+                    Route::get('/cargar', [PreguntasController::class, 'cargar'])
+                        ->middleware('role:root|admin')
+                        ->name('cargar');
                 });
         });
 
