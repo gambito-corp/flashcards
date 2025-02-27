@@ -18,6 +18,75 @@
     <!-- Styles -->
     @livewireStyles
     @stack('styles')
+    @if(config('app.env') == 'prod')
+        <script>
+            // Deshabilitar ciertas teclas
+            document.addEventListener('keydown', e => {
+                if (
+                    [123].includes(e.keyCode) || // F12
+                    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || // Ctrl+Shift+I/J
+                    (e.ctrlKey && e.keyCode === 85) // Ctrl+U
+                ) {
+                    e.preventDefault();
+                }
+            });
+
+            // Deshabilitar el menú contextual (click derecho)
+            document.addEventListener('contextmenu', e => e.preventDefault());
+
+            // Función para copiar mensaje al portapapeles y mostrar un overlay
+            const copyToClipboard = () => {
+                // Crear input oculto y copiar mensaje
+                const aux = document.createElement('input');
+                aux.value = "Você não pode mais dar printscreen. Isto faz parte da nova medida de segurança do sistema.";
+                document.body.appendChild(aux);
+                aux.select();
+                document.execCommand("copy");
+                document.body.removeChild(aux);
+
+                // Crear overlay que cubre toda la pantalla
+                const overlay = document.createElement('div');
+                overlay.id = "screenshotOverlay";
+                Object.assign(overlay.style, {
+                    position: 'fixed',
+                    top: '0',
+                    left: '0',
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'black',
+                    opacity: '1',
+                    zIndex: '9999',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                });
+                overlay.innerHTML = "<p style='color: white; font-size: 24px;'>Print screen y Tecla ctrl desabilitadas haz click en la pantalla para desactivar este aviso.</p>";
+                document.body.appendChild(overlay);
+
+                // Eliminar el overlay al hacer clic o después de 3 segundos
+                overlay.addEventListener('click', () => overlay.remove());
+                setTimeout(() => {
+                    const el = document.getElementById('screenshotOverlay');
+                    if (el) el.remove();
+                }, 3000);
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                window.addEventListener('keyup', e => {
+                    // Detecta Print Screen (44) o Ctrl (17)
+                    if (e.keyCode === 44 || e.keyCode === 17) {
+                        copyToClipboard();
+                    }
+                });
+
+                window.addEventListener('focus', () => document.body.style.display = 'block');
+                window.addEventListener('blur', () => document.body.style.display = 'none');
+            });
+        </script>
+    @endif
+
+
+
 </head>
 <body class="font-sans antialiased">
 <x-banner />
