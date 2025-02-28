@@ -25,7 +25,7 @@ class ProjectSeeder extends Seeder
         // Crear Usuario Principal
         $mainUser = User::query()->create([
             'name' => 'Pedro Asesor',
-            'email' => 'asesor.pedro@gmail.com',
+            'email' => 'kenji@gmail.com',
             'password' => Hash::make('admin123'),
         ]);
 
