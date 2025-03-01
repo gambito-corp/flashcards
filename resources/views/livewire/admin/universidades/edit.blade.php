@@ -1,5 +1,5 @@
-<div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-    <h1 class="text-2xl font-bold mb-4">Editar Universidad</h1>
+<div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg border border-gray-200 container-ask">
+    <h1 class="text-2xl font-bold mb-4 primary-color title-ask-container">Editar Universidad</h1>
 
     @if (session()->has('message'))
         <div class="mb-4 p-2 bg-green-100 text-green-700 rounded">
@@ -7,7 +7,7 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="update">
+    <form wire:submit.prevent="update" class="form-container-ask">
         <div class="mb-4">
             <label for="name" class="block font-medium text-gray-700 mb-1">
                 Nombre <span class="text-red-500">*</span>
@@ -22,10 +22,10 @@
             @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
-        <div class="flex justify-end">
+        <div class="flex justify-end no-bottom">
             <button
                 type="submit"
-                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow boton-success-m"
             >
                 Actualizar Universidad
             </button>

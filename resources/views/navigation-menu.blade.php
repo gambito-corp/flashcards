@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Logo con margen y padding a la izquierda -->
-            <div class="shrink-0 flex mr-24 pr-24">
+            <div class="shrink-0 flex mr-24 pr-24 site-logo">
                 <a href="{{ route('dashboard') }}">
                     <x-application-mark class="block h-9" />
                 </a>

@@ -4,24 +4,24 @@
     </script>
 @else
     <div x-data="examComponent()" x-init="init()" class="container mx-auto p-4 relative">
-        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden container-ask container-exmans">
             <!-- Encabezado de la tarjeta -->
-            <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center">
+            <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center header-examns">
                 <!-- Título dinámico: si ya se envió el examen, se muestra examTitle; de lo contrario, "Realizar Examen" -->
                 <h4 class="text-xl font-bold" x-text="examSubmitted ? examTitle : 'Realizar Examen'"></h4>
                 <!-- Tiempo restante solo si no se ha enviado el examen -->
-                <div class="text-lg font-bold" x-show="!examSubmitted">
+                <div class="text-lg font-bold " x-show="!examSubmitted">
                     Tiempo restante: <span x-text="formattedTime"></span>
                 </div>
             </div>
 
             <!-- Cuerpo de la tarjeta -->
-            <div class="px-6 py-4">
+            <div class=" tarjeta-box">
                 <template x-for="(question, index) in paginatedQuestions" :key="question.id">
                     <div class="mb-6">
                         <!-- Título de la pregunta con badge -->
                         <h5 class="flex items-center text-lg font-semibold">
-                            <span class="inline-block bg-gray-200 text-gray-800 rounded-full px-3 py-1 mr-3">
+                            <span class="inline-block bg-gray-200 text-gray-500 rounded-full px-3 py-1 mr-3 number-question">
                                 <span x-text="(currentPage - 1) * questionsPerPage + index + 1"></span>
                             </span>
                             <span x-text="question.content"></span>

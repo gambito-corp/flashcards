@@ -3,25 +3,26 @@
         window.location.href = "{{ route('dashboard') }}?error=Selecciona%20una%20materia%20primero";
     </script>
 @else
-    <div x-data="tabsComponent()" x-init="init()" class="container mx-auto p-4 bg-white shadow rounded-lg">
-        <h2 class="text-2xl font-bold mb-4">Examen: Selección de Preguntas</h2>
+    <div x-data="tabsComponent()" x-init="init()" class="container mx-auto p-4 bg-white shadow rounded-lg container-ask">
+        <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container">Examen: Selección de Preguntas</h2>
+        <hr>
 
         <!-- Pestañas de Áreas -->
-        <div class="mb-4">
+        <div class="mb-4 areas-buttons">
             <div class="flex border-b">
                 <template x-for="area in areas" :key="area.id">
                     <button
                         @click="setActiveArea(area.id)"
                         x-text="area.name"
                         :class="activeArea === area.id ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                        class="px-4 py-2 focus:outline-none">
+                        class="px-4 py-2 focus:outline-none button">
                     </button>
                 </template>
             </div>
         </div>
 
         <!-- Pestañas de Categorías del Área Activa -->
-        <div class="mb-4">
+        <div class="mb-4 areas-buttons cat-2">
             <div class="flex border-b">
                 <template x-for="cat in activeCategories" :key="cat.id">
                     <button
@@ -35,7 +36,7 @@
         </div>
 
         <!-- Pestañas de Tipos de la Categoría Activa -->
-        <div class="mb-4">
+        <div class="mb-4 areas-buttons cat-3">
             <div class="flex border-b">
                 <template x-for="tipo in activeTipos" :key="tipo.id">
                     <button
@@ -50,13 +51,14 @@
 
         <!-- Sección de selección de universidad y cantidad para el tipo activo -->
         <template x-if="activeTipoObject">
-            <div class="p-4 border rounded mb-4">
-                <p class="font-semibold mb-2">
+            <div class="rounded mb-4 mt-45">
+                <p class="font-semibold mb-2 primary-color title-ask-container">
                     Tipo seleccionado: <span x-text="activeTipoObject.name"></span>
                 </p>
+                <hr>
 
                 <!-- Select de Universidad para el tipo activo -->
-                <label class="block mb-2">
+                <label class="block mb-2 form-container-ask">
                     <span class="text-sm font-semibold">Universidad (opcional):</span>
                     <select class="mt-1 block w-full border-gray-300 rounded"
                             x-model="questionSelections[activeTipo].university"
@@ -69,12 +71,12 @@
                 </label>
 
                 <!-- Mostrar cuántas preguntas hay disponibles -->
-                <p class="text-sm text-gray-500 mb-2">
+                <p class="text-sm text-gray-500 mb-2 m-25">
                     Preguntas disponibles: <span x-text="filteredQuestionsCount"></span>
                 </p>
 
                 <!-- Select de Cantidad de Preguntas -->
-                <label class="block">
+                <label class="block form-container-ask">
                     <span class="text-sm font-semibold">Cantidad de preguntas:</span>
                     <select class="mt-1 block w-full border-gray-300 rounded"
                             x-model.number="questionSelections[activeTipo].quantity"
@@ -89,46 +91,46 @@
 
         <!-- Campo para seleccionar el tiempo del examen -->
         <div class="mb-4">
-            <label class="block">
+            <label class="block form-container-ask">
                 <span class="text-sm font-semibold">Tiempo para realizar el examen (minutos):</span>
-                <input type="number" min="1" x-model.number="timeExam" class="mt-1 block w-full border-gray-300 rounded">
+                <input type="number" min="1" x-model.number="timeExam" class="mt-1 block w-full border-gray-300 rounded placeholder-former">
             </label>
         </div>
 
         <!-- Campo para introducir el título del examen -->
         <div class="mb-4">
-            <label class="block">
+            <label class="block form-container-ask">
                 <span class="text-sm font-semibold">Título del examen:</span>
-                <input type="text" x-model="examTitle" class="mt-1 block w-full border-gray-300 rounded" placeholder="Ej: Examen de Prueba">
+                <input type="text" x-model="examTitle" class="mt-1 block w-full border-gray-300 rounded placeholder-former" placeholder="Ej: Examen de Prueba">
             </label>
         </div>
 
         <!-- Resumen y Botón para realizar el examen -->
         <div class="mt-6">
-            <p class="mb-2">
+            <p class="mb-2 m-25 fw-500 color-text">
                 Total de preguntas seleccionadas: <span x-text="totalSelected"></span>
             </p>
             <button
                 @click="realizarExamen"
                 :disabled="totalSelected === 0"
-                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed boton-success-m">
                 Realizar Examen
             </button>
         </div>
 
         <!-- Lista de resumen de selecciones -->
         <div class="mt-4" x-show="totalSelected > 0">
-            <h3 class="text-lg font-semibold mb-2">Resumen de Selecciones</h3>
+            <h3 class="text-lg font-semibold mb-2 primary-color title-ask-container resumen-s">Resumen de Selecciones</h3>
             <ul class="list-disc list-inside">
                 <template x-for="area in areas" :key="area.id">
                     <template x-for="cat in area.categories" :key="cat.id">
                         <template x-for="tipo in cat.tipos" :key="tipo.id">
                             <template x-if="questionSelections[tipo.id].quantity > 0">
-                                <li>
+                                <li class="list-exams">
                                     <span x-text="area.name"></span> -
                                     <span x-text="cat.name"></span> -
                                     <span x-text="tipo.name"></span> -
-                                    <span x-text="questionSelections[tipo.id].quantity"></span> preguntas
+                                    <span x-text="questionSelections[tipo.id].quantity "></span> preguntas
                                 </li>
                             </template>
                         </template>
