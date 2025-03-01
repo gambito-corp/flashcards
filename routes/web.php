@@ -28,8 +28,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', [HomeController::class, 'landing'])->name('landing');
 Route::redirect('/home', '/dashboard');
-Route::redirect('/', '/dashboard');
 
 Route::middleware([
     'auth:sanctum',
