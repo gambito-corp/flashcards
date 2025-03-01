@@ -126,7 +126,7 @@
                 Asignaturas <span class="text-red-500">*</span>
             </label>
             <div class="flex gap-4 m-25">
-                <div class="w-1/2 h-40">
+                <div class="w-1/2 ">
                     <select
                         id="subjectsLeft"
                         name="availableSubjects[]"
@@ -167,7 +167,7 @@
                         <i class="fa-solid fa-angles-left"></i>
                     </button>
                 </div>
-                <div class="w-1/2 h-40">
+                <div class="w-1/2 ">
                     <div class="w-full h-full rounded px-3 py-2 bg-gray-100 overflow-y-auto">
                         <ul class="list-disc pl-5">
                             @forelse($selectedSubjects as $id => $subjectName)
@@ -190,7 +190,7 @@
         </div>
 
         <!-- Botón de enviar -->
-        <div class="flex justify-end">
+        <div class="flex ">
             <button
                 type="submit"
                 class="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-6 py-2 boton-success-m rounded"

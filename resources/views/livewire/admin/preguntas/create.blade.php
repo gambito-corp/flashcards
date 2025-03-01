@@ -143,7 +143,7 @@
         @endif
 
         <!-- Botones de acción -->
-        <div class="flex justify-end space-x-4 mt-4">
+        <div class="flex  space-x-4 mt-4">
             <button type="button" wire:click="close" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded boton-success-m rounded button-c3">
                 Cancelar
             </button>

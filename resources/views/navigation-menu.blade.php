@@ -120,7 +120,7 @@
 
     <!-- Menú Responsive -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
+        <div class="pt-2 pb-3 space-y-1 menu-movil">
             @foreach ($menu as $item)
                 <x-responsive-nav-link href="{{ route($item['route']) }}" :active="request()->routeIs($item['route'])">
                     {{ __($item['name']) }}
