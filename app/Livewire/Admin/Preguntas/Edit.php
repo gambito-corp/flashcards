@@ -45,9 +45,12 @@ class Edit extends Component
 
     public function mount(Question $question)
     {
+
         $this->question = $question->load('options', 'tipos', 'categories.area.team', 'universidades');
-        $this->newContent = $this->question->content;
-        $tipos = $question->tipos->first()->load('category.area.team');
+        $this->newContent = $this->question?->content;
+//        dd($question->tipos, $question);
+        $tipos = $question?->tipos?->first()?->load('category.area.team');
+
         $this->selectedTeam = $tipos?->category?->area?->team_id;
         $this->teams = Team::with('areas')->get();
         $this->selectedArea = $tipos?->category?->area_id;
@@ -57,13 +60,13 @@ class Edit extends Component
         $this->selectedTipo = $tipos?->id;
         $this->tipos = Tipo::query()->where('category_id', $this->selectedCategory)->get();
         $this->addTipoSelection();
-        $this->selectedUniversidades = $this->question->universidades->pluck('id')->toArray();
+        $this->selectedUniversidades = $this->question?->universidades?->pluck('id')?->toArray();
         $this->universidades = Universidad::all();
-        $this->newMediaUrl = $this->question->media_url;
-        $this->newMediaIframe = $this->question->media_iframe;
-        $this->newExplanation = $this->question->explanation;
+        $this->newMediaUrl = $this->question?->media_url;
+        $this->newMediaIframe = $this->question?->media_iframe;
+        $this->newExplanation = $this->question?->explanation;
         if ($this->questionType === 'multiple_choice') {
-            foreach ($this->question->options as $option) {
+            foreach ($this->question?->options as $option) {
                 $this->newOptions[] = $option->content;
                 if ($option->is_correct) {
                     $this->newCorrectOption = $option->id;
