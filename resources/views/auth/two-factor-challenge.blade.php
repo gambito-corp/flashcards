@@ -1,7 +1,12 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo />
+
+            <div class="shrink-0 flex mr-24 pr-24">
+                <a href="{{ route('dashboard') }}">
+                    <x-application-mark class="block h-9" />
+                </a>
+            </div>
         </x-slot>
 
         <div x-data="{ recovery: false }">
