@@ -2,11 +2,23 @@
     min-height: initial;
     height: initial;
 }
+.text-color{
+    color: #333333;
+}
+.fz-15.title-ask-container{
+    font-size: 17px;
+}
 .m-25{
     margin-bottom: 25px;
 }
 .mt-45{
     margin-top: 45px;
+}
+.mt-25{
+    margin-top: 25px;
+}
+.mb-45{
+    margin-bottom: 45px;
 }
 .fw-500{
     font-weight: 500;
@@ -20,6 +32,17 @@
     display: flex;
 
 }
+[type='file']{
+    border: none !important;
+}
+[type='checkbox'].chexbox-f{
+    width: 30px;
+    height: 30px;
+}
+select.h-auto{
+    height: auto !important;
+}
+
 /*HEADER*/
 
 .site-logo a>div{
@@ -68,6 +91,19 @@ footer{
     margin-top: 25px;
     margin-bottom:90px;
 }
+.container-full{
+    min-width: 100%;
+    padding: 0;
+}
+.container-askt{
+    max-width: 100%;
+    border: none;
+    box-shadow: none;
+    padding: 40px;
+    border-radius: 20px;
+  
+}
+
 .primary-color{
     color:#195b81;
 }
@@ -110,6 +146,7 @@ cursor: pointer;
     color:#333333;
     font-size: 15px;
     font-weight: 600;
+    margin-bottom: 10px;
 }
 .form-container-ask > div{
     padding-bottom: 25px;
@@ -123,6 +160,7 @@ cursor: pointer;
     border: none;
     outline: none;
     transition: .3s all ease-in;
+    font-weight: 600;
   
       
 }
@@ -413,3 +451,192 @@ font-size: 16px;
     color: white;
     background-color: #5b8080;
 }
+.choise-ask  {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+.choise-ask li {
+    width: fit-content;
+    padding: 10px 50px;
+}
+.container-exmans .text-ask{
+    font-size: 18px;
+    font-weight: 500;
+}
+.choise-ask .bg-blue-500{
+    background-color: #157b80;
+}
+.buttons-nv{
+    border: 1px solid #f1f1f1;
+}
+.buttons-numbers .bg-blue-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(247 247 247);
+    border-color: rgb(247 247 247) !important;
+}
+.buttons-nv span{
+   font-weight: 500;
+   color: #333333;
+}
+.container-exmans .buttons-pagination{
+    gap: 20px;
+    display: flex;
+}
+
+.container-exmans .bg-green-500 {
+  
+    background-color: rgb(21 123 128);
+}
+.container-exmans .bg-green-500 span{
+  
+    color: #ffffff;
+}
+.results-exam{
+    display: flex;
+    justify-content: space-between;
+}
+.container-exmans .bg-red-500 {
+
+    background-color: rgb(247 247 247);
+}
+.container-exmans .bg-gray-400 {
+    background-color: rgb(255 255 255);
+}
+
+/*FLASHCARDS*/
+.group-form{
+    display: flex;
+    gap: 15px;
+}
+.group-form .mb-4{
+    width: 100%;
+}
+.group-formt{
+    display: flex;
+   justify-content: space-between;
+}
+.group-formt input{
+   width: 80%;
+}
+.box-cat-flash.border-b{
+    box-shadow: none;
+    border: none;
+}
+.box-cat-flash.border-b button{
+    border-radius: 5px;
+    color: #ffffff;
+    border: none;
+    padding: 14px 25px;
+    background-color: #f7f7f7;
+    height: max-content;
+    box-shadow: none;
+    color: #333333;
+    transition: .3s all ease-in;
+}
+.box-cat-flash.border-b button:hover{
+
+    color: #ffffff;
+    background-color: #195b81;
+  
+}
+
+.box-cat-flash.border-b button.text-indigo-600{
+    background-color: #195b81;
+    color: #ffffff;
+}
+.ask-card{
+    padding: 40px;
+    background: #195b81;
+    width: 33.33%;
+    border-radius: 15px;
+    box-shadow: none;
+}
+.ask-card h2,.container-fc .box-answer h2{
+color: #ffffff;
+font-weight: 500;
+}.ask-card img{
+    width: 35px;
+    margin-bottom: 15px;
+}
+
+.arrow-flash{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.arrow-flash button{
+    background: #f7f7f7;
+}
+.container-fc{
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 20px;
+}
+.container-fc .box-answer{
+    background: #195b81;
+    border: none;
+    box-shadow: none;
+    border-radius: 15px;
+    padding: 60px 40px;
+}
+.box-answer img {
+    margin-bottom: 15px;
+    width: 35px;
+}
+.answer-c img {
+    margin-bottom: 15px;
+    width: 45px;
+ 
+}
+
+.answer-c h2{
+    font-size: 18px;
+    font-weight: 500;
+}
+.form-container-ask label.label-nm {
+    margin-bottom: 0;
+}
+
+/* RESULTADOS */
+.results-content{
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+.results-content p{
+
+    flex-direction: column;
+    display: flex;
+}
+
+.img-answer {
+    width: 350px !important;
+    margin-bottom: 0 !important;
+    position: absolute;
+    top: 20px;
+    right: 21px;
+
+}
+.box-content-answer{
+    padding-top: 150px;
+}
+
+.results-content p{
+    color: #7a7a7a;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: initial;
+}
+.results-content p strong{ 
+    color: #333333;
+    margin-top: 10px;
+ 
+}
+/* CREAR USUARIOS */
+
+.buttons-user button{
+    background-color: rgb(91 128 128);
+}
+
