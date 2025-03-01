@@ -1,13 +1,14 @@
-<div class="m-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
+<div class="m-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 container-ask">
     @if (session()->has('message'))
         <div class="mb-4 p-2 bg-green-100 text-green-700 rounded">
             {{ session('message') }}
         </div>
     @endif
 
-    <form wire:submit.prevent="updateUser">
+    <form wire:submit.prevent="updateUser" class="form-container-ask">
         <!-- SECCIÓN 1: Datos Básicos -->
-        <h2 class="text-lg font-semibold mb-2">Datos Básicos</h2>
+        <h2 class="text-lg font-semibold mb-2 primary-color title-ask-container fz-15">Datos Básicos</h2>
+        <hr>
         <div class="grid grid-cols-2 gap-4 mb-6">
             <div>
                 <label for="name" class="block font-medium text-gray-700 mb-1">
@@ -30,7 +31,8 @@
         </div>
 
         <!-- SECCIÓN 2: Credenciales y Foto de Perfil -->
-        <h2 class="text-lg font-semibold mb-2">Credenciales y Foto</h2>
+        <h2 class="text-lg font-semibold mb-2 primary-color title-ask-container fz-15">Credenciales y Foto</h2>
+        <hr>
         <div class="grid gap-4 mb-6">
             <div>
                 <label for="profile_photo" class="block font-medium text-gray-700 mb-1">
@@ -43,7 +45,8 @@
         </div>
 
         <!-- SECCIÓN 3: Asignaciones -->
-        <h2 class="text-lg font-semibold mb-2">Asignaciones</h2>
+        <h2 class="text-lg font-semibold mb-2 primary-color title-ask-container fz-15">Asignaciones</h2>
+        <hr>
         <div class="grid grid-cols-2 gap-4 mb-6">
             <!-- Roles (Checkbox Group) -->
             <div>
@@ -54,7 +57,7 @@
                     @foreach($roles as $rol)
                         <label class="inline-flex items-center">
                             <input type="checkbox" value="{{ $rol->id }}" wire:model.defer="selectedRoles"
-                                   class="form-checkbox text-green-500">
+                                   class="form-checkbox text-green-500 chexbox-f">
                             <span class="ml-2">{{ $rol->name }}</span>
                         </label>
                     @endforeach
@@ -69,8 +72,8 @@
                 <div class="flex flex-wrap gap-2">
                     @foreach($teams as $team)
                         <label class="inline-flex items-center">
-                            <input type="checkbox" value="{{ $team->id }}" wire:model.live="selectedTeams"
-                                   class="form-checkbox text-green-500">
+                            <input type="checkbox" value="{{ $team->id }}" wire:model.live="selectedTeams "
+                                   class="form-checkbox text-green-500 chexbox-f">
                             <span class="ml-2">{{ $team->name }}</span>
                         </label>
                     @endforeach
@@ -84,11 +87,11 @@
             <label for="subjects" class="block font-medium text-gray-700 mb-1">
                 Asignaturas <span class="text-red-500">*</span>
             </label>
-            <div class="flex gap-4">
+            <div class="flex gap-4 m-25">
                 <!-- Izquierda: Select Múltiple con asignaturas disponibles (excluyendo las ya agregadas) -->
                 <div class="w-1/2 h-40">
                     <select id="subjectsLeft" name="availableSubjects[]" multiple wire:model="selectedToAdd"
-                            class="w-full h-full border rounded px-3 py-2 focus:outline-none">
+                            class="w-full h-full border rounded px-3 py-2 focus:outline-none h-auto">
                         @forelse(collect($availableSubjects)->reject(fn($subject) => isset($selectedSubjects[$subject->id])) as $subject)
                             <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                         @empty
@@ -97,7 +100,7 @@
                     </select>
                 </div>
                 <!-- Centro: Botones verticales -->
-                <div class="flex flex-col items-center justify-center gap-2 h-40">
+                <div class="flex flex-col items-center justify-center gap-2 h-40 buttons-user">
                     <button type="button" wire:click="addSelected"
                             class="w-10 h-10 bg-green-500 hover:bg-green-600 rounded flex items-center justify-center text-white"
                             title="Agregar selección">
@@ -121,7 +124,7 @@
                 </div>
                 <!-- Derecha: Lista de asignaturas seleccionadas -->
                 <div class="w-1/2 h-40">
-                    <div class="w-full h-full border rounded px-3 py-2 bg-gray-100 overflow-y-auto">
+                    <div class="w-full h-full  rounded px-3 py-2 bg-gray-100 overflow-y-auto">
                         <ul class="list-disc pl-5">
                             @forelse($selectedSubjects as $id => $subjectName)
                                 <li class="mb-1">
@@ -143,9 +146,9 @@
         </div>
 
         <!-- Botón de enviar -->
-        <div class="flex justify-end">
+        <div class="flex ">
             <button type="submit"
-                    class="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-6 py-2 rounded shadow">
+                    class="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-6 py-2 boton-success-m rounded">
                 Actualizar Usuario
             </button>
         </div>

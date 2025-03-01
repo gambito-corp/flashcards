@@ -42,7 +42,7 @@
             @error('team_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
-        <div class="flex justify-end no-bottom">
+        <div class="flex no-bottom">
             <button type="submit"
                     class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow boton-success-m">
                 Actualizar Asignatura
