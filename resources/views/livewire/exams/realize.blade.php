@@ -8,9 +8,9 @@
             <!-- Encabezado de la tarjeta -->
             <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center header-examns">
                 <!-- Título dinámico: si ya se envió el examen, se muestra examTitle; de lo contrario, "Realizar Examen" -->
-                <h4 class="text-xl font-bold" x-text="examSubmitted ? examTitle : 'Realizar Examen'"></h4>
+                <h4 class="text-xl font-semibold" x-text="examSubmitted ? examTitle : 'Realizar Examen'"></h4>
                 <!-- Tiempo restante solo si no se ha enviado el examen -->
-                <div class="text-lg font-bold " x-show="!examSubmitted">
+                <div class="text-lg font-semibold " x-show="!examSubmitted">
                     Tiempo restante: <span x-text="formattedTime"></span>
                 </div>
             </div>
@@ -18,17 +18,19 @@
             <!-- Cuerpo de la tarjeta -->
             <div class=" tarjeta-box">
                 <template x-for="(question, index) in paginatedQuestions" :key="question.id">
-                    <div class="mb-6">
+                    <div class="mb-6 mb-45">
                         <!-- Título de la pregunta con badge -->
-                        <h5 class="flex items-center text-lg font-semibold">
+                        <h5 class="flex items-center text-lg font-semibold m-25">
                             <span class="inline-block bg-gray-200 text-gray-500 rounded-full px-3 py-1 mr-3 number-question">
                                 <span x-text="(currentPage - 1) * questionsPerPage + index + 1"></span>
                             </span>
-                            <span x-text="question.content"></span>
+                            <span class="text-ask" x-text="question.content"></span>
+                            
                         </h5>
+                        <hr>
 
                         <!-- Opciones de la pregunta -->
-                        <ul class="mt-2 space-y-2">
+                        <ul class="mt-2 space-y-2 choise-ask">
                             <template x-for="option in question.options" :key="option.id">
                                 <li class="p-3 border rounded cursor-pointer"
                                     :class="getOptionClass(question.id, option.id)"
@@ -41,12 +43,14 @@
 
                         <!-- Medios: se muestran después de enviar el examen, debajo de las opciones -->
                         <template x-if="examSubmitted && question.media_iframe">
-                            <div class="mt-2">
+                            <div class="mt-2 m-25 mt-25">
                                 <div x-html="question.media_iframe"></div>
                             </div>
+                           
                         </template>
+                
                         <template x-if="examSubmitted && !question.media_iframe && question.media_url">
-                            <div class="mt-2">
+                            <div class="mt-2 m-25 mt-25">
                                 <iframe :src="getEmbedUrl(question.media_url)" class="w-full" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                             </div>
                         </template>
@@ -72,48 +76,56 @@
                 </template>
 
                 <!-- Controles de paginación (1 pregunta por página) -->
-                <div class="flex justify-between items-center mt-6">
+                <div class="flex justify-between items-center mt-6 m-25">
+                
+                    <div class="buttons-pagination">
                     <button @click="prevPage()"
                             :disabled="currentPage === 1"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50">
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50 boton-success-m button-c3">
                         Anterior
                     </button>
-                    <div class="text-sm font-semibold">
-                        Página <span x-text="currentPage"></span> de <span x-text="totalPages"></span>
-                    </div>
+                  
                     <button @click="nextPage()"
                             :disabled="currentPage === totalPages"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50">
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50 boton-success-m button-c2">
                         Siguiente
                     </button>
-                </div>
 
-                <!-- Navegación con cuadrados numerados -->
-                <div class="flex flex-wrap gap-2 mt-4 justify-center">
+</div>
+
+    <!-- Navegación con cuadrados numerados -->
+    <div class="flex flex-wrap gap-2 mt-4  buttons-numbers">
                     <template x-for="(question, index) in questions" :key="question.id">
                         <div @click="currentPage = index + 1"
-                             class="w-10 h-10 flex items-center justify-center border cursor-pointer rounded"
+                             class="w-10 h-10 flex items-center justify-center border cursor-pointer rounded buttons-nv"
                              :class="getSquareClass(question)">
                             <span x-text="index + 1"></span>
                         </div>
                     </template>
                 </div>
+                </div>
+
+                <hr>
+                <div class="text-sm">
+                        Página <span x-text="currentPage"></span> de <span x-text="totalPages"></span>
+                    </div>
+            
             </div>
 
             <!-- Pie de la tarjeta -->
             <div class="px-6 py-4 bg-gray-100 text-right">
                 <!-- Botón para enviar examen si aún no se envió -->
                 <template x-if="!examSubmitted">
-                    <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                    <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded boton-success-m button-c2"
                             @click="submitExam()">
                         Enviar Examen
                     </button>
                 </template>
                 <!-- Una vez enviado, mostrar score y botón para ir al Home -->
                 <template x-if="examSubmitted">
-                    <div>
-                        <p class="mt-4 font-bold text-lg">Puntuación: <span x-text="score"></span>/100</p>
-                        <a href="{{ route('dashboard') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block mt-4">
+                    <div class="results-exam">
+                        <p class="mt-4 font-semibold text-lg">Puntuación: <span x-text="score"></span>/100</p>
+                        <a href="{{ route('dashboard') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block mt-4 boton-success-m button-c2">
                             Ir al Home
                         </a>
                     </div>
@@ -122,7 +134,7 @@
         </div>
 
         <!-- Cuadrado flotante para el tiempo restante (oculto al enviar) -->
-        <div x-show="!examSubmitted" class="fixed top-4 right-4 bg-blue-500 text-white p-4 rounded shadow-lg" x-cloak>
+        <div x-show="!examSubmitted" class="fixed top-4 right-4 bg-blue-500 text-white p-4 rounded shadow-lg " x-cloak>
             <div class="text-lg font-bold mb-1">Tiempo restante</div>
             <div class="text-2xl font-extrabold" x-text="formattedTime"></div>
         </div>

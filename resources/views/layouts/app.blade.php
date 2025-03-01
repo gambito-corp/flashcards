@@ -110,7 +110,7 @@
     @endif
 
     <!-- Page Content -->
-    <main class="h-screen overflow-y-auto">
+    <main class="">
         {{ $slot }}
     </main>
 
