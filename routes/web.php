@@ -9,11 +9,11 @@ use App\Http\Controllers\Admin\TiposController;
 use App\Http\Controllers\Admin\UniversidadesController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CurrentTeamController;
+use App\Http\Controllers\CustomLoginController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PreguntasController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,6 +30,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'landing'])->name('landing');
 Route::redirect('/home', '/dashboard');
+
+
+Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
 
 Route::middleware([
     'auth:sanctum',
