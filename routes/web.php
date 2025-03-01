@@ -37,6 +37,7 @@ Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('log
 
 Route::middleware([
     'auth:sanctum',
+    'single.session',
     config('jetstream.auth_session'),
     'verified',
 ])->group(callback: function () {
@@ -184,5 +185,4 @@ Route::middleware([
                         ->name('cargar');
                 });
         });
-
 });
