@@ -33,6 +33,20 @@ class ExamController extends Controller
 
     public function createExam(Request $request)
     {
+        $user = Auth::user();
+        // Si el usuario tiene status 0, se verifica el límite de exámenes del mes actual.
+//        if ($user->status == 0) {
+//            $currentMonthExamCount = ExamResult::query()->where('user_id', $user->id)
+//                ->whereYear('created_at', now()->year)
+//                ->whereMonth('created_at', now()->month)
+//                ->count();
+//
+//            if ($currentMonthExamCount >= 10) {
+//                return response()->json([
+//                    'error' => 'No puede crear más de 10 exámenes por mes.'
+//                ], 403);
+//            }
+//        }
         if (!auth()->check()) {
             return response()->json(['error' => 'No autenticado'], 401);
         }

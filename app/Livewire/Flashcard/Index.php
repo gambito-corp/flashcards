@@ -5,9 +5,11 @@ namespace App\Livewire\Flashcard;
 use Livewire\Component;
 use App\Models\FcCard;
 use App\Models\FcCategory;
+use Livewire\WithFileUploads;
 
 class Index extends Component
 {
+    use WithFileUploads;
     // Propiedades para el formulario de creación de flashcards
     public $pregunta;
     public $url;
@@ -39,9 +41,9 @@ class Index extends Component
         'pregunta'           => 'required|string',
         'respuesta'          => 'required|string',
         'url'                => 'nullable|url',
-        'imagen'             => 'nullable|string',
+        'imagen'             => 'nullable|image|max:10240',
         'url_respuesta'      => 'nullable|url',
-        'imagen_respuesta'   => 'nullable|string',
+        'imagen_respuesta'   => 'nullable|image|max:10240',
         'selectedCategories' => 'nullable|array',
     ];
 
@@ -53,16 +55,19 @@ class Index extends Component
     public function createCard()
     {
         $this->validate();
+        // Procesamos la imagen, subiéndola a S3 si se ha seleccionado
+        $imagenPath = $this->imagen ? $this->imagen->store('flashcard_images', 's3') : null;
+        $imagenRespuestaPath = $this->imagen_respuesta ? $this->imagen_respuesta->store('flashcard_images', 's3') : null;
 
         // Creamos la flashcard asociándola al usuario autenticado
         $card = FcCard::create([
             'user_id'          => auth()->id(),
             'pregunta'         => $this->pregunta,
             'url'              => $this->url,
-            'imagen'           => $this->imagen,
+            'imagen'           => $imagenPath,
             'respuesta'        => $this->respuesta,
             'url_respuesta'    => $this->url_respuesta,
-            'imagen_respuesta' => $this->imagen_respuesta,
+            'imagen_respuesta' => $imagenRespuestaPath,
         ]);
 
         // Si se han seleccionado categorías, se asocian a la flashcard

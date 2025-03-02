@@ -22,7 +22,7 @@ class UserService
             ]);
 
             if (isset($data['profile_photo'])) {
-                $path = $data['profile_photo']->store('profile_photos', 'public');
+                $path = $data['profile_photo']->store('avatars', 's3');
                 $user->profile_photo_path = $path;
                 $user->save();
             } else {
@@ -52,7 +52,7 @@ class UserService
 
             // Guarda la foto de perfil si se envía, o deja la existente
             if (isset($data['profile_photo'])) {
-                $path = $data['profile_photo']->store('profile_photos', 'public');
+                $path = $data['profile_photo']->store('avatars', 's3');
                 $user->update(['profile_photo_path' => $path]);
             } else {
                 // Si no se envía nueva foto, se deja la actual o se establece null para usar el avatar por defecto

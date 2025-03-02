@@ -110,12 +110,17 @@
             <p class="mb-2 m-25 fw-500 color-text">
                 Total de preguntas seleccionadas: <span x-text="totalSelected"></span>
             </p>
-            <button
-                @click="realizarExamen"
-                :disabled="totalSelected === 0"
-                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed boton-success-m">
-                Realizar Examen
-            </button>
+            @if(!$overLimit)
+                <button
+                    @click="realizarExamen"
+                    :disabled="totalSelected === 0"
+                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed boton-success-m">
+                    Realizar Examen
+                </button>
+            @else
+                <p class="text-red-800 font-bold">*** Supero La Cantidad De Examenes Permitidos Por Mes Desea Adquirir Premium ***</p>
+                <x-pago/>
+            @endif
         </div>
 
         <!-- Lista de resumen de selecciones -->

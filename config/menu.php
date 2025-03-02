@@ -6,14 +6,14 @@ return [
         'name'   => 'Dashboard',
         'route'  => 'dashboard',
         'active' => 'dashboard',
-        'roles'  => ['admin', 'root', 'colab'],
+        'roles'  => ['admin', 'root', 'colab', 'user'],
     ],
     [
         'group'  => 'common',
         'name'   => 'Panel Administrador',
         'route'  => 'admin.index',
         'active' => 'admin.index',
-        'roles'  => [],
+        'roles'  => ['admin', 'root', 'colab'],
     ],
 
     // ELEMENTOS EXCLUSIVOS VISTA USUARIOS
@@ -22,14 +22,14 @@ return [
         'name'   => 'Examenes',
         'route'  => 'examenes.index',
         'active' => 'examenes.index',
-        'roles'  => [],
+        'roles'  => ['admin', 'root', 'colab', 'user'],
     ],
     [
         'group'  => 'user',
         'name'   => 'Flashcard',
         'route'  => 'flashcard.index',
         'active' => 'flashcard.index',
-        'roles'  => [],
+        'roles'  => ['admin', 'root', 'colab', 'user'],
     ],
 
     // ELEMENTOS EXCLUSIVOS VISTA ADMINISTRACIÓN

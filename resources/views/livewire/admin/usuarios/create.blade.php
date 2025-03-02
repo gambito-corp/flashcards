@@ -83,6 +83,12 @@
                     accept="image/*"
                 />
                 @error('profile_photo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+
+                @if ($profile_photo)
+                    <div class="mt-2">
+                        <img src="{{ $profile_photo->temporaryUrl() }}" alt="Previsualización de la Foto de Perfil" class="w-10 h-10 rounded-full">
+                    </div>
+                @endif
             </div>
         </div>
 

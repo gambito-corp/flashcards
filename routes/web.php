@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomLoginController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PreguntasController;
 use Illuminate\Support\Facades\Route;
 
@@ -186,3 +187,11 @@ Route::middleware([
                 });
         });
 });
+
+
+
+//Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
+//
+//Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+//Route::get('/payment/failure', [PaymentController::class, 'failure'])->name('payment.failure');
+//Route::get('/payment/pending', [PaymentController::class, 'pending'])->name('payment.pending');
