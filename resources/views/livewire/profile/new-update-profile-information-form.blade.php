@@ -10,6 +10,7 @@
     <x-slot name="form">
         <!-- Profile Photo -->
         {{--        {{$ejemplo}}--}}
+        @dd($this->user->profile_photo_path)
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
             <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
                 <!-- Profile Photo File Input -->
