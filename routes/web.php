@@ -18,9 +18,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PreguntasController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [HomeController::class, 'landing'])->name('landing');
 Route::redirect('/home', '/dashboard');
-
+Route::redirect('/', '/dashboard');
 
 Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
