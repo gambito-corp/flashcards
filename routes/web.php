@@ -19,7 +19,7 @@ use App\Http\Controllers\PreguntasController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/home', '/dashboard');
-Route::redirect('/', '/dashboard');
+Route::redirect('/', 'https://medbystudents.com/app-banqueo/');
 
 Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
