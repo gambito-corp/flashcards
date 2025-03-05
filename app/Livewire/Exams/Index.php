@@ -20,7 +20,7 @@ class Index extends Component
                 ->whereMonth('created_at', now()->month)
                 ->count();
 
-            if ($currentMonthExamCount >= 1) {
+            if ($currentMonthExamCount >= 10) {
                 $this->overLimit = true;
             }
         }

@@ -28,5 +28,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
         $user->forceFill([
             'password' => Hash::make($input['password']),
         ])->save();
+        // Envía la notificación de confirmación de cambio de contraseña
+        $user->notify(new \App\Notifications\PasswordChangedConfirmationEmail());
     }
 }

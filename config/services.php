@@ -30,5 +30,12 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'mercadopago' => [
+        'base_url' => env('MP_BASE_URL', 'https://api.mercadopago.com'),
+        'token' => env('MP_TOKEN'),
+        'public_key' => env('MP_PUBLIC_KEY'),
+        'secret_key' => env('MP_SECRET_KEY'),
+        'sandbox' => env('MP_SANDBOX', false),
+    ]
 
 ];

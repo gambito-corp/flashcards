@@ -15,6 +15,7 @@
         <thead class="bg-gray-200">
         <tr>
             <th class="px-4 py-2 text-left">Nº</th>
+            <th class="px-4 py-2 text-left">Id</th>
             <th class="px-4 py-2 text-left">Nombre</th>
             <th class="px-4 py-2 text-center">Acciones</th>
         </tr>
@@ -23,6 +24,7 @@
         @foreach($universidades as $index => $universidad)
             <tr class="border-b">
                 <td class="px-4 py-2">{{ $index + 1 }}</td>
+                <td class="px-4 py-2">{{ $universidad->id }}</td>
                 <td class="px-4 py-2">{{ $universidad->name }}</td>
                 <td class="px-4 py-2 text-center button-edit">
                     <a href="{{ route('admin.universidades.edit', $universidad) }}"

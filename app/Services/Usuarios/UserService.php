@@ -19,6 +19,7 @@ class UserService
                 'name'     => $data['name'],
                 'email'    => $data['email'],
                 'password' => bcrypt($data['password']),
+                'current_team_id' => $data['teams'][0],
             ]);
 
             if (isset($data['profile_photo'])) {
@@ -36,6 +37,11 @@ class UserService
             }
             $subjectIds = array_keys($data['subjects']);
             $user->areas()->sync($subjectIds);
+            if (isset($data['pwd_generate']) && $data['pwd_generate'] === true) {
+                $user->notify(new \App\Notifications\CustomVerifyEmail($data['password']));
+            } else {
+                $user->sendEmailVerificationNotification();
+            }
 
             return $user;
         });

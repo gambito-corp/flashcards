@@ -25,16 +25,20 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         return DB::transaction(function () use ($input) {
-            return tap(User::create([
-                'name' => $input['name'],
-                'email' => $input['email'],
-                'password' => Hash::make($input['password']),
+            $user = tap(User::create([
+                'name'            => $input['name'],
+                'email'           => $input['email'],
+                'password'        => Hash::make($input['password']),
                 'current_team_id' => Team::query()->where('id', 1)->first()->id,
-                'status' => '0'
+                'status'          => '0'
             ]), function (User $user) {
                 $rol = Role::query()->where('name', 'user')->first();
                 $user->assignRole($rol);
             });
+
+            $user->sendEmailVerificationNotification();
+
+            return $user;
         });
     }
 }
