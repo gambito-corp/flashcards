@@ -89,34 +89,40 @@
 
     </head>
     <body>
-    <header class="bg-white shadow">
+    <!-- <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
             @if (Route::has('login'))
                 <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Panel de Control</a>
+                        <a href="{{ url('/dashboard') }}" class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</a>
                     @else
                         <a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log in</a>
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="ml-4 font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Registro</a>
+                            <a href="{{ route('register') }}" class="ml-4 font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</a>
                         @endif
                     @endauth
                 </div>
             @endif
 
         </div>
-    </header>
-        <div class="font-sans text-gray-900 antialiased">
+    </header> -->
+
+    <div class="login-register__container">
+        <div class="font-sans text-gray-900 antialiased md-50">
             {{ $slot }}
         </div>
+        <div class="img-login__register md-50">
+
+        </div>
+    </div>
 
         <!-- Footer -->
-        <footer class="bg-footer text-white border-t border-gray-200">
+          <!-- <footer class="bg-footer text-white border-t border-gray-200">
             <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm">
-                © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Todos los derechos reservados.
+                © {{ date('Y') }} {{ config('app.name', 'MBS') }}. Todos los derechos reservados.
             </div>
-        </footer>
+        </footer> -->
         </div>
         @stack('modals')
         @livewireScripts
