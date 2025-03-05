@@ -70,21 +70,51 @@ class PreguntasSevices
         return $question;
     }
 
+    private function limpiarCodificacion($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        // Reemplazar espacios no separables
+        $value = str_replace("\u{A0}", ' ', $value);
+
+        // Incluir codificaciones comunes en MS-DOS
+        $detected = mb_detect_encoding($value, ['UTF-8', 'ISO-8859-1', 'WINDOWS-1252', 'CP850'], true);
+
+        if ($detected && $detected !== 'UTF-8') {
+            $value = mb_convert_encoding($value, 'UTF-8', $detected);
+        }
+
+        // Opcional: Si siguen apareciendo caracteres extraños, forzar conversión desde CP850
+        if (strpos($value, 'Â') !== false) {
+            $value = iconv('CP850', 'UTF-8//TRANSLIT//IGNORE', $value);
+        }
+
+        return trim($value);
+    }
+
+
+
     public function crearPreguntaCSV($row)
     {
-        $approved =(auth()->user()->hasRole('admin') || auth()->user()->hasRole('root')) ? 1 : 0;
+        try {
+            $approved =(auth()->user()->hasRole('admin') || auth()->user()->hasRole('root')) ? 1 : 0;
 
-        $tipoIds = array_filter(array_map('intval', explode(',', $row['tipos'])));
-        $universidadIds = array_filter(array_map('intval', explode(',', $row['universidades'])));
-        $question = Question::query()->create([
-            'content' => $row['content'],
-            'question_type' => 'multiple_choice',
-            'explanation' => $row['explicacion'],
-            'media_url' => $row['url'],
-            'media_iframe' => $row['iframe'],
-            'approved' => $approved,
-            'user_id' => auth()->id(),
-        ]);
+            $tipoIds = array_filter(array_map('intval', explode(',', $row['tipos'])));
+            $universidadIds = array_filter(array_map('intval', explode(',', $row['universidades'])));
+            $question = Question::query()->create([
+                'content' => $this->limpiarCodificacion($row['content']),
+                'question_type' => 'multiple_choice',
+                'explanation' => $this->limpiarCodificacion($row['explicacion']),
+                'media_url' => $row['url'],
+                'media_iframe' => $row['iframe'],
+                'approved' => $approved,
+                'user_id' => auth()->id(),
+            ]);
+        }catch (\Exception $e){
+            dd($e->getMessage(),  $row);
+        }
 
         foreach ($tipoIds as $key => $tipoId) {
             $question->tipos()->attach($tipoId);
@@ -95,30 +125,30 @@ class PreguntasSevices
 
         if ($row['answer1'] != '') {
             $question->options()->create([
-                'content' => $row['answer1'],
-                'is_correct' => ($row['is_correct1'] == '1'),
-                'points' => ($row['is_correct1'] == '1') ? 1 : 0,
+                'content' => $this->limpiarCodificacion($row['answer1']),
+                'is_correct' => ($row['is_correct1'] == '1' || $row['is_correct1'] == 'true'),
+                'points' => ($row['is_correct1'] == '1' || $row['is_correct1'] == 'true') ? 1 : 0,
             ]);
         }
         if ($row['answer2'] != '') {
             $question->options()->create([
-                'content' => $row['answer2'],
-                'is_correct' => ($row['is_correct2'] == '1'),
-                'points' => ($row['is_correct2'] == '1') ? 1 : 0,
+                'content' => $this->limpiarCodificacion($row['answer2']),
+                'is_correct' => ($row['is_correct2'] == '1'||$row['is_correct2'] == 'true'),
+                'points' => ($row['is_correct2'] == '1'||$row['is_correct2'] == 'true') ? 1 : 0,
             ]);
         }
         if ($row['answer3'] != '') {
             $question->options()->create([
-                'content' => $row['answer3'],
-                'is_correct' => ($row['is_correct3'] == '1'),
-                'points' => ($row['is_correct3'] == '1') ? 1 : 0,
+                'content' => $this->limpiarCodificacion($row['answer3']),
+                'is_correct' => ($row['is_correct3'] == '1'||$row['is_correct3'] == 'true'),
+                'points' => ($row['is_correct3'] == '1'||$row['is_correct3'] == 'true') ? 1 : 0,
             ]);
         }
         if ($row['answer4'] != '') {
             $question->options()->create([
-                'content' => $row['answer4'],
-                'is_correct' => ($row['is_correct4'] == '1'),
-                'points' => ($row['is_correct4'] == '1') ? 1 : 0,
+                'content' => $this->limpiarCodificacion($row['answer4']),
+                'is_correct' => ($row['is_correct4'] == '1'||$row['is_correct4'] == 'true'),
+                'points' => ($row['is_correct4'] == '1'||$row['is_correct4'] == 'true') ? 1 : 0,
             ]);
         }
     }

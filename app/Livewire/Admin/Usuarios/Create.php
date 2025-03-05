@@ -95,8 +95,10 @@ class Create extends Component
             'selectedSubjects' => 'required|array',
         ]);
 
+        $pwd_generate = false;
         if ($this->autoPassword) {
             $this->password = \Str::random(8);
+            $pwd_generate = true;
         }
 
         // Preparamos los datos a enviar al servicio
@@ -109,6 +111,7 @@ class Create extends Component
             'roles'         => $this->selectedRoles,
             'subjects'      => $this->selectedSubjects,
             'autoPassword'  => $this->autoPassword,
+            'pwd_generate'  => $pwd_generate,
         ];
 
         // Se delega la creación del usuario en el servicio

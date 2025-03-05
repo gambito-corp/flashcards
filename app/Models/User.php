@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable  implements MustVerifyEmail
 {
     use HasApiTokens;
     use HasFactory;
@@ -30,8 +33,14 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'current_team_id', 'status'
     ];
+
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\CustomResetPassword($token));
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -63,6 +72,11 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new CustomVerifyEmail);
+    }
+
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'team_user')
@@ -75,6 +89,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Area::class, 'area_user')
             ->using(AreaUser::class)
             ->withTimestamps();
+    }
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
+    public function products()
+    {
+        return $this->hasManyThrough(Product::class, Purchase::class);
     }
 
 

@@ -34,14 +34,29 @@
         <h2 class="text-lg font-semibold mb-2 primary-color title-ask-container fz-15">Credenciales y Foto</h2>
         <hr>
         <div class="grid gap-4 mb-6">
-            <div>
+            <div class="mb-4">
                 <label for="profile_photo" class="block font-medium text-gray-700 mb-1">
                     Foto de Perfil (opcional)
                 </label>
                 <input type="file" id="profile_photo" name="profile_photo" wire:model.live="profile_photo"
                        class="w-full border rounded px-3 py-2 focus:outline-none" accept="image/*">
                 @error('profile_photo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+
+                <!-- Previsualización: Si se selecciona una nueva foto, la muestra; de lo contrario, la foto actual -->
+                <div class="mt-2">
+                    @if ($profile_photo)
+                        <!-- Previsualización de la nueva foto -->
+                        <img src="{{ $profile_photo->temporaryUrl() }}" alt="Previsualización de la Foto de Perfil" class="w-20 h-20 rounded-full object-cover">
+                    @elseif($usuario->profile_photo_path)
+                        <!-- Foto actual almacenada en S3 -->
+                        <img src="{{ Storage::disk('s3')->temporaryUrl($usuario->profile_photo_path, now()->addMinutes(10)) }}" alt="{{ $usuario->name }}" class="w-20 h-20 rounded-full object-cover">
+                    @else
+                        <!-- Imagen por defecto -->
+                        <img src="{{$usuario->profile_photo_url}}" alt="Foto de Perfil" class="w-20 h-20 rounded-full object-cover">
+                    @endif
+                </div>
             </div>
+
         </div>
 
         <!-- SECCIÓN 3: Asignaciones -->
@@ -72,7 +87,7 @@
                 <div class="flex flex-wrap gap-2">
                     @foreach($teams as $team)
                         <label class="inline-flex items-center">
-                            <input type="checkbox" value="{{ $team->id }}" wire:model.live="selectedTeams "
+                            <input type="checkbox" value="{{ $team->id }}" wire:model.live="selectedTeams"
                                    class="form-checkbox text-green-500 chexbox-f">
                             <span class="ml-2">{{ $team->name }}</span>
                         </label>

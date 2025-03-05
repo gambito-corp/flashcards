@@ -62,7 +62,11 @@
                         </td>
                         <!-- Foto de Perfil -->
                         <td class="px-4 py-2">
-                            <img src="{{ $item->profile_photo_url }}" alt="Foto de Perfil" class="w-10 h-10 rounded-full">
+                            @if ($item->profile_photo_path)
+                                <img src="{{ Storage::disk('s3')->temporaryUrl($item->profile_photo_path, now()->addMinutes(10)) }}" alt="Foto de Perfil" class="w-10 h-10 rounded-full">
+                            @else
+                                <img src="{{ $item->profile_photo_url }}" alt="Foto de Perfil" class="w-10 h-10 rounded-full">
+                            @endif
                         </td>
                         <!-- Carreras Registradas -->
                         <td class="px-4 py-2">

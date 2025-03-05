@@ -13,24 +13,13 @@ use App\Http\Controllers\CustomLoginController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MercadoPagoWebhookController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PreguntasController;
 use Illuminate\Support\Facades\Route;
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-Route::get('/', [HomeController::class, 'landing'])->name('landing');
 Route::redirect('/home', '/dashboard');
-
+Route::redirect('/', 'https://medbystudents.com/app-banqueo/');
 
 Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
@@ -186,3 +175,22 @@ Route::middleware([
                 });
         });
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    // Ruta para iniciar la suscripción pasando el ID del producto
+    Route::get('/subscription/create/{productId}', [PaymentController::class, 'createSubscription'])
+        ->name('mercadopago.createSubscription');
+
+    // Ruta de callback (retorno) de MercadoPago
+    Route::get('/mercadopago/callback', [PaymentController::class, 'callback'])
+        ->name('mercadopago.callback');
+});
+
+Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle']);
+
+//Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
+//
+//Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+//Route::get('/payment/failure', [PaymentController::class, 'failure'])->name('payment.failure');
+//Route::get('/payment/pending', [PaymentController::class, 'pending'])->name('payment.pending');

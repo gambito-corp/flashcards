@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
+use Spatie\Permission\Models\Role;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -24,22 +25,20 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         return DB::transaction(function () use ($input) {
-            return tap(User::create([
-                'name' => $input['name'],
-                'email' => $input['email'],
-                'password' => Hash::make($input['password']),
+            $user = tap(User::create([
+                'name'            => $input['name'],
+                'email'           => $input['email'],
+                'password'        => Hash::make($input['password']),
+                'current_team_id' => Team::query()->where('id', 1)->first()->id,
+                'status'          => '0'
             ]), function (User $user) {
-                $this->createTeam($user);
+                $rol = Role::query()->where('name', 'user')->first();
+                $user->assignRole($rol);
             });
-        });
-    }
 
-    protected function createTeam(User $user): void
-    {
-        $user->ownedTeams()->save(Team::forceCreate([
-            'user_id' => $user->id,
-            'name' => explode(' ', $user->name, 2)[0]."'s Team",
-            'personal_team' => true,
-        ]));
+            $user->sendEmailVerificationNotification();
+
+            return $user;
+        });
     }
 }

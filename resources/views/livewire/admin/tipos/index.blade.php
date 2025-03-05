@@ -27,6 +27,7 @@
             <thead class="bg-gray-200">
             <tr>
                 <th class="px-4 py-2 text-left">Nº</th>
+                <th class="px-4 py-2 text-left">Id</th>
                 <th class="px-4 py-2 text-left">Carrera</th>
                 <th class="px-4 py-2 text-left">Asignatura</th>
                 <th class="px-4 py-2 text-left">Categoría</th>
@@ -37,7 +38,8 @@
             <tbody>
             @forelse($tipos as $index => $tipo)
                 <tr class="border-b">
-                    <td class="px-4 py-2">{{ $index + 1 }}</td>
+                    <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                    <td class="px-4 py-2">{{ $tipo->id }}</td>
                     <td class="px-4 py-2">{{ $tipo->category->area->team->name ?? '-' }}</td>
                     <td class="px-4 py-2">{{ $tipo->category->area->name ?? '-' }}</td>
                     <td class="px-4 py-2">{{ $tipo->category->name ?? '-' }}</td>

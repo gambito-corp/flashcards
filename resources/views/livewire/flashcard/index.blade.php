@@ -20,7 +20,7 @@
               <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 boton-success-m">Crear Categoría</button></div>
             </div>
 
-          
+
         </form>
     </div>
 
@@ -51,8 +51,8 @@
                 @error('url') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div class="mb-4">
-                <label for="imagen" class="block text-gray-700">Imagen (URL o ruta)</label>
-                <input type="text" id="imagen" wire:model="imagen" class="mt-1 block w-full rounded border-gray-300  ">
+                <label for="imagen" class="block text-gray-700">Imagen</label>
+                <input type="file" id="imagen" wire:model="imagen" accept="image/*" class="mt-1 block w-full rounded border-gray-300">
                 @error('imagen') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             </div>
@@ -63,8 +63,8 @@
                 @error('url_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div class="mb-4">
-                <label for="imagen_respuesta" class="block text-gray-700">Imagen Respuesta (URL o ruta)</label>
-                <input type="text" id="imagen_respuesta" wire:model="imagen_respuesta" class="mt-1 block w-full rounded border-gray-300 ">
+                <label for="imagen_respuesta" class="block text-gray-700">Imagen Respuesta</label>
+                <input type="file" id="imagen_respuesta" wire:model="imagen_respuesta" accept="image/*" class="mt-1 block w-full rounded border-gray-300">
                 @error('imagen_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             </div>

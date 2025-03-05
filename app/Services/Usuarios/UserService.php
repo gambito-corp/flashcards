@@ -19,10 +19,11 @@ class UserService
                 'name'     => $data['name'],
                 'email'    => $data['email'],
                 'password' => bcrypt($data['password']),
+                'current_team_id' => $data['teams'][0],
             ]);
 
             if (isset($data['profile_photo'])) {
-                $path = $data['profile_photo']->store('profile_photos', 'public');
+                $path = $data['profile_photo']->store('avatars', 's3');
                 $user->profile_photo_path = $path;
                 $user->save();
             } else {
@@ -36,6 +37,11 @@ class UserService
             }
             $subjectIds = array_keys($data['subjects']);
             $user->areas()->sync($subjectIds);
+            if (isset($data['pwd_generate']) && $data['pwd_generate'] === true) {
+                $user->notify(new \App\Notifications\CustomVerifyEmail($data['password']));
+            } else {
+                $user->sendEmailVerificationNotification();
+            }
 
             return $user;
         });
@@ -52,7 +58,7 @@ class UserService
 
             // Guarda la foto de perfil si se envía, o deja la existente
             if (isset($data['profile_photo'])) {
-                $path = $data['profile_photo']->store('profile_photos', 'public');
+                $path = $data['profile_photo']->store('avatars', 's3');
                 $user->update(['profile_photo_path' => $path]);
             } else {
                 // Si no se envía nueva foto, se deja la actual o se establece null para usar el avatar por defecto
