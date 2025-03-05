@@ -32,6 +32,8 @@ Route::middleware([
 ])->group(callback: function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
+    Route::get('/planes', [HomeController::class, 'planes'])->name('planes');
+
     Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.update');
 //    /*PREGUNTAS*/
     Route::get('/preguntas', [PreguntasController::class, 'index'])

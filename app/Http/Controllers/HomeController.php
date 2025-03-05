@@ -12,6 +12,11 @@ class HomeController extends Controller
         return view('index.dashboard');
     }
 
+    public function planes()
+    {
+        return view('index.planes');
+    }
+
     public function landing()
     {
         return view('index.landing');
