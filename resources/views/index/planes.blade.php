@@ -1,10 +1,10 @@
 <x-app-layout title="palnes">
     <div class="max-w-5xl mx-auto p-4">
         <!-- Contenedor de cards: 1 columna en móviles y 2 en pantallas medianas y superiores -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
 
             <!-- Card para el Plan Básico -->
-            <div class="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+            <div class="bg-white rounded-2xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 p-5 flex-center flex">
                 <div class="p-6">
                     <h2 class="text-2xl font-bold mb-3">Plan Básico</h2>
                     <p class="text-gray-600 mb-4">
@@ -20,7 +20,7 @@
             </div>
 
             <!-- Card para el Plan Premium -->
-            <div class="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+            <div class="bg-white rounded-2xl  border border-gray-200 hover:shadow-xl transition-shadow duration-300">
                 <div class="p-6">
                     <h2 class="text-2xl font-bold mb-3">Plan Premium</h2>
                     <p class="text-gray-600 mb-4">
