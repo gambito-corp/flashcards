@@ -857,3 +857,26 @@ color: #ffffff;
     color:var(--primary-color) !important;
     opacity: 0.9;
 }
+      /* Ajustes de estilo adicionales */
+      .swiper-container {
+        height: fit-content;
+        width: auto;
+    }
+
+    .swiper-slide {
+        width: max-content !important;
+    }
+    .swiper-button-next,
+    .swiper-button-prev {
+
+        width: 30px;
+        height: 30px;
+        background-color: hsl(0deg 0% 0% / 40%);
+        border-radius: 50px;
+        font-size: 14px;
+    }
+    .swiper-button-next::after,
+    .swiper-button-prev::after {
+        font-size: 13px;
+        color: white;
+    }
