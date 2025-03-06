@@ -4,49 +4,34 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
 
             <!-- Card para el Plan Básico -->
-            <div class="bg-white rounded-2xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 py-5">
-                <div class="p-6 text-center flex content-center flex-col">
-                    <img class="text-center img-planes w-[100px] m-auto pb-5 "  src="/imgc.webp" alt="Planes">
-                    <h2 class="text-2xl font-bold mb-3">Plan Premium (1 mes)</h2>
-                    <div class="text-2xl font-extrabold  primary-color ">
-                    S/ 50.00<span class="text-base font-normal font-black "></span>
+
+                @forelse ($planes as $plan)
+                    <div class="bg-white rounded-2xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 py-5">
+                        <div class="p-6 text-center flex content-center flex-col">
+                        <img class="text-center img-planes w-[100px] m-auto pb-5 "  src="/imgc.webp" alt="Planes">
+                        <h2 class="text-2xl font-bold mb-3">{{$plan->name}}</h2>
+                        <div class="text-2xl font-extrabold  primary-color ">
+                            S/ {{$plan->price}}<span class="text-base font-normal font-black "></span>
+                        </div>
+{{--                        @if ($plan->id == 1)--}}
+                            <ul class="py-3 pb-6 text-[#727275] text-[17px] leading-[30px]  font-medium ">
+                                <li>Examenes ilimitados</li>
+                                <li>Uso de flashcards</li>
+                                <li>Control y estadisticas de nota</li>
+                                <li>Inteligencia artificial e Medisearch</li>
+
+                            </ul>
+{{--                        @else--}}
+{{--                        @endif--}}
+
+                        <a href="{{ route('mercadopago.createSubscription', ['productId' => $plan->id]) }}" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300 boton-success-m">
+                            Seleccionar Plan
+                        </a>
                     </div>
-                    <ul class="py-3 pb-6 text-[#727275] text-[17px] leading-[30px]  font-medium ">
-                        <li>Examenes ilimitados</li>
-                        <li>Uso de flashcards</li>
-                        <li>Control y estadisticas de nota</li>
-                        <li>Inteligencia artificial e Medisearch</li>
-
-                    </ul>
-                 
-                    <a href="{{ route('mercadopago.createSubscription', ['productId' => 1]) }}" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300 boton-success-m">
-                        Seleccionar Plan
-                    </a>
-                </div>
-            </div>
-
-            <!-- Card para el Plan Premium -->
-            <div class="bg-white rounded-2xl  border border-gray-200 hover:shadow-xl transition-shadow duration-300 py-5">
-            <div class="p-6 text-center flex content-center flex-col">
-                <img class="text-center img-planes w-[100px] m-auto pb-5 "  src="/imgc.webp" alt="Planes">
-                    <h2 class="text-2xl font-bold mb-3">Plan Premium (6 meses)</h2>
-                    <div class="text-2xl font-extrabold  primary-color">
-                    S/ 200.00<span class="text-base font-normal font-black">
-                       </span>
                     </div>
-                    <ul class="py-3 pb-6 text-[#727275] text-[17px] leading-[30px]   font-medium">
-                        <li>Examenes ilimitados</li>
-                        <li>Uso de flashcards</li>
-                        <li>Control y estadisticas de nota</li>
-                        <li>Inteligencia artificial e Medisearch</li>
-                    </ul>
-                  
-                    <a href="{{ route('mercadopago.createSubscription', ['productId' => 2]) }}" class="w-full inline-block text-center bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg transition-colors duration-300  boton-success-m">
-                        Seleccionar Plan
-                    </a>
-                </div>
-            </div>
-
+                @empty
+                    <h1>No Se Cargaron planes Todavia...</h1>
+                @endforelse
         </div>
     </div>
 </x-app-layout>
