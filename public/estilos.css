@@ -838,13 +838,19 @@ nav .text-gray-900 {
 
 color: #ffffff;
 }
-.img-dashboard__regret{
-    position: absolute;
-    top: 0;
-    right: 0;
-    mix-blend-mode: luminosity;
-}
 
+.img-dashboard__regret{
+display:none;
+}
+@media (min-width:992px){
+    .img-dashboard__regret{
+        position: absolute;
+        top: 0;
+        right: 0;
+        mix-blend-mode: luminosity;
+        display: block;
+    }   
+}
 
 .box-dashboard hr{
     opacity: .1;
