@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomLoginController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MedisearchController;
 use App\Http\Controllers\MercadoPagoWebhookController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PreguntasController;
@@ -190,6 +191,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle']);
+
+Route::get('/chat/{query}', [MedisearchController::class, 'chat'])->name('chat');
 
 //Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
 //
