@@ -79,7 +79,7 @@
                     id="profile_photo"
                     name="profile_photo"
                     wire:model.live="profile_photo"
-                    class="w-full border rounded px-3 py-2 focus:outline-none"
+                    class="text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer"
                     accept="image/*"
                 />
                 @error('profile_photo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
