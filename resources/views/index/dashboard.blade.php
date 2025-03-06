@@ -9,7 +9,7 @@
                     <a href="{{route('planes')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
                         Más información<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg"/>
                     </a>
-                    <img class="absolute right-0 bottom-0 mix-blend-luminosity hidden lg:block" src="/dashboard-img.png" />
+                    <img class="absolute right-0 bottom-0 mix-blend-luminosity" src="/dashboard-img.png" />
                 </div>
                 <div class="col-span-3 flex items-center justify-center">
                     <i class="fal fa-graduation-cap fa-3x opacity-30"></i>
