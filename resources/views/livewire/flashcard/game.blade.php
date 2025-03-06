@@ -43,14 +43,9 @@
         @if($currentCard)
             <div class=" rounded-lg  ">
                 <!-- Contenedor 3D con perspectiva y efecto slide -->
-                <div class="relative perspective-1000 w-full "
-                     :class="{
-                         'slide-left': slideDirection === 'left',
-                         'slide-right': slideDirection === 'right'
-                     }">
+                <div class="relative  w-full">
                     <!-- Contenedor interno que rota en 3D -->
-                    <div class="w-full  transition-transform duration-500 transform-style-3d"
-                         :class="{ 'rotate-y-180': showAnswer }">
+                    <div class="w-full ">
                         <!-- Cara frontal (pregunta) -->
 
                         <div class=" w-full  backface-hidden bg-white p-4 border rounded shadow flex  justify-center box-answer flex-col card-frontal">
@@ -61,16 +56,19 @@
 
                                 </h2>
                             </div>
-                            <div>
-                                @if ($currentCard->imagen)
-                                    <img class="img-answer" src="{{ Storage::disk('s3')->temporaryUrl($currentCard->imagen, now()->addMinutes(10)) }}" alt="Imagen de la pregunta">
-                                @else
-                                    <img class="img-answer" src="{{ asset('img.png') }}" alt="Imagen por defecto">
-                                @endif
-                            </div>
+                            <div class="cursor-pointer">
+    @if ($currentCard->imagen)
+        <img class="img-answer" src="{{ Storage::disk('s3')->temporaryUrl($currentCard->imagen, now()->addMinutes(10)) }}" alt="Imagen de la pregunta" onclick="openModal(this)">
+    @else
+        <img class="img-answer" src="{{ asset('img.png') }}" alt="Imagen por defecto" onclick="openModal(this)">
+    @endif
+</div>
+
+
+
                         </div>
                         <!-- Cara trasera (respuesta) -->
-                        <div class=" w-full  backface-hidden bg-white p-4 rounded  flex  justify-center transform rotate-y-180 answer-c flex-col top-0  card-trasera">
+                        <div class=" w-full  backface-hidden bg-white p-4 rounded  flex  justify-center  answer-c flex-col top-0  card-trasera">
                         <div class="box-content-answer">
                         <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyNC4yLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0ic3ZnMiIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyINCgkgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMjYuMiAxMjYuMiINCgkgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTI2LjIgMTI2LjI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+DQoJLnN0MHtmaWxsOiMxOTVCODE7fQ0KPC9zdHlsZT4NCjxnPg0KCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04NC4xLDQxLjhjMy45LDAuNyw4LDEsMTEuNywyLjNjMTYuOCw1LjUsMjYuNywxNy4yLDI5LjQsMzQuN2MxLjEsNy41LDAsMTQuNy0zLDIxLjcNCgkJYy0wLjIsMC41LTAuMywxLjItMC4yLDEuOGMxLjEsNi4zLDIuMywxMi42LDMuNCwxOC45YzAuNSwzLTEuMyw0LjktNC4zLDQuNGMtNS41LTAuOS0xMC45LTEuOS0xNi4zLTNjLTIuMi0wLjQtNC4yLTAuNC02LjQsMC41DQoJCWMtMjQsOC45LTUwLjItNS42LTU1LjQtMzAuN2MtMC42LTIuNy0wLjctNS40LTEtOC4xYy0yLjctMC4zLTUuNS0wLjUtOC4yLTEuMWMtMi42LTAuNi01LjItMS42LTcuNy0yLjNjLTAuOC0wLjItMS43LTAuNC0yLjUtMC4zDQoJCWMtNi4xLDEuMS0xMi4yLDIuMi0xOC40LDMuNGMtMy4yLDAuNi01LjItMS4zLTQuNi00LjVDMS44LDczLDMsNjYuOCw0LjEsNjAuNWMwLjEtMC42LDAtMS4zLTAuMi0xLjhDLTQuNiwzOC40LDMuNywxNS4zLDIzLjIsNS4yDQoJCUM0Ny4zLTcuMyw3Nyw2LjYsODIuOSwzMy4xQzgzLjUsMzYuMSw4My43LDM5LjEsODQuMSw0MS44eiBNMTE3LjcsMTE3LjhjMC0wLjQsMC0wLjYtMC4xLTAuOGMtMC44LTQuNC0xLjYtOC45LTIuNS0xMy4zDQoJCWMtMC40LTIuMi0wLjMtNC4xLDAuNy02LjJjMi41LTUuNSwzLjMtMTEuNCwyLjYtMTcuNGMtMS43LTE0LjktMTIuMy0yNi43LTI2LjktMzAuMWMtMi43LTAuNi01LjUtMS04LjEtMC44DQoJCWMtNC4zLDE4LjctMTUuNywzMC0zNC4zLDM0LjNjMC4xLDEuNywwLjEsMy40LDAuNCw1LjFjMy4yLDIzLjMsMjcuNywzNi42LDQ5LjEsMjYuOWMxLTAuNSwyLjMtMC41LDMuNS0wLjUNCgkJYzEuNiwwLjEsMy4yLDAuNSw0LjgsMC44QzExMC40LDExNi41LDExNCwxMTcuMiwxMTcuNywxMTcuOHogTTguMyw3Ni4yQzksNzYuMSw5LjUsNzYsOS45LDc1LjljNC42LTAuOCw5LjMtMS43LDEzLjktMi42DQoJCWMxLjQtMC4zLDIuNy0wLjEsNCwwLjVjNS42LDIuNiwxMS41LDMuNSwxNy43LDIuOWMxOS42LTEuOSwzMy44LTE5LjYsMzEuMi0zOUM3NC4xLDE4LjYsNTYuNSw1LjIsMzcuMyw3LjkNCgkJYy0yMi41LDMuMi0zNiwyNy0yNy4xLDQ3LjhjMSwyLjIsMS4yLDQuMywwLjcsNi42QzEwLDY2LjgsOS4yLDcxLjQsOC4zLDc2LjJ6Ii8+DQoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTEwMS4zLDEwMWMwLDItMSwzLjMtMi42LDMuN2MtMS43LDAuNC0zLjMtMC4zLTQtMmMtMS0yLjQtMi00LjgtMi45LTcuM2MtMC4zLTAuNy0wLjYtMS4xLTEuNS0xDQoJCWMtNC4yLDAtOC40LDAtMTIuNiwwYy0wLjgsMC0xLjIsMC4zLTEuNSwxLjFjLTAuOSwyLjMtMS44LDQuNS0yLjcsNi44Yy0wLjksMi4yLTIuOCwzLjEtNC43LDIuM2MtMS45LTAuOC0yLjYtMi43LTEuOC00LjkNCgkJYzQuNS0xMS4zLDkuMS0yMi43LDEzLjYtMzRjMC42LTEuNSwxLjctMi41LDMuNC0yLjVjMS43LDAsMi44LDEsMy40LDIuNWM0LjUsMTEuMyw5LDIyLjYsMTMuNSwzMy45DQoJCUMxMDEuMSwxMDAuMSwxMDEuMiwxMDAuNywxMDEuMywxMDF6IE04OC41LDg3LjRjLTEuNS0zLjgtMy03LjUtNC42LTExLjRjLTEuNiw0LTMsNy43LTQuNSwxMS40QzgyLjUsODcuNCw4NS40LDg3LjQsODguNSw4Ny40eiIvPg0KCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik01OS4yLDU0LjVjMSwwLjksMS45LDEuNywyLjgsMi42YzEuNSwxLjYsMS41LDMuNywwLjEsNS4xYy0xLjQsMS40LTMuNCwxLjQtNS0wLjFjLTAuOS0wLjktMS43LTEuOS0yLjUtMi44DQoJCWMtMTAuOSw3LjItMjMuMSwzLjUtMjktNC41Yy02LjItOC40LTUuMy0yMC4xLDIuMS0yNy4zYzcuNi03LjMsMTkuMi04LDI3LjQtMS42QzYzLDMyLDY2LjEsNDQuMSw1OS4yLDU0LjV6IE01NCw0OS4zDQoJCWMzLjgtNS45LDIuMy0xMy45LTMuMy0xOC4yYy01LjgtNC40LTE0LTMuNy0xOC45LDEuOGMtNC44LDUuMy00LjYsMTMuNywwLjMsMTguOWM0LjUsNC42LDEyLjcsNS44LDE2LjksMi4zDQoJCWMtMC43LTAuNy0xLjUtMS40LTIuMi0yLjJjLTEuNS0xLjYtMS42LTMuNy0wLjMtNS4xYzEuNC0xLjUsMy41LTEuNSw1LjEsMC4xQzUyLjYsNDcuNiw1My4yLDQ4LjUsNTQsNDkuM3oiLz4NCjwvZz4NCjwvc3ZnPg0K"/>
                         <h2 class=" font-semibold text-gray-500  text-color">
@@ -135,22 +133,7 @@
 
 @push('styles')
     <style>
-        /* Perspectiva 3D */
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-        /* Permite que el contenedor interno mantenga su estilo 3D */
-        .transform-style-3d {
-            transform-style: preserve-3d;
-        }
-        /* Oculta la cara que no se está mostrando */
-        .backface-hidden {
-            backface-visibility: hidden;
-        }
-        /* Rota la tarjeta 180° en el eje Y */
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-        }
+  
         /* Efectos de slide para el contenedor */
         .slide-left {
             transform: translateX(-100%);
@@ -182,6 +165,21 @@
         cardTrasera.style.display = 'block';
     }, 500);
   });
+
+  // Función para abrir el modal
+function openModal(imgElement) {
+    var modal = document.getElementById("lightboxModal");
+    var modalImg = document.getElementById("modalImage");
+    modal.style.display = "flex"; // Mostramos el modal
+    modalImg.src = imgElement.src; // Establecemos la imagen del modal
+}
+
+// Función para cerrar el modal
+function closeModal() {
+    var modal = document.getElementById("lightboxModal");
+    modal.style.display = "none"; // Ocultamos el modal
+}
+
 </script>
 
 @endpush
