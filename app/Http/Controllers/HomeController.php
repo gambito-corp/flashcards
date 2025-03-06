@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Exam;
 use App\Models\ExamResult;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -56,7 +57,8 @@ class HomeController extends Controller
 
     public function planes()
     {
-        return view('index.planes');
+        $planes = Product::query()->take(2)->get();
+        return view('index.planes', compact('planes'));
     }
 
     public function landing()
