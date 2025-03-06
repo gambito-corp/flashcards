@@ -837,6 +837,13 @@ nav .text-gray-900 {
 
 color: #ffffff;
 }
+.img-dashboard__regret{
+    position: absolute;
+    top: 0;
+    right: 0;
+    mix-blend-mode: luminosity;
+}
+
 
 .box-dashboard hr{
     opacity: .1;
