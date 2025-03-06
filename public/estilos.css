@@ -880,3 +880,6 @@ color: #ffffff;
         font-size: 13px;
         color: white;
     }
+    .nopadding-dashboard{
+        margin-bottom: 0 !important;
+    }

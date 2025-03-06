@@ -62,7 +62,7 @@
 
     <!-- Paginación -->
     @if($perPage !== 'all')
-        <div class="mt-4">
+        <div class="mt-4 pagination-table">
             {{ $categories->links() }}
         </div>
     @endif

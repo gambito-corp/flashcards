@@ -1,5 +1,5 @@
 <x-main-layout title="Bienvenido {{auth()->user()->name}}">
-    <div class=" bg-white border-b border-gray-200  container-ask box-dashboard relative overflow-hidden max-sm:m-5 shadow-md">
+    <div class=" bg-white border-b border-gray-200  container-ask box-dashboard relative overflow-hidden max-sm:m-5 shadow-md nopadding-dashboard">
         <div class="mb-4 bg-[radial-gradient(circle, rgb(2,85,91), rgb(1,25,27))]">
             <div class="grid grid-cols-2 relative">
                 <div class="span-2">
@@ -9,7 +9,7 @@
                     <a href="{{route('planes')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
                         Más información<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg"/>
                     </a>
-                    <img class="absolute right-0 bottom-0 mix-blend-luminosity hidden lg:block" src="{{asset('dashboard-img.png')}}" />
+                    <img class="absolute right-0 bottom-0 mix-blend-luminosity hidden lg:block top-0" src="{{asset('dashboard-img.png')}}" />
                 </div>
                 <div class="col-span-3 flex items-center justify-center">
                     <i class="fal fa-graduation-cap fa-3x opacity-30"></i>
@@ -20,9 +20,10 @@
     <div class="">
 
         <!-- Card 2: Tabla de últimos exámenes realizados -->
-        <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200">
+        <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 container-ask nopadding-dashboard">
             <div class="p-6">
-                <h2 class="text-2xl font-bold mb-4">Últimos Exámenes Realizados</h2>
+                <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container ">Últimos Exámenes Realizados</h2>
+                <hr>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -60,9 +61,10 @@
         </div>
 
         <!-- Card 3: Gráfico de evolución -->
-        <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200">
+        <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 container-ask">
             <div class="p-6">
-                <h2 class="text-2xl font-bold mb-4">Evolución del Usuario</h2>
+                <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container ">Evolución del Usuario</h2>
+                <hr>
                 <!-- Selector para elegir el rango de tiempo -->
                 <select id="timeframe" class="mb-4 p-2 border rounded">
                     <option value="day">Día a Día</option>
