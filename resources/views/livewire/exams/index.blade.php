@@ -146,7 +146,7 @@
                     Realizar Examen
                 </button>
             @else
-                <p class="text-red-800 font-bold">*** Supero La Cantidad De Examenes Permitidos Por Mes Desea Adquirir Premium ***</p>
+                <p class="text-red-800 font-bold">*** Supero La Cantidad De Examenes Permitidos Por Semana Desea Adquirir Premium ***</p>
                 <x-pago/>
             @endif
         </div>
