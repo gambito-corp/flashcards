@@ -98,6 +98,7 @@ class PreguntasSevices
 
     public function crearPreguntaCSV($row)
     {
+        dd($row);
         try {
             $approved =(auth()->user()->hasRole('admin') || auth()->user()->hasRole('root')) ? 1 : 0;
 
