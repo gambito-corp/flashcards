@@ -4,7 +4,6 @@
     </script>
 @else
     <div x-data="tabsComponent({{json_encode(auth()->user()->status) }})" x-init="init()" class="container mx-auto p-4 bg-white shadow rounded-lg container-ask">
-        @dump(auth()->user()->status, json_encode(auth()->user()->status))
         <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container">Examen: Selección de Preguntas</h2>
         <hr>
 
