@@ -49,9 +49,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">Matemáticas</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">2025-02-25</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">85%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap" colspan="3">No Hay Resultados</td>
                                 </tr>
                             @endforelse
                         </tbody>
