@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Purchase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
@@ -78,11 +79,33 @@ class PaymentController extends Controller
         }
     }
 
+    public function checkPaymentStatus($paymentId)
+    {
+        $accessToken = config('services.mercadopago.token');
+
+        $response = Http::get("https://api.mercadopago.com/v1/payments/{$paymentId}", [
+            'access_token' => $accessToken,
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $status = $data['status'] ?? 'desconocido';
+            return $status;
+        }
+
+        return null;
+    }
+
     public function callback(Request $request)
     {
         Log::info('Callback de MercadoPago recibido:', $request->all());
-        $status = $request->query('status');
-        dd($request->all());
+        $paymentQuery = $request->query('payment_id');
+        if (!is_array($paymentQuery) || !isset($paymentQuery['preapproval_id'])) {
+            return redirect()->back()->with('error', 'No se recibió el ID de preaprobación del pago.');
+        }
+        $preapprovalId = $paymentQuery['preapproval_id'];
+        $status = $this->checkPaymentStatus($preapprovalId);
+        dd($status);
 
         if ($status === 'approved') {
             // Lógica para pago exitoso
