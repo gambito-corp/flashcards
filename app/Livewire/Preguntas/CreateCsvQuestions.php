@@ -26,7 +26,7 @@ class CreateCsvQuestions extends Component
         if (($handle = fopen($path, 'r')) !== false) {
             // Aplica un filtro para convertir de ISO-8859-1 a UTF-8.
             // Si tu archivo está en WINDOWS-1252, cambia el primer parámetro.
-            stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
+            stream_filter_append($handle, 'convert.iconv.WINDOWS-1252/UTF-8');
 
             $header = fgetcsv($handle, 1000, ';');
             while (($data = fgetcsv($handle, 1000, ';')) !== false) {
