@@ -36,6 +36,10 @@ return [
         'public_key' => env('MP_PUBLIC_KEY'),
         'secret_key' => env('MP_SECRET_KEY'),
         'sandbox' => env('MP_SANDBOX', false),
-    ]
+    ],
+    'medisearch' => [
+        'base_url' => env('MEDSEARCH_BASE_URL', 'https://api.medisearch.com'),
+        'token' => env('MEDSEARCH_TOKEN'),
+    ],
 
 ];

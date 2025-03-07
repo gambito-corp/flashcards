@@ -19,8 +19,8 @@ class MedisearchController extends Controller
     }
     public function buscarMedisearchGuzzle($query)
     {
-        $apiKey = 'TU_API_KEY'; // Reemplaza con tu API Key
-        $baseUrl = 'https://api.medisearch.io/v1';
+        $apiKey = config('services.medisearch.token'); // Reemplaza con tu API Key
+        $baseUrl = config('services.medisearch.base_url');
         $client = new Client();
 
         $response = $client->request('GET', $baseUrl . '/search', [
