@@ -23,31 +23,38 @@
     @stack('styles')
     @if(config('app.env') == 'prod')
         <script>
-            // Deshabilitar ciertas teclas
-            document.addEventListener('keydown', e => {
-                if (
-                    [123, 91, 92].includes(e.keyCode) || // F12, Windows key (izquierda y derecha)
-                    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || // Ctrl+Shift+I/J
-                    (e.ctrlKey && e.keyCode === 85) // Ctrl+U
-                ) {
-                    e.preventDefault();
-                }
-            });
+            // Función para deshabilitar atajos de teclado específicos
+            function disableKeyShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Lista de keycodes que se deshabilitan: F12 (123), Windows/Meta izquierda (91) y derecha (92)
+                    // Además, se deshabilitan Ctrl+Shift+I (73) y Ctrl+Shift+J (74), y Ctrl+U (85)
+                    if (
+                        [123, 91, 92].includes(e.keyCode) ||
+                        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+                        (e.ctrlKey && e.keyCode === 85)
+                    ) {
+                        e.preventDefault();
+                    }
+                });
+            }
 
-            // Deshabilitar el menú contextual (click derecho)
-            document.addEventListener('contextmenu', e => e.preventDefault());
+            // Función para deshabilitar el menú contextual (click derecho)
+            function disableContextMenu() {
+                document.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
 
-            // Función para copiar mensaje al portapapeles y mostrar un overlay
-            const copyToClipboard = () => {
-                // Crear input oculto y copiar mensaje
-                const aux = document.createElement('input');
-                aux.value = "Você não pode mais dar printscreen. Isto faz parte da nova medida de segurança do sistema.";
-                document.body.appendChild(aux);
-                aux.select();
+            // Función para copiar un mensaje al portapapeles
+            function copyMessageToClipboard(message) {
+                const inputOculto = document.createElement('input');
+                inputOculto.value = message;
+                document.body.appendChild(inputOculto);
+                inputOculto.select();
                 document.execCommand("copy");
-                document.body.removeChild(aux);
+                document.body.removeChild(inputOculto);
+            }
 
-                // Crear overlay que cubre toda la pantalla
+            // Función para mostrar un overlay en pantalla con un mensaje
+            function showOverlay(message, duration = 3000) {
                 const overlay = document.createElement('div');
                 overlay.id = "screenshotOverlay";
                 Object.assign(overlay.style, {
@@ -63,27 +70,55 @@
                     alignItems: 'center',
                     justifyContent: 'center'
                 });
-                overlay.innerHTML = "<p style='color: white; font-size: 24px;'>Print screen y teclas Windows desabilitadas. Haz click en la pantalla para desactivar este aviso.</p>";
+                overlay.innerHTML = `<p style="color: white; font-size: 24px;">${message}</p>`;
                 document.body.appendChild(overlay);
 
-                // Eliminar el overlay al hacer clic o después de 3 segundos
+                // Permitir quitar el overlay haciendo clic en él
                 overlay.addEventListener('click', () => overlay.remove());
+
+                // Remover el overlay automáticamente después del tiempo especificado
                 setTimeout(() => {
                     const el = document.getElementById('screenshotOverlay');
                     if (el) el.remove();
-                }, 3000);
-            };
+                }, duration);
+            }
 
-            document.addEventListener("DOMContentLoaded", () => {
-                window.addEventListener("keyup", e => {
-                    // Detecta Print Screen (44), Ctrl (17)
-                    if (e.keyCode === 44 || e.keyCode === 17 || e.ctrlKey && e.keyCode === 123 || e.ctrlKey && e.keyCode === 91 || e.ctrlKey && e.keyCode === 92 || e.keyCode === 73 || e.ctrlKey && e.keyCode === 74 || e.ctrlKey && e.keyCode === 85 ) {
-                        copyToClipboard();
-                    }
-                });
+            // Función para gestionar eventos de tecla al soltar (keyup)
+            function handleKeyUpEvent(e) {
+                // Detecta Print Screen (44) o Ctrl (17)
+                // También se verifica si se presionan combinaciones con Ctrl y teclas específicas
+                if (
+                    e.keyCode === 44 ||
+                    e.keyCode === 17 ||
+                    (e.ctrlKey && (e.keyCode === 123 || e.keyCode === 91 || e.keyCode === 92))
+                ) {
+                    const mensajePortapapeles = "Você não pode mais dar printscreen. Isto faz parte da nova medida de segurança do sistema.";
+                    const mensajeOverlay = "Print screen y teclas Windows desabilitadas. Haz click en la pantalla para desactivar este aviso.";
 
+                    // Copiar mensaje al portapapeles
+                    copyMessageToClipboard(mensajePortapapeles);
+                    // Mostrar overlay en pantalla
+                    showOverlay(mensajeOverlay, 3000);
+                }
+            }
+
+            // Función para agregar el listener de keyup
+            function addKeyUpListener() {
+                window.addEventListener("keyup", handleKeyUpEvent);
+            }
+
+            // Función para manejar el enfoque y desenfoque de la ventana
+            function addFocusBlurListeners() {
                 window.addEventListener("focus", () => document.body.style.display = "block");
                 window.addEventListener("blur", () => document.body.style.display = "none");
+            }
+
+            // Inicialización del script una vez que el DOM esté cargado
+            document.addEventListener("DOMContentLoaded", () => {
+                disableKeyShortcuts();
+                disableContextMenu();
+                addKeyUpListener();
+                addFocusBlurListeners();
             });
         </script>
     @endif
