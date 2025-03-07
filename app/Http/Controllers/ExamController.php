@@ -100,9 +100,12 @@ class ExamController extends Controller
             $allSelectedQuestions = $allSelectedQuestions->merge($selected);
         }
 
-        // Limitar a un máximo global de 200 preguntas
-        if ($allSelectedQuestions->count() > 200) {
-            $allSelectedQuestions = $allSelectedQuestions->random(200);
+        // Definir el límite según el estado del usuario
+        $limit = auth()->user()->status == 1 ? 200 : 10;
+
+        // Limitar a un máximo global de preguntas según el límite definido
+        if ($allSelectedQuestions->count() > $limit) {
+            $allSelectedQuestions = $allSelectedQuestions->random($limit);
         }
 
         // Adjuntar las preguntas al examen (relación many-to-many)

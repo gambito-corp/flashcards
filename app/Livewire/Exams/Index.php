@@ -15,14 +15,15 @@ class Index extends Component
         $user = Auth::user();
         // Si el usuario tiene status 0, se verifica el límite de exámenes del mes actual.
         if ($user->status == 0) {
-            $currentMonthExamCount = ExamResult::query()->where('user_id', $user->id)
-                ->whereYear('created_at', now()->year)
-                ->whereMonth('created_at', now()->month)
+            $currentWeekExamCount = ExamResult::query()
+                ->where('user_id', $user->id)
+                ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
                 ->count();
 
-            if ($currentMonthExamCount >= 10) {
+            if ($currentWeekExamCount >= 3) {
                 $this->overLimit = true;
             }
+
         }
 
         return view('livewire.exams.index');
