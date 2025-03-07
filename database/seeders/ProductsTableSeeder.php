@@ -12,7 +12,7 @@ class ProductsTableSeeder extends Seeder
         DB::table('products')->insert([
             [
                 'name' => 'Suscripción Mensual',
-                'price' => 9.99,       // Precio de ejemplo
+                'price' => 49.90,       // Precio de ejemplo
                 'duration_days' => 30,
                 'description' => 'Acceso mensual a nuestros servicios.',
                 'created_at' => now(),
@@ -20,17 +20,9 @@ class ProductsTableSeeder extends Seeder
             ],
             [
                 'name' => 'Suscripción Semestral',
-                'price' => 49.99,      // Precio de ejemplo
+                'price' => 249.90,      // Precio de ejemplo
                 'duration_days' => 180,
                 'description' => 'Acceso semestral a nuestros servicios.',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Suscripción Anual',
-                'price' => 89.99,      // Precio de ejemplo
-                'duration_days' => 365,
-                'description' => 'Acceso anual a nuestros servicios.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
