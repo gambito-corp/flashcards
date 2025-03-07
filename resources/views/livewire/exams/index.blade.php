@@ -3,7 +3,7 @@
         window.location.href = "{{ route('dashboard') }}?error=Selecciona%20una%20materia%20primero";
     </script>
 @else
-    <div x-data="tabsComponent({{auth()->user()->status}})" x-init="init()" class="container mx-auto p-4 bg-white shadow rounded-lg container-ask">
+    <div x-data="tabsComponent({{json_encode(auth()->user()->status) }})" x-init="init()" class="container mx-auto p-4 bg-white shadow rounded-lg container-ask">
         <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container">Examen: Selección de Preguntas</h2>
         <hr>
 
@@ -322,8 +322,6 @@
                         alert('Debes seleccionar al menos una pregunta.');
                         return;
                     }
-                    console.log(this.userStatus)
-                    debugger;
 
                     // Definir el límite según el estado del usuario: si status == 1, límite de 200; de lo contrario, 10
                     const limit = this.userStatus === 1 ? 200 : 10;
