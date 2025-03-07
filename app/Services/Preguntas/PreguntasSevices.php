@@ -79,16 +79,20 @@ class PreguntasSevices
         // Reemplazar espacios no separables
         $value = str_replace("\u{A0}", ' ', $value);
 
-        // Incluir codificaciones comunes en MS-DOS
+        // Detecta la codificación entre un conjunto de opciones
         $detected = mb_detect_encoding($value, ['UTF-8', 'ISO-8859-1', 'WINDOWS-1252', 'CP850'], true);
 
+        // Si se detectó y no es UTF-8, convertir
         if ($detected && $detected !== 'UTF-8') {
             $value = mb_convert_encoding($value, 'UTF-8', $detected);
+        } else if (!$detected) {
+            // Si no se detecta, forzamos una conversión desde WINDOWS-1252 (o ISO-8859-1) como fallback
+            $value = mb_convert_encoding($value, 'UTF-8', 'WINDOWS-1252');
         }
 
-        // Opcional: Si siguen apareciendo caracteres extraños, forzar conversión desde CP850
-        if (strpos($value, 'Â') !== false) {
-            $value = iconv('CP850', 'UTF-8//TRANSLIT//IGNORE', $value);
+        // Opcional: Si aparecen caracteres extraños, usar iconv como respaldo
+        if (strpos($value, 'Â') !== false || strpos($value, '¤') !== false) {
+            $value = iconv('WINDOWS-1252', 'UTF-8//TRANSLIT//IGNORE', $value);
         }
 
         return trim($value);
