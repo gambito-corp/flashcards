@@ -33,7 +33,20 @@ class Index extends Component
     {
         // Cargamos las categorías y flashcards del usuario autenticado
         $this->availableCategories = FcCategory::where('user_id', auth()->id())->get();
-        $this->cards = FcCard::query()->where('user_id', auth()->id())->with('categories')->orderBy('errors', 'desc')->get();
+        if (auth()->user()->status == 0) {
+            $this->cards = FcCard::query()
+                ->where('user_id', auth()->id())
+                ->with('categories')
+                ->orderBy('errors', 'desc')
+                ->limit(50)
+                ->get();
+        } else {
+            $this->cards = FcCard::query()
+                ->where('user_id', auth()->id())
+                ->with('categories')
+                ->orderBy('errors', 'desc')
+                ->get();
+        }
     }
 
     // Reglas para la validación de flashcards (solo pregunta y respuesta son obligatorios)
@@ -55,6 +68,15 @@ class Index extends Component
     public function createCard()
     {
         $this->validate();
+
+        // Validación: si el usuario no es premium (status == 0) y ya tiene 50 flashcards, no permitir crear más
+        if (auth()->user()->status == 0) {
+            $currentCount = FcCard::query()->where('user_id', auth()->id())->count();
+            if ($currentCount >= 50) {
+                session()->flash('error', 'Has alcanzado el límite de 50 flashcards. Adquiere premium para crear más.');
+                return;
+            }
+        }
         // Procesamos la imagen, subiéndola a S3 si se ha seleccionado
         $imagenPath = $this->imagen ? $this->imagen->store('flashcard_images', 's3') : null;
         $imagenRespuestaPath = $this->imagen_respuesta ? $this->imagen_respuesta->store('flashcard_images', 's3') : null;
