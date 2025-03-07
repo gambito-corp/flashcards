@@ -24,7 +24,7 @@
             <option value="100">100 por página</option>
             <option value="all">Todas</option>
         </select>
-        <input type="text" wire:model.live="search" placeholder="Buscar..." class="border-gray-300 rounded p-1 w-1/2" />
+        <input type="text" wire:model.live="search" placeholder="Buscar..." class="border-gray-300 rounded p-1 w-1/2 search-input" />
     </div>
 
     <!-- Tabla de Preguntas -->
