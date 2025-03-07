@@ -3,7 +3,7 @@
         window.location.href = "{{ route('dashboard') }}?error=Selecciona%20una%20materia%20primero";
     </script>
 @else
-    <div x-data="tabsComponent()" x-init="init()" class="container mx-auto p-4 bg-white shadow rounded-lg container-ask">
+    <div x-data="tabsComponent({{auth()->user()->status}})" x-init="init()" class="container mx-auto p-4 bg-white shadow rounded-lg container-ask">
         <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container">Examen: Selección de Preguntas</h2>
         <hr>
 
@@ -31,12 +31,12 @@
     <div class="swiper-button-prev"></div>
 </div>
 
-        
+
 
         <!-- Pestañas de Categorías del Área Activa -->
         <div class="swiper-container overflow-hidden relative">
     <div class="swiper-wrapper">
-        
+
         <template x-for="cat in activeCategories" :key="cat.id">
     <div class="swiper-slide">
         <div class="areas-buttons cat-2">
@@ -177,7 +177,7 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
-        function tabsComponent() {
+        function tabsComponent(userStatus) {
             return {
                 areas: @json($areas),
 
@@ -322,8 +322,11 @@
                         alert('Debes seleccionar al menos una pregunta.');
                         return;
                     }
-                    if (this.totalSelected > 20) {
-                        alert('El total de preguntas no puede exceder 20.');
+
+                    // Definir el límite según el estado del usuario: si status == 1, límite de 200; de lo contrario, 10
+                    const limit = this.userStatus === 1 ? 200 : 10;
+                    if (this.totalSelected > limit) {
+                        alert(`El total de preguntas no puede exceder ${limit}.`);
                         return;
                     }
 
@@ -387,7 +390,7 @@
             768: {
                 slidesPerView: 3,
             },
-            
+
         }
     });
 </script>
