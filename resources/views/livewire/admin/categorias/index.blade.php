@@ -19,7 +19,7 @@
             <option value="all">Todas</option>
         </select>
         <input type="text" wire:model.live="search" placeholder="Buscar..."
-               class="border-gray-300 rounded p-1 w-1/2" />
+               class="border-gray-300 rounded p-1 w-1/2 search-input" />
     </div>
 
     <!-- Tabla de Categorías -->
