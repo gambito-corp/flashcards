@@ -14,6 +14,9 @@
 input:focus {
     border-color: var(--primary-color) !important;
 }
+.bg-primary-color{
+    background-color: var(--primary-color);
+}
 
 .button-primary {
     background-color: var(--primary-color);
@@ -455,6 +458,39 @@ nav .text-gray-900 {
 .resumen-s {
     font-size: 16px;
 }
+.box-time__exams{
+    top: 88px;
+    right: 20px;
+    background: var(--accent-color);
+    border-radius: 10px;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+}
+@media (max-width:620px) {
+    .box-time__exams {
+        width: 100%;
+        right: 0;
+        border-radius: 0px;
+        top: initial;
+        bottom: 0;
+        padding: 15px 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+    }
+    .box-time__exams  .text-base{
+    margin-bottom: 0px !important;
+    }
+
+    /*HEADER MOBILE*/
+    .border-b .max-w-7xl {
+        height: 65px !important;
+    }
+    
+    
+}
 
 /*TABLA USUARIOS */
 .table-users thead {
@@ -504,8 +540,11 @@ nav .text-gray-900 {
 }
 .buttons-numbers .bg-blue-500 {
     --tw-bg-opacity: 1;
-    background-color: rgb(247 247 247);
-    border-color: rgb(247 247 247) !important;
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color) !important;
+}
+.buttons-numbers .bg-blue-500 span{
+   color: #ffffff;
 }
 .buttons-nv span {
     font-weight: 500;
@@ -526,9 +565,9 @@ nav .text-gray-900 {
     display: flex;
     justify-content: space-between;
 }
-.container-exmans .bg-red-500 {
+/*.container-exmans .bg-red-500 {
     background-color: rgb(247 247 247);
-}
+}*/
 .container-exmans .bg-gray-400 {
     background-color: rgb(255 255 255);
 }

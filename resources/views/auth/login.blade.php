@@ -26,8 +26,17 @@
             </div>
 
             <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+            <div class="relative">
+    <!-- Campo de Contraseña -->
+    <x-label for="password" value="{{ __('Password') }}" />
+    <x-input id="password" class="block mt-1 w-full pr-10" type="password" name="password" required autocomplete="current-password" />
+
+    <!-- Icono de Ojo -->
+    <span id="togglePassword">
+        <!-- Aquí puedes usar cualquier icono, en este caso, Font Awesome -->
+        <i class="fas fa-eye absolute right-3 cursor-pointer primary-color bottom-[15px]" aria-hidden="true"></i>
+    </span>
+</div>
             </div>
 
             <div class="block mt-4">
@@ -54,3 +63,26 @@
         </form>
     </x-authentication-card>
 </x-guest-layout>
+
+
+
+
+
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        // Cambiar tipo de input entre 'password' y 'text'
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+</script>
+
