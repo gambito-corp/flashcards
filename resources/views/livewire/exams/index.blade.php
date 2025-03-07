@@ -322,6 +322,8 @@
                         alert('Debes seleccionar al menos una pregunta.');
                         return;
                     }
+                    console.log(this.userStatus)
+                    debugger;
 
                     // Definir el límite según el estado del usuario: si status == 1, límite de 200; de lo contrario, 10
                     const limit = this.userStatus === 1 ? 200 : 10;
