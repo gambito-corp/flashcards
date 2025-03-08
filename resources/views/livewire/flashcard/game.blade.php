@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (localStorage.getItem('tarjeta-revelada') === 'true') {
         cardFrontal.style.display = 'none';
         cardTrasera.style.display = 'block';
-        
+
     } else {
         cardFrontal.style.display = 'block';
         cardTrasera.style.display = 'none';
