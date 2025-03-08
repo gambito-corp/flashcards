@@ -378,7 +378,7 @@
 
 <script>
     const swiper = new Swiper('.swiper-container', {
-        slidesPerView: 3, // Número de elementos visibles en PC
+        slidesPerView: 2, // Número de elementos visibles en PC
         spaceBetween: 10, // Espaciado entre los elementos
         navigation: {
             nextEl: '.swiper-button-next',

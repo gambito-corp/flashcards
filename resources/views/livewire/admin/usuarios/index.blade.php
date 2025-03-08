@@ -23,7 +23,7 @@
             <input
                 type="text"
                 placeholder="Buscar..."
-                class="w-1/2 border rounded px-2 py-1 focus:outline-none"
+                class="w-1/2 border rounded px-2 py-1 focus:outline-none search-input"
             />
         </div>
 

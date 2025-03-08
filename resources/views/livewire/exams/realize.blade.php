@@ -134,8 +134,8 @@
         </div>
 
         <!-- Cuadrado flotante para el tiempo restante (oculto al enviar) -->
-        <div x-show="!examSubmitted" class="fixed top-4 right-4 bg-blue-500 text-white p-4 rounded shadow-lg " x-cloak>
-            <div class="text-lg font-bold mb-1">Tiempo restante</div>
+        <div x-show="!examSubmitted" class="fixed box-time__exams" x-cloak>
+            <div class="text-base font-bold mb-1">Tiempo restante</div>
             <div class="text-2xl font-extrabold" x-text="formattedTime"></div>
         </div>
     </div>

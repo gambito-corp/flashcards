@@ -125,7 +125,7 @@
                     <!-- Contenedor del slider de "Sin Categoría" -->
                     <div x-data class="relative">
                         <div
-                            class="flex space-x-4 overflow-x-auto py-2  flash-c-g"
+                            class="flex space-x-4 overflow-x-auto py-2  flash-c-g gap-[10px]"
                             x-ref="slider">
                             @foreach($cardsWithoutCategory as $card)
                             <div
