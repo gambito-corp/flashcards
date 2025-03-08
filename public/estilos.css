@@ -14,6 +14,9 @@
 input:focus {
     border-color: var(--primary-color) !important;
 }
+.bg-primary-color{
+    background-color: var(--primary-color);
+}
 
 .button-primary {
     background-color: var(--primary-color);
@@ -455,6 +458,39 @@ nav .text-gray-900 {
 .resumen-s {
     font-size: 16px;
 }
+.box-time__exams{
+    top: 88px;
+    right: 20px;
+    background: var(--accent-color);
+    border-radius: 10px;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+}
+@media (max-width:620px) {
+    .box-time__exams {
+        width: 100%;
+        right: 0;
+        border-radius: 0px;
+        top: initial;
+        bottom: 0;
+        padding: 15px 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+    }
+    .box-time__exams  .text-base{
+    margin-bottom: 0px !important;
+    }
+
+    /*HEADER MOBILE*/
+    .border-b .max-w-7xl {
+        height: 65px !important;
+    }
+    
+    
+}
 
 /*TABLA USUARIOS */
 .table-users thead {
@@ -499,13 +535,37 @@ nav .text-gray-900 {
 .choise-ask .bg-blue-500 {
     background-color: var(--secondary-color);
 }
+
+@media(max-width:620px){
+    .choise-ask {
+        gap: 15px;
+    }
+    .choise-ask  li{
+        width: 100%;
+        text-align: center;
+    }
+    .container-exmans .tarjeta-box {
+        padding: 25px;
+    }
+    .container-exmans .buttons-pagination {
+        gap: 10px;
+
+
+    }
+    .container-exmans.container-ask {
+        margin-top: -20px;
+    }
+}
 .buttons-nv {
     border: 1px solid #f1f1f1;
 }
 .buttons-numbers .bg-blue-500 {
     --tw-bg-opacity: 1;
-    background-color: rgb(247 247 247);
-    border-color: rgb(247 247 247) !important;
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color) !important;
+}
+.buttons-numbers .bg-blue-500 span{
+   color: #ffffff;
 }
 .buttons-nv span {
     font-weight: 500;
@@ -526,9 +586,9 @@ nav .text-gray-900 {
     display: flex;
     justify-content: space-between;
 }
-.container-exmans .bg-red-500 {
+/*.container-exmans .bg-red-500 {
     background-color: rgb(247 247 247);
-}
+}*/
 .container-exmans .bg-gray-400 {
     background-color: rgb(255 255 255);
 }
@@ -613,7 +673,7 @@ nav .text-gray-900 {
 
 .arrow-flash {
     position: absolute;
-    top: 0;
+    top:-25px;
     right: 0;
 }
 
@@ -742,8 +802,7 @@ nav .text-gray-900 {
     .areas-buttons button,
     .areas-buttons button.border-b-2 {
         padding: 10px 20px;
-        width: max-content;
-        min-width: fit-content;
+
     }
     .areas-buttons .border-b {
         display: flex;
@@ -884,9 +943,9 @@ display:none;
         width: auto;
     }
 
-    .swiper-slide {
+    /*.swiper-slide {
         width: max-content !important;
-    }
+    }*/
     .swiper-button-next,
     .swiper-button-prev {
 
