@@ -61,7 +61,7 @@
                                 @elseif($currentCard->url)
                                     <img class="img-answer" src="{{$currentCard->url}}" alt="Imagen de la pregunta" onclick="openModal(this)" />
                                 @else
-                                    <img class="img-answer" src="{{ asset('img.png') }}" alt="Imagen por defecto" onclick="openModal(this)">
+
                                 @endif
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                                 @elseif($currentCard->url)
                                     <img class="img-answer" src="{{$currentCard->url}}" alt="Imagen de la Respuesta" onclick="openModal(this)" />
                                 @else
-                                    <img class="img-answer" src="{{ asset('img.png') }}" alt="Imagen por defecto" onclick="openModal(this)">
+
                                 @endif
                             </div>
                         </div>
