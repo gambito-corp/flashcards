@@ -535,6 +535,27 @@ nav .text-gray-900 {
 .choise-ask .bg-blue-500 {
     background-color: var(--secondary-color);
 }
+
+@media(max-width:620px){
+    .choise-ask {
+        gap: 15px;
+    }
+    .choise-ask  li{
+        width: 100%;
+        text-align: center;
+    }
+    .container-exmans .tarjeta-box {
+        padding: 25px;
+    }
+    .container-exmans .buttons-pagination {
+        gap: 10px;
+
+
+    }
+    .container-exmans.container-ask {
+        margin-top: -20px;
+    }
+}
 .buttons-nv {
     border: 1px solid #f1f1f1;
 }
@@ -652,7 +673,7 @@ nav .text-gray-900 {
 
 .arrow-flash {
     position: absolute;
-    top: 0;
+    top:-25px;
     right: 0;
 }
 
@@ -923,9 +944,9 @@ display:none;
         width: auto;
     }
 
-    .swiper-slide {
+    /*.swiper-slide {
         width: max-content !important;
-    }
+    }*/
     .swiper-button-next,
     .swiper-button-prev {
 

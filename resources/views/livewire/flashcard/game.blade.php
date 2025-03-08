@@ -157,14 +157,23 @@
 @endpush
 @push('scripts')
 <script>
-  document.querySelector('.revelar-ask').addEventListener('click', function() {
-    const cardFrontal = document.querySelector('.card-frontal');
-    const cardTrasera = document.querySelector('.card-trasera');
-    setTimeout(function() {
-        cardFrontal.style.display = 'none';
-        cardTrasera.style.display = 'block';
-    }, 500);
-  });
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.addEventListener('click', function(event) {
+        if (event.target.classList.contains('revelar-ask')) {
+            event.preventDefault(); // Evita recargas involuntarias
+            
+            const cardFrontal = document.querySelector('.card-frontal');
+            const cardTrasera = document.querySelector('.card-trasera');
+
+            if (cardFrontal && cardTrasera) {
+                setTimeout(function() {
+                    cardFrontal.style.display = 'none';
+                    cardTrasera.style.display = 'block';
+                }, 500);
+            }
+        }
+    });
+});
 
   // Función para abrir el modal
 function openModal(imgElement) {
