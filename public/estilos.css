@@ -104,13 +104,7 @@ header.shadow span {
 header.shadow i {
     font-size: 18px;
 }
-footer {
-    padding: 20px 20px;
-}
 
-.min-h-screen {
-    background-color: var(--background-color);
-}
 .container-ask {
     max-width: 100%;
     border: none;
@@ -537,6 +531,7 @@ nav .text-gray-900 {
 }
 
 @media(max-width:620px){
+  
     .choise-ask {
         gap: 15px;
     }
@@ -594,6 +589,7 @@ nav .text-gray-900 {
 }
 
 /*FLASHCARDS*/
+
 .group-form {
     display: flex;
     gap: 15px;
@@ -660,11 +656,11 @@ nav .text-gray-900 {
     filter: invert(0);
 }
 
-.container-fc .box-answer h2,
+/*.container-fc .box-answer h2,
 .flash-c-g .box-flashcard-game h2 {
     color: var(--text-color);
     font-weight: 500;
-}
+}*/
 .flash-c-g img {
     width: 35px;
     margin-bottom: 15px;
@@ -708,6 +704,24 @@ nav .text-gray-900 {
 .form-container-ask label.label-nm {
     margin-bottom: 0;
 }
+.box-answer,.answer-c{
+    flex-wrap: wrap;
+}
+.box-answer .box-content-answer,.button-revelar{
+    width: 100%;
+}
+.button-revelar button {
+    color: #195b81;
+    font-weight: 700;
+    margin-top: 39px;
+    transition: .3s all ease-in;
+}
+.button-revelar button:hover {
+    color: #195b81;
+    background-color: #ffffff;
+    opacity: 0.8;
+
+}
 
 /* RESULTADOS */
 .results-content {
@@ -750,6 +764,13 @@ nav .text-gray-900 {
 /*NEDIA QUERIES*/
 
 @media (max-width: 620px) {
+    .box-content-answer {
+        padding-top: 120px;
+    }
+    .button-incorrect{
+        margin-left: 0 !important;
+        margin-top: 10px;
+    }
     .border-b .max-w-7xl {
         padding: 0 15px;
     }
