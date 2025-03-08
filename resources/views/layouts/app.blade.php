@@ -129,7 +129,7 @@
 <body class="font-sans antialiased">
 <x-banner />
 
-<div class="min-h-screen bg-gray-100">
+<div class="min-h-screen bg-gray-100 bg-[#f7f7f7]">
     <livewire:nav-link/>
 
     <!-- Page Heading -->
@@ -160,7 +160,7 @@
     
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <!-- Footer -->
-    <footer class="bg-footer text-white border-t border-gray-200">
+    <footer class="bg-footer text-white border-t border-gray-200 py-4">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm">
             © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Todos los derechos reservados.
         </div>

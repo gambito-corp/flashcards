@@ -104,13 +104,7 @@ header.shadow span {
 header.shadow i {
     font-size: 18px;
 }
-footer {
-    padding: 20px 20px;
-}
 
-.min-h-screen {
-    background-color: var(--background-color);
-}
 .container-ask {
     max-width: 100%;
     border: none;
