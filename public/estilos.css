@@ -802,8 +802,7 @@ nav .text-gray-900 {
     .areas-buttons button,
     .areas-buttons button.border-b-2 {
         padding: 10px 20px;
-        width: max-content;
-        min-width: fit-content;
+
     }
     .areas-buttons .border-b {
         display: flex;
