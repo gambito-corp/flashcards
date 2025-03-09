@@ -39,7 +39,7 @@
                     Foto de Perfil (opcional)
                 </label>
                 <input type="file" id="profile_photo" name="profile_photo" wire:model.live="profile_photo"
-                       class="text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer" accept="image/*">
+                       class="w-full text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer" accept="image/*">
                 @error('profile_photo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
 
                 <!-- Previsualización: Si se selecciona una nueva foto, la muestra; de lo contrario, la foto actual -->

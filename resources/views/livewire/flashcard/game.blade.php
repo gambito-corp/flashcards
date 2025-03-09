@@ -32,7 +32,7 @@
      }"
      x-on:touchstart="touchStart($event)"
      x-on:touchend="touchEnd($event)">
-     <h1 class="text-3xl font-bold mb-6 text-indigo-700 primary-color title-ask-container">Juego de Flashcards</h1>
+     <h1 class="text-3xl font-bold mb-6 text-indigo-700 primary-color title-ask-container ">Juego de Flashcards</h1>
     <hr>
 
 
@@ -42,7 +42,7 @@
         @endphp
 
         @if($currentCard)
-            <div class="pb-10 m-25">
+            <div class="pb-10 m-25 game-space">
                 <!-- Contenedor 3D con perspectiva y efecto slide -->
                 <div class="relative perspective-1000 w-full "
                      :class="{
