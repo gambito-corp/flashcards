@@ -53,7 +53,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="imagen" class="block text-gray-700">Imagen</label>
-                    <input type="file" id="imagen" wire:model="imagen" accept="image/*" class="text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer">
+                    <input type="file" id="imagen" wire:model="imagen" accept="image/*" class="w-full text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer">
                     @error('imagen') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="imagen_respuesta" class="block text-gray-700">Imagen Respuesta</label>
-                    <input type="file" id="imagen_respuesta" wire:model="imagen_respuesta" accept="image/*" class="text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer ">
+                    <input type="file" id="imagen_respuesta" wire:model="imagen_respuesta" accept="image/*" class="w-full text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer ">
                     @error('imagen_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
             </div>

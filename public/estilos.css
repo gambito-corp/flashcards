@@ -740,6 +740,8 @@ nav .text-gray-900 {
     position: absolute;
     top: 20px;
     right: 21px;
+    height: 220px;
+    object-fit: cover;
 }
 .box-content-answer {
     padding-top: 171px;
@@ -796,7 +798,11 @@ nav .text-gray-900 {
         font-size: 14px;
     }
     .title-ask-container {
-        font-size: 18px;
+        font-size: 17px;
+        line-height: 24px;
+    }
+    .game-space,.title-ask-container{
+        padding: 0 20px;
     }
     .grid-cols-2 {
         grid-template-columns: repeat(1, minmax(0, 1fr));
