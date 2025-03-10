@@ -7,6 +7,12 @@ use GuzzleHttp\Client;
 
 class MedisearchController extends Controller
 {
+
+
+    Public function index(){
+        Return view('medisearch.index');
+    }
+
     public function chat($query){
         try
         {

@@ -2,11 +2,12 @@
 
 return [
     [
-        'group'  => 'common',
-        'name'   => 'Dashboard',
-        'route'  => 'dashboard',
-        'active' => 'dashboard',
-        'roles'  => ['admin', 'root', 'colab', 'user'],
+        'group'         => 'common',
+        'name'          => 'Dashboard',
+        'route'         => 'dashboard',
+        'active'        => 'dashboard',
+        'roles'         => ['admin', 'root', 'colab', 'user'],
+        'need_premium'  => false
     ],
     [
         'group'  => 'common',
@@ -14,6 +15,7 @@ return [
         'route'  => 'admin.index',
         'active' => 'admin.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
 
     // ELEMENTOS EXCLUSIVOS VISTA USUARIOS
@@ -23,6 +25,7 @@ return [
         'route'  => 'examenes.index',
         'active' => 'examenes.index',
         'roles'  => ['admin', 'root', 'colab', 'user'],
+        'need_premium' => false
     ],
     [
         'group'  => 'user',
@@ -30,6 +33,15 @@ return [
         'route'  => 'flashcard.index',
         'active' => 'flashcard.index',
         'roles'  => ['admin', 'root', 'colab', 'user'],
+        'need_premium' => false
+    ],
+    [
+        'group'  => 'user',
+        'name'   => 'MediSearch',
+        'route'  => 'medisearch.index',
+        'active' => 'medisearch.index',
+        'roles'  => ['admin', 'root', 'colab', 'user'],
+        'need_premium' => true
     ],
 
     // ELEMENTOS EXCLUSIVOS VISTA ADMINISTRACIÓN
@@ -39,6 +51,7 @@ return [
         'route'  => 'admin.usuarios.index',
         'active' => 'admin.usuarios.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
     [
         'group'  => 'admin',
@@ -46,6 +59,7 @@ return [
         'route'  => 'admin.universidades.index',
         'active' => 'admin.universidades.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
     [
         'group'  => 'admin',
@@ -53,6 +67,7 @@ return [
         'route'  => 'admin.carreras.index',
         'active' => 'admin.carreras.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
     [
         'group'  => 'admin',
@@ -60,6 +75,7 @@ return [
         'route'  => 'admin.asignaturas.index',
         'active' => 'admin.asignaturas.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
     [
         'group'  => 'admin',
@@ -67,6 +83,7 @@ return [
         'route'  => 'admin.categorias.index',
         'active' => 'admin.categorias.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
     [
         'group'  => 'admin',
@@ -74,6 +91,7 @@ return [
         'route'  => 'admin.tipos.index',
         'active' => 'admin.tipos.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
     [
         'group'  => 'admin',
@@ -81,5 +99,6 @@ return [
         'route'  => 'admin.preguntas.index',
         'active' => 'preguntas.index',
         'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
     ],
 ];

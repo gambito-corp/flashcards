@@ -16,44 +16,64 @@ class NavLink extends Component
     {
         $allMenuItems = config('menu');
 
-        // Eliminar claves innecesarias
+        // Eliminamos claves innecesarias (si existe alguna)
         if (isset($allMenuItems['active'])) {
             unset($allMenuItems['active']);
         }
 
-        // Detectamos si estamos en la vista de administración
+        // Determinamos si estamos en la vista de administración
         $isAdminView = request()->is('admin/*') || request()->routeIs('admin.*');
 
-        // Filtramos los elementos del menú según grupo y roles
-        $this->menu = array_filter($allMenuItems, function ($item) use ($isAdminView) {
-            // Si se define la clave roles, se verifica que el usuario tenga al menos uno
+        // Obtenemos el usuario autenticado
+        $user = auth()->user();
+
+        $this->menu = array_filter($allMenuItems, function ($item) use ($isAdminView, $user) {
+            // Si el usuario no está autenticado, no se muestra ningún ítem
+            if (!$user) {
+                return false;
+            }
+
+            // Filtrado de roles: si se define 'roles' y el usuario no tiene ninguno, se descarta el ítem.
             if (isset($item['roles']) && count($item['roles']) > 0) {
-                // Si el usuario no está autenticado o no tiene ninguno de esos roles, se omite el ítem
-                if (!auth()->check() || !auth()->user()->hasAnyRole($item['roles'])) {
+                if (!$user->hasAnyRole($item['roles'])) {
                     return false;
                 }
             }
 
-            // Si no se define el grupo, asumimos que es común
+            // Filtrado premium:
+            // Si el ítem requiere premium, el usuario debe tener status == 1.
+            if (isset($item['need_premium'])) {
+                if ($item['need_premium'] === true && $user->status != 1) {
+                    return false;
+                }
+                // Si el ítem no requiere premium, se mostrará solo a usuarios con status 0 o 1.
+                if ($item['need_premium'] === false && !in_array($user->status, [0, 1])) {
+                    return false;
+                }
+            }
+
+            // Filtrado por grupo:
+            // Si no se define el grupo, se muestra.
             if (!isset($item['group'])) {
                 return true;
             }
 
-            // Elementos comunes se muestran siempre
+            // Los ítems del grupo 'common' se muestran a todos.
             if ($item['group'] === 'common') {
                 return true;
             }
 
-            // Si es vista admin, se muestran los elementos del grupo admin
+            // Si estamos en vista de administración, se muestran los ítems del grupo 'admin'
             if ($isAdminView && $item['group'] === 'admin') {
                 return true;
             }
 
-            // Si no es admin, se muestran los elementos del grupo usuario
+            // Si no es vista admin, se muestran los ítems del grupo 'user'
             if (!$isAdminView && $item['group'] === 'user') {
                 return true;
             }
 
+            // En caso de que no se cumplan las condiciones anteriores, no se muestra el ítem.
             return false;
         });
     }

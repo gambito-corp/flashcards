@@ -83,6 +83,9 @@ Route::middleware([
     Route::get('/flashcard/game', [FlashcardController::class, 'game'])->name('flashcard.game');
     Route::get('/flashcard/game/result', [FlashcardController::class, 'result'])->name('flashcard.results');
 
+    /*MEDISEARCH API*/
+    Route::get('/medisearch', [MedisearchController::class, 'index'])->name('medisearch.index');
+
 
     Route::prefix('admin')
         ->as('admin.')
@@ -196,10 +199,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mercadopago/callback', [PaymentController::class, 'callback'])
         ->name('mercadopago.callback');
 });
-
-Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle']);
-
-Route::get('/chat/{query}', [MedisearchController::class, 'chat'])->name('chat');
 
 //Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
 //
