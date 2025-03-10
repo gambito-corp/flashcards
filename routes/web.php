@@ -20,7 +20,14 @@ use App\Http\Controllers\PreguntasController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/home', '/dashboard');
-Route::redirect('/', 'https://medbystudents.com/app-banqueo/');
+if(config('app.env') === 'production') {
+    Route::get('/robots.txt', function () {
+        return response('User-agent: *' . PHP_EOL . 'Disallow: /', 200);
+    })->name('robots.txt');
+    Route::redirect('/', 'https://medbystudents.com/app-banqueo/');
+}else{
+    Route::redirect('/', '/login');
+}
 
 Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');

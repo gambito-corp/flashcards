@@ -20,6 +20,10 @@ class PaymentController extends Controller
 
         // 2. Calcular la frecuencia (convertir días a meses)
         $months = max(1, intval($product->duration_days / 30));
+        $frequency = 'day';
+        if (config('app.env') === 'production') {
+            $frequency = 'months';
+        }
 
         // 3. Preparar el array de datos (payload) para la suscripción
         $payloadArray = [
@@ -30,9 +34,10 @@ class PaymentController extends Controller
             'auto_recurring'     => [
                 'frequency'          => $months,
                 'frequency_type'     => 'months',
+                'repetition'         => 12,
+                'billing_day'        => now()->day,
+                'currency_id'        => 'PEN',
                 'transaction_amount' => (float) $product->price,
-                'currency_id'        => 'PEN', // Ajusta la moneda según corresponda
-                'repetition'         => 0,
             ],
         ];
 
