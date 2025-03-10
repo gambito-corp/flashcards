@@ -192,6 +192,7 @@ function closeModal() {
     modal.style.display = "none"; // Ocultamos el modal
 }
 
+
 </script>
 
 @endpush
