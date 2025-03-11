@@ -115,7 +115,7 @@ class PaymentController extends Controller
         if ($status === 'approved') {
             // Lógica para pago exitoso
             return redirect()->route('dashboard')->with('status', 'Pago aprobado y suscripción activada.');
-        } elseif ($status === 'rejected') {
+            } elseif ($status === 'rejected') {
             // Lógica para pago rechazado
             return redirect()->route('dashboard')->with('error', 'El pago fue rechazado.');
         } else {

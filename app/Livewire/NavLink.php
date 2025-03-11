@@ -40,17 +40,17 @@ class NavLink extends Component
                 }
             }
 
-            // Filtrado premium:
-            // Si el ítem requiere premium, el usuario debe tener status == 1.
-            if (isset($item['need_premium'])) {
-                if ($item['need_premium'] === true && $user->status != 1) {
-                    return false;
-                }
-                // Si el ítem no requiere premium, se mostrará solo a usuarios con status 0 o 1.
-                if ($item['need_premium'] === false && !in_array($user->status, [0, 1])) {
-                    return false;
-                }
-            }
+//            // Filtrado premium:
+//            // Si el ítem requiere premium, el usuario debe tener status == 1.
+//            if (isset($item['need_premium'])) {
+//                if ($item['need_premium'] === true && $user->status != 1) {
+//                    return false;
+//                }
+//                // Si el ítem no requiere premium, se mostrará solo a usuarios con status 0 o 1.
+//                if ($item['need_premium'] === false && !in_array($user->status, [0, 1])) {
+//                    return false;
+//                }
+//            }
 
             // Filtrado por grupo:
             // Si no se define el grupo, se muestra.

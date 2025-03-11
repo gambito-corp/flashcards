@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Auth;
 
 class MedisearchController extends Controller
 {
 
 
     Public function index(){
-        Return view('medisearch.index');
+        if (Auth::user()->status === 0){
+            return redirect()->route('planes.index');
+        }
+        return view('medisearch.index');
     }
 
     public function chat($query){
