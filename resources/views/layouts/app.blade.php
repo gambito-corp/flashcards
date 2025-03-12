@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="body-content">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -129,7 +129,7 @@
 <body class="font-sans antialiased">
 <x-banner />
 
-<div class="min-h-screen bg-gray-100 bg-[#f7f7f7]">
+<div class="min-h-screen bg-gray-100 bg-[#f7f7f7] body-content">
     <livewire:nav-link/>
 
     <!-- Page Heading -->
@@ -160,10 +160,11 @@
     
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <!-- Footer -->
-    <footer class="bg-footer text-white border-t border-gray-200 py-4">
-        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm">
+    <footer class="bg-footer text-white  z-10 footer-mbs flex justify-between px-[50px] py-[35px]">
+        <div class=" text-sm">
             © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Todos los derechos reservados.
         </div>
+        <div class="text-sm flex gap-4 underline"><a href="https://medbystudents.com/libro-de-reclamaciones/">Libro de reclamaciones</a><a href="https://medbystudents.com/politicas-de-privacidad/">Políticas de privacidad</a></div>
     </footer>
 </div>
 @stack('modals')

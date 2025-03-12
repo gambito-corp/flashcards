@@ -21,6 +21,9 @@ export default {
             fontFamily: {
                 sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
             },
+            backgroundImage: {
+                'text-gradient': 'linear-gradient(84deg, #195b81 24.87%, #5b8080 61.64%)',
+              },
         },
     },
     plugins: [forms, typography],

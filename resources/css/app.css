@@ -5,3 +5,10 @@
 [x-cloak] {
     display: none;
 }
+
+@layer components {
+    .title-mbs{ 
+        @apply bg-white ;
+    }
+    
+}
