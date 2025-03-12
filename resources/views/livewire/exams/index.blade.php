@@ -8,62 +8,83 @@
         <hr>
 
 
-        <!-- Pestañas de Áreas -->
-        <div class="overflow-x-scroll relative">
-            <div class="flex gap-2 my-2">
-                <template x-for="area in areas" :key="area.id">
-                    <div class="flex-none">
-                        <div class="areas-buttons cat-1">
-                            <button
-                                @click="setActiveArea(area.id)"
-                                x-text="area.name"
-                                :class="activeArea === area.id ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                                class="px-4 py-2 focus:outline-none button">
-                            </button>
-                        </div>
-                    </div>
-                </template>
+    <!-- Pestañas de Áreas -->
+<div class="relative">
+    <button id="scrollLeft" class="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-[30px] h-[30px] bg-[#00000073] rounded-full">
+        <i class="fa-solid fa-chevron-left text-white text-[11px]"></i>
+    </button>
+
+    <div id="scrollContainer" class="relative flex gap-2 my-2 whitespace-nowrap scroll-smooth overflow-hidden cursor-grab">
+        <template x-for="area in areas" :key="area.id">
+            <div class="flex-none">
+                <div class="areas-buttons cat-1">
+                    <button
+                        @click="setActiveArea(area.id)"
+                        x-text="area.name"
+                        :class="activeArea === area.id ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                        class="px-4 py-2 focus:outline-none">
+                    </button>
+                </div>
             </div>
-        </div>
+        </template>
+    </div>
 
+    <button id="scrollRight" class="absolute right-0 top-1/2 transform -translate-y-1/2 w-[30px] h-[30px] bg-[#00000073] rounded-full">
+        <i class="fa-solid fa-chevron-right text-white text-[11px]"></i>
+    </button>
+</div>
 
+<!-- Pestañas de Categorías -->
+<div class="relative">
+    <button id="scrollLeftCat" class="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-[30px] h-[30px] bg-[#00000073] rounded-full">
+        <i class="fa-solid fa-chevron-left text-white text-[11px]"></i>
+    </button>
 
-
-        <!-- Pestañas de Categorías del Área Activa -->
-        <div class="overflow-x-scroll relative">
-            <div class="flex gap-2 my-2">
-                <template x-for="cat in activeCategories" :key="cat.id">
-                    <div class="flex-none">
-                        <div class="areas-buttons cat-2">
-                            <button
-                                @click="setActiveCategory(cat.id)"
-                                x-text="cat.name"
-                                :class="activeCategory === cat.id ? 'border-b-2 border-green-500 text-green-500' : 'text-gray-500'"
-                                class="px-4 py-2 focus:outline-none">
-                            </button>
-                        </div>
-                    </div>
-                </template>
+    <div id="scrollContainerCat" class="relative flex gap-2 my-2 whitespace-nowrap scroll-smooth overflow-hidden cursor-grab">
+        <template x-for="cat in activeCategories" :key="cat.id">
+            <div class="flex-none">
+                <div class="areas-buttons cat-2">
+                    <button
+                        @click="setActiveCategory(cat.id)"
+                        x-text="cat.name"
+                        :class="activeCategory === cat.id ? 'border-b-2 border-green-500 text-green-500' : 'text-gray-500'"
+                        class="px-4 py-2 focus:outline-none">
+                    </button>
+                </div>
             </div>
-        </div>
+        </template>
+    </div>
 
-        <!-- Pestañas de Tipos de la Categoría Activa -->
-        <div class="overflow-x-scroll relative">
-            <div class="flex gap-2 my-2">
-                <template x-for="tipo in activeTipos" :key="tipo.id">
-                    <div class="flex-none">
-                        <div class="areas-buttons mb-0 cat-3">
-                            <button
-                                @click="setActiveTipo(tipo.id)"
-                                x-text="tipo.name"
-                                :class="activeTipo === tipo.id ? 'border-b-2 border-purple-500 text-purple-500' : 'text-gray-500'"
-                                class="px-4 py-2 focus:outline-none button">
-                            </button>
-                        </div>
-                    </div>
-                </template>
+    <button id="scrollRightCat" class="absolute right-0 top-1/2 transform -translate-y-1/2 w-[30px] h-[30px] bg-[#00000073] rounded-full">
+        <i class="fa-solid fa-chevron-right text-white text-[11px]"></i>
+    </button>
+</div>
+
+<!-- Pestañas de Tipos -->
+<div class="relative">
+    <button id="scrollLeftTipo" class="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-[30px] h-[30px] bg-[#00000073] rounded-full">
+        <i class="fa-solid fa-chevron-left text-white text-[11px]"></i>
+    </button>
+
+    <div id="scrollContainerTipo" class="relative flex gap-2 my-2 whitespace-nowrap scroll-smooth overflow-hidden cursor-grab">
+        <template x-for="tipo in activeTipos" :key="tipo.id">
+            <div class="flex-none">
+                <div class="areas-buttons mb-0 cat-3">
+                    <button
+                        @click="setActiveTipo(tipo.id)"
+                        x-text="tipo.name"
+                        :class="activeTipo === tipo.id ? 'border-b-2 border-purple-500 text-purple-500' : 'text-gray-500'"
+                        class="px-4 py-2 focus:outline-none">
+                    </button>
+                </div>
             </div>
-        </div>
+        </template>
+    </div>
+
+    <button id="scrollRightTipo" class="absolute right-0 top-1/2 transform -translate-y-1/2 w-[30px] h-[30px] bg-[#00000073] rounded-full">
+        <i class="fa-solid fa-chevron-right text-white text-[11px]"></i>
+    </button>
+</div>
 
 
         <!-- Sección de selección de universidad y cantidad para el tipo activo -->
@@ -363,5 +384,57 @@
                 }
             };
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+        function setupScroll(containerId, leftButtonId, rightButtonId) {
+            const scrollContainer = document.getElementById(containerId);
+            const scrollLeft = document.getElementById(leftButtonId);
+            const scrollRight = document.getElementById(rightButtonId);
+
+            let isDown = false;
+            let startX;
+            let scrollLeftPosition;
+
+            // Eventos para el desplazamiento con botones
+            scrollLeft.addEventListener("click", () => {
+                scrollContainer.scrollBy({ left: -100, behavior: "smooth" });
+            });
+
+            scrollRight.addEventListener("click", () => {
+                scrollContainer.scrollBy({ left: 100, behavior: "smooth" });
+            });
+
+            // Eventos para el arrastre con el mouse
+            scrollContainer.addEventListener("mousedown", (e) => {
+                isDown = true;
+                scrollContainer.classList.add("cursor-grabbing");
+                startX = e.pageX - scrollContainer.offsetLeft;
+                scrollLeftPosition = scrollContainer.scrollLeft;
+            });
+
+            scrollContainer.addEventListener("mouseleave", () => {
+                isDown = false;
+                scrollContainer.classList.remove("cursor-grabbing");
+            });
+
+            scrollContainer.addEventListener("mouseup", () => {
+                isDown = false;
+                scrollContainer.classList.remove("cursor-grabbing");
+            });
+
+            scrollContainer.addEventListener("mousemove", (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - scrollContainer.offsetLeft;
+                const walk = (x - startX) * 2; // Velocidad del desplazamiento
+                scrollContainer.scrollLeft = scrollLeftPosition - walk;
+            });
+        }
+
+        // Aplicar la función a Áreas, Categorías y Tipos
+        setupScroll("scrollContainer", "scrollLeft", "scrollRight");
+        setupScroll("scrollContainerCat", "scrollLeftCat", "scrollRightCat");
+        setupScroll("scrollContainerTipo", "scrollLeftTipo", "scrollRightTipo");
+    });
     </script>
 @endpush

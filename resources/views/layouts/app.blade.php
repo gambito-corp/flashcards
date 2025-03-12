@@ -158,11 +158,11 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-footer text-white  z-10 footer-mbs flex justify-between px-[50px] py-[35px]">
+    <footer class="bg-footer text-white  z-10 footer-mbs flex flex-col  md:flex-row justify-between px-[20px] md:px-[50px] py-[35px] flex">
         <div class=" text-sm">
             © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Todos los derechos reservados.
         </div>
-        <div class="text-sm flex gap-4 underline"><a href="https://medbystudents.com/libro-de-reclamaciones/">Libro de reclamaciones</a><a href="https://medbystudents.com/politicas-de-privacidad/">Políticas de privacidad</a></div>
+        <div class="text-sm flex flex-col  md:flex-row gap-4 underline text-center"><a href="https://medbystudents.com/libro-de-reclamaciones/">Libro de reclamaciones</a><a href="https://medbystudents.com/politicas-de-privacidad/">Políticas de privacidad</a></div>
     </footer>
 </div>
 @stack('modals')

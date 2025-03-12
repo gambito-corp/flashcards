@@ -158,6 +158,44 @@ hr{
         opacity: 0;
         display: none;
     }
+    @keyframes spin360 {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin-360 {
+    animation: spin360 2s linear infinite;
+}
+
+  /* Animación para los puntos suspensivos */
+    .dots::after {
+        content: '.';
+        animation: dotsAnimation 1.5s infinite steps(1) 1s;
+    }
+    .dots::before {
+        content: '';
+        animation: dotsAnimation 1.5s infinite steps(1) 0.5s;
+    }
+
+    @keyframes dotsAnimation {
+        0% {
+            content: '.';
+        }
+        33% {
+            content: '..';
+        }
+        66% {
+            content: '...';
+        }
+        100% {
+            content: '.';
+        }
+    }
+
 </style>
 @endpush
 
