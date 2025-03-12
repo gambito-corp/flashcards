@@ -9,73 +9,62 @@
 
 
         <!-- Pestañas de Áreas -->
-        <div class="swiper-container overflow-hidden relative">
-    <div class="swiper-wrapper">
-    <template x-for="area in areas" :key="area.id">
-    <div class="swiper-slide">
-        <div class="areas-buttons cat-1">
-            <button
-                @click="setActiveArea(area.id)"
-                x-text="area.name"
-                :class="activeArea === area.id ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                class="px-4 py-2 focus:outline-none button">
-            </button>
+        <div class="overflow-x-scroll relative">
+            <div class="flex gap-2 my-2">
+                <template x-for="area in areas" :key="area.id">
+                    <div class="flex-none">
+                        <div class="areas-buttons cat-1">
+                            <button
+                                @click="setActiveArea(area.id)"
+                                x-text="area.name"
+                                :class="activeArea === area.id ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                                class="px-4 py-2 focus:outline-none button">
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
-    </div>
-</template>
 
-    </div>
-
-    <!-- Botones de navegación -->
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-</div>
 
 
 
         <!-- Pestañas de Categorías del Área Activa -->
-        <div class="swiper-container overflow-hidden relative">
-    <div class="swiper-wrapper">
-
-        <template x-for="cat in activeCategories" :key="cat.id">
-    <div class="swiper-slide">
-        <div class="areas-buttons cat-2">
-        <button
-            @click="setActiveCategory(cat.id)"
-            x-text="cat.name"
-            :class="activeCategory === cat.id ? 'border-b-2 border-green-500 text-green-500' : 'text-gray-500'"
-            class="px-4 py-2 focus:outline-none">
-        </button></div>
-    </div>
-</template>
-    </div>
-
-    <!-- Botones de navegación -->
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-</div>
-        <!-- Pestañas de Tipos de la Categoría Activa -->
-        <div class="swiper-container overflow-hidden relative">
-    <div class="swiper-wrapper">
-    <template x-for="tipo in activeTipos" :key="tipo.id">
-    <div class="swiper-slide">
-        <div class="areas-buttons mb-0 cat-3">
-            <button
-                @click="setActiveTipo(tipo.id)"
-                x-text="tipo.name"
-                :class="activeTipo === tipo.id ? 'border-b-2 border-purple-500 text-purple-500' : 'text-gray-500'"
-                class="px-4 py-2 focus:outline-none button">
-            </button>
+        <div class="overflow-x-scroll relative">
+            <div class="flex gap-2 my-2">
+                <template x-for="cat in activeCategories" :key="cat.id">
+                    <div class="flex-none">
+                        <div class="areas-buttons cat-2">
+                            <button
+                                @click="setActiveCategory(cat.id)"
+                                x-text="cat.name"
+                                :class="activeCategory === cat.id ? 'border-b-2 border-green-500 text-green-500' : 'text-gray-500'"
+                                class="px-4 py-2 focus:outline-none">
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
-    </div>
-</template>
 
-    </div>
+        <!-- Pestañas de Tipos de la Categoría Activa -->
+        <div class="overflow-x-scroll relative">
+            <div class="flex gap-2 my-2">
+                <template x-for="tipo in activeTipos" :key="tipo.id">
+                    <div class="flex-none">
+                        <div class="areas-buttons mb-0 cat-3">
+                            <button
+                                @click="setActiveTipo(tipo.id)"
+                                x-text="tipo.name"
+                                :class="activeTipo === tipo.id ? 'border-b-2 border-purple-500 text-purple-500' : 'text-gray-500'"
+                                class="px-4 py-2 focus:outline-none button">
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
 
-    <!-- Botones de navegación -->
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-</div>
 
         <!-- Sección de selección de universidad y cantidad para el tipo activo -->
         <template x-if="activeTipoObject">
@@ -375,27 +364,4 @@
             };
         }
     </script>
-
-<script>
-    const swiper = new Swiper('.swiper-container', {
-        slidesPerView: 2, // Número de elementos visibles en PC
-        spaceBetween: 10, // Espaciado entre los elementos
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        grabCursor: true, // Soporte para drag
-        breakpoints: {
-            // Para pantallas grandes (PC)
-            1024: {
-                slidesPerView: 7,
-            },
-            // Para pantallas móviles (hasta 1024px)
-            768: {
-                slidesPerView: 3,
-            },
-
-        }
-    });
-</script>
 @endpush

@@ -482,8 +482,8 @@ nav .text-gray-900 {
     .border-b .max-w-7xl {
         height: 65px !important;
     }
-    
-    
+
+
 }
 
 /*TABLA USUARIOS */
@@ -531,7 +531,7 @@ nav .text-gray-900 {
 }
 
 @media(max-width:620px){
-  
+
     .choise-ask {
         gap: 15px;
     }
@@ -942,7 +942,7 @@ display:none;
         right: 0;
         mix-blend-mode: luminosity;
         display: block;
-    }   
+    }
 }
 
 .box-dashboard hr{
