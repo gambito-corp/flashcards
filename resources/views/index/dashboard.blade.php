@@ -21,7 +21,7 @@
 
         <!-- Card 2: Tabla de últimos exámenes realizados -->
         <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 container-ask nopadding-dashboard">
-            <div class="p-6">
+            <div class="">
                 <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container ">Últimos Exámenes Realizados</h2>
                 <hr>
                 <div class="overflow-x-auto">
@@ -60,7 +60,7 @@
 
         <!-- Card 3: Gráfico de evolución -->
         <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 container-ask">
-            <div class="p-6">
+            <div class="">
                 <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container ">Evolución del Usuario</h2>
                 <hr>
                 <!-- Selector para elegir el rango de tiempo -->

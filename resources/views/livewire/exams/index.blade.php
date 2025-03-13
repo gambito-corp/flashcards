@@ -395,6 +395,16 @@
             let startX;
             let scrollLeftPosition;
 
+            // Función para verificar y actualizar la visibilidad de los botones
+            function updateButtons() {
+                const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+                const hasScrollableContent = maxScrollLeft > 0;
+
+                // Mostrar u ocultar botones según si hay contenido desplazable
+                scrollLeft.classList.toggle("hidden", !hasScrollableContent || scrollContainer.scrollLeft <= 0);
+                scrollRight.classList.toggle("hidden", !hasScrollableContent || scrollContainer.scrollLeft >= maxScrollLeft);
+            }
+
             // Eventos para el desplazamiento con botones
             scrollLeft.addEventListener("click", () => {
                 scrollContainer.scrollBy({ left: -100, behavior: "smooth" });
@@ -429,6 +439,16 @@
                 const walk = (x - startX) * 2; // Velocidad del desplazamiento
                 scrollContainer.scrollLeft = scrollLeftPosition - walk;
             });
+
+            // Verificar si hay contenido desplazable
+            scrollContainer.addEventListener("scroll", updateButtons);
+
+            // Verificar el estado de los botones después de que los elementos hayan sido renderizados
+            setTimeout(updateButtons, 500);  // Usamos un timeout para esperar que Alpine.js renderice
+
+            // Observar cambios en los elementos hijos (por ejemplo, con Alpine.js)
+            const observer = new MutationObserver(updateButtons);
+            observer.observe(scrollContainer, { childList: true, subtree: true });
         }
 
         // Aplicar la función a Áreas, Categorías y Tipos

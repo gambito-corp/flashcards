@@ -1,17 +1,17 @@
-<div class="max-w-[67rem] mx-auto p-4 pt-[40px] md:pt-[70px] h-full ">
+<div class="max-w-[67rem] mx-auto p-4 pt-[40px] md:pt-[70px] h-full main-chat-bot-mbs">
 <div class="overlay"></div>
   <!-- Sección de Historial de Chats -->
-        <div class="sidebar-chat bg-white z-0   p-10 m-0 fixed    rounded-[0px] md:rounded-[20px] z-10 left-5 transform md:-translate-x-[0%] -translate-x-[109%]">
+        <div class="sidebar-chat bg-white z-0   p-9 m-0 fixed    rounded-[0px] md:rounded-[20px] z-10 left-5 transform md:-translate-x-[0%] -translate-x-[109%]">
 
         <h3 class="text-lg font-bold mb-4 text-[#195b81]">Historial</h3>
         <hr>
-        <div class="  flex flex-col overflow-hidden gap-[13px] text-center">
+        <div class="  flex flex-col overflow-hidden gap-[12px] text-center mt-2 w-full">
             @foreach($chatHistory as $chat)
                 <button wire:click="selectChat({{ $chat->id }})"
-                        class="border-0 w-full text-gray-800 flex mb-2 items-center gap-4 text-sm font-medium  py-2  font-semibold chat-history
-                        {{ $activeChatId == $chat->id ?  : '' }} "><i class="fa-regular fa-message"></i>
+                        class="border-0 w-full text-gray-800 flex mb-1 items-center  text-sm font-medium  py-1  font-semibold chat-history md:hover:bg-[#f3f6fb] md:rounded-[20px] md:p-[10px_15px]
+                        {{ $activeChatId == $chat->id ?  : '' }} "><i class="fa-regular fa-message mr-3"></i>
                     Chat #{{ $chat->id }} <br>
-                    <span class="text-xs">{{ $chat->created_at->format('d/m/Y') }}</span>
+                    <span class="text-xs ml-3">{{ $chat->created_at->format('d/m/Y') }}</span>
                 </button>
             @endforeach
         </div>
@@ -20,7 +20,7 @@
      <div class="history-chat-button fixed left-[20px] bottom-[15px] bg-white z-[999] px-[25px] py-[10px] rounded-full text-[14px] shadow-md md:hidden block"><i class="fa-regular fa-message mr-1"></i>Historial</div>
 
     <!-- Área del Chat -->
-    <div class=" flex flex-col  mt-4  rounded-2xl ">
+    <div class=" flex flex-col  mt-4  rounded-2xl content-chat__mbs">
         <!-- Chat Header -->
         <div class="p-4 md-4  md:mt-[0px]">
         <h2 class="text-[24px] md:text-[30px] font-extrabold text-[#195b81]" >¿En qué puedo ayudarte?</h2>
@@ -111,6 +111,40 @@
 
 @push('styles')
 <style>
+
+@media (min-width: 768px) {
+    .main-chat-bot {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        justify-content: end;
+        padding-right: 20vw;
+    }
+
+    .main-chat-bot-mbs {
+        max-width: 100%;
+    }
+
+    .box-chat {
+        width: calc(100% - 410px);
+    }
+}
+
+@media (max-width: 1640px) and (min-width: 769px) {
+    .main-chat-bot {
+
+        padding-right: 9vw;
+    }
+
+    .main-chat-bot-mbs {
+        max-width: 100%;
+    }
+
+    .box-chat {
+        width: calc(100% - 300px);
+    }
+}
+
     .header-mbs{
         position: fixed;
         width: 100%;
@@ -196,117 +230,142 @@ hr{
         }
     }
 
+/*Sidebar historial */
+@media (min-width:620px){
+.chat-history{
+    width: 200px;
+}}
+.sidebar-chat {
+    overflow-y: auto;
+}
+@media (min-width:992px){
+.sidebar-chat {
+    min-width: fit-content;
+    max-height: 620px;
+}
+/* Barra de desplazamiento */
+.sidebar-chat::-webkit-scrollbar{
+ width: 8px;
+ background-color: #dedede;
+ border-radius: 20px;
+ }
+.sidebar-chat::-webkit-scrollbar:window-inactive {
+ display: none;
+ }
+.sidebar-chat::-webkit-scrollbar-thumb  {
+ background-color: #5b8080;
+ border-radius: 6px;
+
+ }}
+
+.card-ati{
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s all ease-in;
+}
+.active-card{
+    opacity: 1;
+    visibility: visible;
+    transition: .3s all ease-in; 
+
+}
+
 </style>
 @endpush
 
 <script>
 
+// Animar texto bot
 document.addEventListener("DOMContentLoaded", function () {
-    // Escuchar cambios en los mensajes del chat
     let observer = new MutationObserver(() => {
         const botMessages = document.querySelectorAll(".bot-text");
         if (botMessages.length === 0) return;
 
-        const lastMessage = botMessages[botMessages.length - 1]; // Último mensaje del bot
+        const lastMessage = botMessages[botMessages.length - 1];
+
         if (!lastMessage.classList.contains("animated")) {
-            hideArticles(); // Ocultar las tarjetas antes de la animación
+            // Seleccionar la última sección antes de la animación y agregar "card-ati"
+            const articleSections = document.querySelectorAll(".article-section");
+            const lastSection = articleSections[articleSections.length - 1];
+            if (lastSection) {
+                lastSection.classList.add("card-ati");
+            }
+
+            // Animar el texto y luego cambiar las clases
             animateText(lastMessage, () => {
-                showArticles(); // Mostrar las tarjetas después de la animación
+                // Remover "active-card" de todas las secciones
+                articleSections.forEach(section => section.classList.remove("active-card"));
+
+                if (lastSection) {
+                    // Eliminar "card-ati" y agregar "active-card" después de la animación
+                    lastSection.classList.remove("card-ati");
+                    lastSection.classList.add("active-card");
+                }
             });
-            lastMessage.classList.add("animated"); // Marcar como animado para evitar repetir animación
+
+            lastMessage.classList.add("animated");
         }
     });
 
     observer.observe(document.getElementById("chat-messages"), { childList: true, subtree: true });
 
     function animateText(element, callback) {
-        const message = element.textContent; // Obtener el texto
-        element.textContent = ""; // Vaciar el texto para animarlo
+        const message = element.textContent;
+        element.textContent = "";
         let index = 0;
 
         function typeWriter() {
             if (index < message.length) {
                 element.textContent += message.charAt(index);
                 index++;
-                setTimeout(typeWriter, 10); // Velocidad de animación
+                setTimeout(typeWriter, 10);
             } else if (callback) {
-                callback(); // Llamar a la función después de la animación
+                callback(); // Ejecutar el callback después de la animación
             }
         }
 
         typeWriter();
     }
+});
 
-    function hideArticles() {
+//Mostrar el boton ver mas articulos
+
+document.addEventListener("DOMContentLoaded", function () {
+    function actualizarBotones() {
         document.querySelectorAll(".article-section").forEach(section => {
-            section.style.opacity = "0"; // Ocultar antes de la animación
-            section.style.pointerEvents = "none"; // Evitar interacción antes de la animación
+            const articles = section.querySelectorAll(".article-card.hidden");
+            const verMasButton = section.querySelector(".verMas");
+
+            if (!verMasButton) return;
+
+            if (articles.length === 0) {
+                verMasButton.classList.add("hidden");
+            } else {
+                verMasButton.classList.remove("hidden");
+            }
+
+            verMasButton.onclick = function () {
+                articles.forEach(article => article.classList.remove("hidden"));
+                this.style.display = "none";
+            };
         });
     }
 
-    function showArticles() {
-        document.querySelectorAll(".article-section").forEach(section => {
-            setTimeout(() => {
-                section.style.transition = "opacity 0.8s ease-in-out";
-                section.style.opacity = "1"; // Fade-in después de la animación del texto
-                section.style.pointerEvents = "auto"; // Restaurar la interacción
-            }, 300); // Retraso para asegurar que la animación del texto termine
-        });
-    }
+    // Llamamos a la función al cargar la página
+    actualizarBotones();
+
+    // Observamos cambios en el DOM
+    const observer = new MutationObserver(actualizarBotones);
+    observer.observe(document.body, { childList: true, subtree: true });
 });
 
-/*document.addEventListener("DOMContentLoaded", () => {
-    const botTextElement = document.getElementById('bot-text');
-    const message = botTextElement.getAttribute('data-text'); // Obtener el texto del atributo data-text
-    let index = 0;
 
-    function typeWriter() {
-        if (index < message.length) {
-            botTextElement.innerHTML += message.charAt(index);
-            index++;
-            setTimeout(typeWriter, 10); // Controla la velocidad de la animación
-        }
-    }
-
-    typeWriter(); // Inicia la animación
-});
-*/
 
 // Agregar fondo a toda la pagina
 document.querySelectorAll('.body-content').forEach(element => {
   element.style.background = '#f3f6fb';
 });
 
-// Boton ver mas Articulos
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".article-section").forEach(section => {
-        const articles = section.querySelectorAll(".article-card.hidden");
-        const verMasButton = section.querySelector(".verMas");
-
-        if (!verMasButton) return; // Si no hay botón, salir
-
-        if (articles.length === 0) {
-            verMasButton.classList.add("hidden");
-        } else {
-            verMasButton.classList.remove("hidden");
-        }
-
-        verMasButton.addEventListener("click", function () {
-            articles.forEach((article, index) => {
-                setTimeout(() => {
-                    article.style.display = "block"; // Muestra el elemento
-                    setTimeout(() => {
-                        article.classList.remove("hidden"); // Activa la animación
-                    }, 10);
-                }, index * 100); // Retraso progresivo para efecto más suave
-            });
-
-            setTimeout(() => {
-                this.style.display = "none"; // Oculta el botón después de mostrar los elementos
-            }, articles.length * 100);
-        });
-    });
-});
 
 //Activar boton historial
 document.querySelectorAll(".history-chat-button").forEach(button => {
