@@ -12,7 +12,7 @@ class MedisearchController extends Controller
 
     Public function index(){
         if (Auth::user()->status === 0){
-            return redirect()->route('planes.index');
+            return redirect()->route('planes');
         }
         return view('medisearch.index');
     }
