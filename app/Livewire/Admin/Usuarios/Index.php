@@ -27,5 +27,10 @@ class Index extends Component
         return $userAreas->pluck('name')->implode(', ');
     }
 
+    public function getUserStatus($status)
+    {
+        return $status ? 'Premium' : 'Fremium';
+    }
+
 
 }
