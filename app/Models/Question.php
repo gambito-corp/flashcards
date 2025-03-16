@@ -52,6 +52,6 @@ class Question extends Model
 
     public function options()
     {
-        return $this->hasMany(Option::class);
+        return $this->hasMany(Option::class)->inRandomOrder();
     }
 }
