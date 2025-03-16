@@ -3,6 +3,7 @@
 namespace App\Services\Usuarios;
 
 
+use App\Models\Purchase;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
@@ -20,7 +21,16 @@ class UserService
                 'email'    => $data['email'],
                 'password' => bcrypt($data['password']),
                 'current_team_id' => $data['teams'][0],
+                'status' => $data['is_premium']
             ]);
+
+            if ($data['is_premium'] == 1) {
+                Purchase::create([
+                    'user_id' => $user->id,
+                    'product_id' => 2,
+                    'purchase_at' => now(),
+                ]);
+            }
 
             if (isset($data['profile_photo'])) {
                 $path = $data['profile_photo']->store('avatars', 's3');
@@ -54,8 +64,16 @@ class UserService
             $user->update([
                 'name'  => $data['name'],
                 'email' => $data['email'],
+                'status' => $data['is_premium']
             ]);
 
+            if ($data['is_premium'] == 1) {
+                Purchase::create([
+                    'user_id' => $user->id,
+                    'product_id' => 2,
+                    'purchase_at' => now(),
+                ]);
+            }
             // Guarda la foto de perfil si se envía, o deja la existente
             if (isset($data['profile_photo'])) {
                 $path = $data['profile_photo']->store('avatars', 's3');

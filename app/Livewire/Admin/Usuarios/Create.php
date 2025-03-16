@@ -13,7 +13,7 @@ class Create extends Component
 {
     use WithFileUploads;
 
-    public $name, $email, $password, $autoPassword = false, $profile_photo;
+    public $name, $email, $password, $autoPassword = false, $profile_photo, $isPremium = false;
     public $teams, $selectedTeams = [];
     public $roles, $selectedRoles = [];
     public $selectedSubjects = [], $availableSubjects = [], $selectedToAdd = [];
@@ -93,6 +93,7 @@ class Create extends Component
             'teams' => 'required|array',
             'roles' => 'required|array',
             'selectedSubjects' => 'required|array',
+            'isPremium' => 'boolean',
         ]);
 
         $pwd_generate = false;
@@ -112,6 +113,7 @@ class Create extends Component
             'subjects'      => $this->selectedSubjects,
             'autoPassword'  => $this->autoPassword,
             'pwd_generate'  => $pwd_generate,
+            'is_premium'    => $this->isPremium,
         ];
 
         // Se delega la creación del usuario en el servicio
@@ -137,5 +139,6 @@ class Create extends Component
         $this->availableSubjects = [];
         $this->selectedToAdd = [];
         $this->deleteAsignature = [];
+        $this->isPremium = false;
     }
 }

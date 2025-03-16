@@ -15,7 +15,7 @@ class Edit extends Component
     use WithFileUploads;
 
     public $usuario;
-    public $name, $email, $password, $autoPassword = false, $profile_photo;
+    public $name, $email, $password, $autoPassword = false, $profile_photo, $isPremium = false;
     public $selectedTeams = [], $selectedRoles = [];
     public $selectedSubjects = [], $availableSubjects = [], $selectedToAdd = [];
     public $deleteAsignature = [];
@@ -35,7 +35,7 @@ class Edit extends Component
         // Dejar la contraseña vacía; si se quiere cambiar se ingresa una nueva.
         $this->password = null;
         $this->autoPassword = false;
-
+        $this->isPremium = (bool) $usuario->status;
         // Cargar teams y roles disponibles
         $this->selectedTeams = $usuario->teams->pluck('id')->toArray();
         $this->selectedRoles = $usuario->roles->pluck('id')->toArray();
@@ -106,6 +106,7 @@ class Edit extends Component
             'selectedTeams'   => 'required|array',
             'selectedRoles'   => 'required|array',
             'selectedSubjects'=> 'required|array',
+            'isPremium'       => 'boolean',
         ]);
 
         $data = [
@@ -116,6 +117,7 @@ class Edit extends Component
             'teams'         => $this->selectedTeams,
             'roles'         => $this->selectedRoles,
             'subjects'      => $this->selectedSubjects, // [subject_id => subject_name]
+            'is_premium'    => $this->isPremium,
         ];
 
         $this->userService->update($data, $this->usuario);
@@ -131,7 +133,7 @@ class Edit extends Component
         $this->reset([
             'name', 'email', 'password', 'autoPassword', 'profile_photo',
             'selectedTeams', 'selectedRoles', 'selectedSubjects',
-            'availableSubjects', 'selectedToAdd', 'deleteAsignature'
+            'availableSubjects', 'selectedToAdd', 'deleteAsignature', 'isPremium'
         ]);
     }
 

@@ -60,16 +60,29 @@
                         id="toggle-password"></i>
                 </div>
                 @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                <div class="mt-2 flex items-center space-x-2">
-                    <input
-                        type="checkbox"
-                        id="autoPassword"
-                        name="autoPassword"
-                        wire:model.live="autoPassword"
-                        class="h-4 w-4 chexbox-f" />
-                    <label for="autoPassword" class="text-sm text-gray-600 label-nm">
-                        Generar automáticamente
-                    </label>
+                <div class="flex gap-4">
+                    <div class="mt-2 flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            id="autoPassword"
+                            name="autoPassword"
+                            wire:model.live="autoPassword"
+                            class="h-4 w-4 chexbox-f" />
+                        <label for="autoPassword" class="text-sm text-gray-600 label-nm">
+                            Generar automáticamente
+                        </label>
+                    </div>
+                    <div class="mt-2 flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            id="isPremium"
+                            name="isPremium"
+                            wire:model.live="isPremium"
+                            class="h-4 w-4 chexbox-f" />
+                        <label for="isPremium" class="text-sm text-gray-600 label-nm">
+                            Usuario Premium
+                        </label>
+                    </div>
                 </div>
             </div>
             <div>

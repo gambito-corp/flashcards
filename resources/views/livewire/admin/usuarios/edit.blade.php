@@ -34,6 +34,17 @@
         <h2 class="text-lg font-semibold mb-2 primary-color title-ask-container fz-15">Credenciales y Foto</h2>
         <hr>
         <div class="grid gap-4 mb-6">
+            <div class="mt-2 flex items-center space-x-2">
+                <input
+                    type="checkbox"
+                    id="isPremium"
+                    name="isPremium"
+                    wire:model.live="isPremium"
+                    class="h-4 w-4 chexbox-f" />
+                <label for="isPremium" class="text-sm text-gray-600 label-nm">
+                    Usuario Premium
+                </label>
+            </div>
             <div class="mb-4">
                 <label for="profile_photo" class="block font-medium text-gray-700 mb-1">
                     Foto de Perfil (opcional)
