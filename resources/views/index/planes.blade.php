@@ -23,7 +23,7 @@
 {{--                        @else--}}
 {{--                        @endif--}}
 
-                            <a href="{{ route('mercadopago.createSubscription', ['productId' => $plan->id]) }}" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300 boton-success-m">
+                            <a href="https://www.mercadopago.com.pe/subscriptions/checkout?preapproval_plan_id=2c93808495b8594f0195cf59cbcb0c69" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300 boton-success-m">
                                 Seleccionar Plan
                             </a>
                         </div>
