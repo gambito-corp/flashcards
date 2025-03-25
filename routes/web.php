@@ -200,6 +200,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('mercadopago.callback');
 });
 
+Route::get('/pago-exitoso', function () {
+    dd('Correcto');
+});
+
 //Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
 //
 //Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');

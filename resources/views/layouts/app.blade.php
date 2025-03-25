@@ -20,6 +20,26 @@
     <!-- Styles -->
     @livewireStyles
     @stack('styles')
+    <styles>
+        .environment-indicator {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            font-weight: 800;
+            padding: 8px 20px;
+            border-radius: 5px;
+            border: 2px solid #ff0000;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </styles>
     @if(config('app.env') == 'prod')
         <script>
             // Función para deshabilitar atajos de teclado específicos
@@ -126,6 +146,12 @@
 
 </head>
 <body class="font-sans antialiased">
+<!-- Texto flotante para entorno PRE -->
+@if(app()->environment('pre'))
+    <div class="environment-indicator">
+        ENTORNO PRE - AMBIENTE DE PRUEBAS
+    </div>
+@endif
 <x-banner />
 
 <div class="min-h-screen bg-gray-100 bg-[#f7f7f7] body-content">
