@@ -20,7 +20,7 @@
     <!-- Styles -->
     @livewireStyles
     @stack('styles')
-    <styles>
+    <style>
         .environment-indicator {
             position: fixed;
             top: 10px;
@@ -39,7 +39,7 @@
             backdrop-filter: blur(2px);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-    </styles>
+    </style>
     @if(config('app.env') == 'prod')
         <script>
             // Función para deshabilitar atajos de teclado específicos
