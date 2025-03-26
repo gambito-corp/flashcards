@@ -23,7 +23,7 @@
     <style>
         .environment-indicator {
             position: fixed;
-            top: 10px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
