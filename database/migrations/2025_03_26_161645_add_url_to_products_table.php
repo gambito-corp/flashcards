@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->string('preaproval_id')->nullable(); // Campo preaproval_id
-            $table->softDeletes(); // Campo deleted_at para borrado suave
+        Schema::table('products', function (Blueprint $table) {
+            $table->string('url')->nullable()->after('referencia'); // Campo URL
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->dropColumn(['preaproval_id']);
-            $table->dropSoftDeletes();
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn(['url']);
         });
     }
 };

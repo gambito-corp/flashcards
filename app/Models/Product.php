@@ -17,7 +17,8 @@ class Product extends Model
         'price',
         'duration_days',
         'description',
-        'referencia'
+        'referencia',
+        'url'
     ];
 
     /**
