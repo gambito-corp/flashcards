@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use SoftDeletes;
     // Especificamos la tabla (opcional si el nombre sigue la convención plural)
     protected $table = 'products';
 
@@ -15,6 +17,7 @@ class Product extends Model
         'price',
         'duration_days',
         'description',
+        'referencia'
     ];
 
     /**

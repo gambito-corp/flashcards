@@ -224,6 +224,7 @@ Route::get('/pago-exitoso', function (Request $request) {
                     'user_id' => auth()->user()->id,
                     'product_id' => $product->id,
                     'purchase_at' => now(),
+                    'preaproval_id' => $request->preapproval_id,
                 ]);
 
                 return redirect()->route('dashboard');
@@ -244,6 +245,7 @@ Route::get('/pago-exitoso', function (Request $request) {
             'user_id' => auth()->user()->id,
             'product_id' => 1,
             'purchase_at' => now(),
+            'preaproval_id' => $request->preapproval_id,
         ]);
 
         return redirect()->route('dashboard');

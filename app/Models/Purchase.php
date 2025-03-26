@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Purchase extends Model
 {
+    use SoftDeletes;
     // Especificamos la tabla (opcional)
     protected $table = 'purchases';
 
@@ -14,6 +16,7 @@ class Purchase extends Model
         'user_id',
         'product_id',
         'purchased_at',
+        'preaproval_id'
     ];
 
     /**
