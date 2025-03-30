@@ -12,7 +12,7 @@ use App\Models\Tipo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+ini_set('memory_limit', '512M');
 class ExamController extends Controller
 {
 
@@ -21,15 +21,23 @@ class ExamController extends Controller
         if (Auth::user()->current_team_id === null) {
             return redirect()->route('dashboard')->with('error', 'Selecciona una materia primero');
         }
-        // Cargar las áreas, categorías, tipos y preguntas aprobadas.
+
         $areas = Area::with([
-            'categories.tipos.questions' => function ($query) {
-                $query->where('approved', true);
-            },
-            'categories.tipos.questions.universidades'
-        ])->where('team_id', Auth::user()->current_team_id)->get();
+            'categories' => fn($query) => $query->select('id', 'name', 'area_id'),
+            'categories.tipos' => fn($query) => $query->select('id', 'name', 'category_id'),
+            'categories.tipos.questions' => fn($query) => $query
+                ->where('approved', true)
+                ->select('id', 'question', 'answer', 'tipo_id')
+                ->with(['universidades' => fn($q) => $q->select('universities.id', 'name')])
+                ->limit(1000) // Ajusta según necesidades
+        ])
+            ->where('team_id', Auth::user()->current_team_id)
+            ->select('id', 'name', 'team_id')
+            ->get();
+
         return view('examenes.index', compact('areas'));
     }
+
 
     public function createExam(Request $request)
     {
