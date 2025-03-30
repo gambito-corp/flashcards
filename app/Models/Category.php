@@ -36,6 +36,12 @@ class Category extends Model
     }
     public function tipos()
     {
-        return $this->hasMany(Tipo::class);
+        return $this->belongsToMany(
+            Tipo::class,
+            'question_tipo',
+            'question_id', // Foreign key en la tabla pivot para Question
+            'tipo_id'      // Foreign key en la tabla pivot para Tipo
+        )->withPivot('cr'); // Añade esto si hay columnas adicionales en la pivot
     }
+
 }

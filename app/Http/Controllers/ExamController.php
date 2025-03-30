@@ -28,8 +28,7 @@ class ExamController extends Controller
             'categories.tipos.questions' => fn($query) => $query
                 ->where('approved', true)
                 ->select('id', 'question', 'answer', 'tipo_id')
-                ->with(['universidades' => fn($q) => $q->select('universities.id', 'name')])
-                ->limit(1000) // Ajusta según necesidades
+                ->with(['universidades:id,name'])
         ])
             ->where('team_id', Auth::user()->current_team_id)
             ->select('id', 'name', 'team_id')
