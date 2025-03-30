@@ -43,7 +43,7 @@ Route::middleware([
 
     Route::get('/planes', [HomeController::class, 'planes'])->name('planes');
 
-    Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.update');
+    Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.updates');
 //    /*PREGUNTAS*/
     Route::get('/preguntas', [PreguntasController::class, 'index'])
         ->middleware('role:root|admin|colab')
@@ -133,7 +133,7 @@ Route::middleware([
                     Route::post('/create', [CarrerasController::class, 'store'])->name('store');
                     Route::get('/{team}', [CarrerasController::class, 'show'])->name('show');
                     Route::get('/{team}/edit', [CarrerasController::class, 'edit'])->name('edit');
-                    Route::put('/{team}', [CarrerasController::class, 'update'])->name('update');
+//                    Route::put('/{team}', [CarrerasController::class, 'update'])->name('update');
                 });
 
 
@@ -207,9 +207,9 @@ use MercadoPago\MercadoPagoConfig;
 
 Route::get('/pago-exitoso', function (Request $request) {
 //    dd($request->all());
-    MercadoPagoConfig::setAccessToken(env('MP_TOKEN'));
+    MercadoPagoConfig::setAccessToken(config('services.mercadopago.token'));
 
-    if (env('APP_ENV') === 'local') {
+    if (config('app.env') === 'local') {
         try {
             $client = new PreapprovalClient();
             $preapproval = $client->get($request->preapproval_id);

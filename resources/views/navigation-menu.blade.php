@@ -51,11 +51,11 @@
                                     {{ __('Selecciona Materia') }}
                                 </div>
                                 @forelse (Auth::user()->teams as $team)
-                                    <x-dropdown-link href="{{ route('current-team.update', $team) }}"
+                                    <x-dropdown-link href="{{ route('current-team.updates', $team) }}"
                                                      onclick="event.preventDefault(); document.getElementById('team-switch-form-{{ $team->id }}').submit();">
                                         {{ $team->name }}
                                     </x-dropdown-link>
-                                    <form id="team-switch-form-{{ $team->id }}" action="{{ route('current-team.update', $team) }}" method="POST" class="hidden">
+                                    <form id="team-switch-form-{{ $team->id }}" action="{{ route('current-team.updates', $team) }}" method="POST" class="hidden">
                                         @csrf
                                         @method('PUT')
                                     </form>
@@ -154,11 +154,11 @@
                 </button>
                 <div x-show="teamOpen" class="mt-2 space-y-1">
                     @forelse (Auth::user()->teams as $team)
-                        <x-responsive-nav-link href="{{ route('current-team.update', $team) }}"
+                        <x-responsive-nav-link href="{{ route('current-team.updates', $team) }}"
                                                onclick="event.preventDefault(); document.getElementById('team-switch-form-mobile-{{ $team->id }}').submit();">
                             {{ $team->name }}
                         </x-responsive-nav-link>
-                        <form id="team-switch-form-mobile-{{ $team->id }}" action="{{ route('current-team.update', $team) }}" method="POST" class="hidden">
+                        <form id="team-switch-form-mobile-{{ $team->id }}" action="{{ route('current-team.updates', $team) }}" method="POST" class="hidden">
                             @csrf
                             @method('PUT')
                         </form>
