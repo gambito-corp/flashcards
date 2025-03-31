@@ -75,6 +75,7 @@ Route::middleware([
 
 //   /*EXAMENES*/
     Route::get('/examenes', [ExamController::class, 'index'])->name('examenes.index');
+    Route::get('/examenes/create', [ExamController::class, 'store'])->name('examenes.store');
     Route::post('/examenes', [ExamController::class, 'createExam'])->name('examenes.create');
     Route::get('/examenes/{id}', [ExamController::class, 'showExam'])->name('examenes.show');
     Route::post('/examenes/evaluar', [ExamController::class, 'evaluarExamen'])->name('examenes.evaluar');

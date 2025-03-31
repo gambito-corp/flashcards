@@ -47,8 +47,12 @@ class Question extends Model
      */
     public function universidades()
     {
-        return $this->belongsToMany(Universidad::class, 'question_universidad');
+        return $this->belongsToMany(Universidad::class, 'question_universidad')
+            ->using(QuestionUniversidad::class) // Necesario para tablas con id autoincremental
+            ->withPivot('id') // Incluir el id del pivot
+            ->select('universidades.id as universidad_id', 'universidades.name');
     }
+
 
     public function options()
     {

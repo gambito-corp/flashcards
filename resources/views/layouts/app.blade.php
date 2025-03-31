@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="{{ asset('estilos.css') }}">
 
     <!-- Styles -->
-    @livewireStyles
+    <livewire:styles />
     @stack('styles')
     <style>
         .environment-indicator {
@@ -154,7 +154,7 @@
 @endif
 <x-banner />
 
-<div class="min-h-screen bg-gray-100 bg-[#f7f7f7] body-content">
+<div class="min-h-screen bg-[#f7f7f7] body-content">
     <livewire:nav-link/>
 
     <!-- Page Heading -->
@@ -175,7 +175,7 @@
 <!-- Modal -->
 <div id="lightboxModal" class="lightbox-modal" onclick="closeModal()">
     <span class="close-btn">&times;</span>
-    <img class="modal-content" id="modalImage">
+    <img class="modal-content" id="modalImage" alt="as">
 </div>
 
     <main class="">
@@ -184,7 +184,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-footer text-white  z-10 footer-mbs flex flex-col  md:flex-row justify-between px-[20px] md:px-[50px] py-[35px] flex ">
+    <footer class="bg-footer text-white  z-10 footer-mbs flex flex-col  md:flex-row justify-between px-[20px] md:px-[50px] py-[35px] ">
         <div class=" text-sm text-center mb-3 md:mb-0">
             © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Todos los derechos reservados.
         </div>
@@ -192,7 +192,7 @@
     </footer>
 </div>
 @stack('modals')
-@livewireScripts
+<livewire:scripts />
 @stack('scripts')
 </body>
 </html>

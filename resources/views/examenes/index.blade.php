@@ -1,3 +1,3 @@
-<x-main-layout title="Examenes">
-    <livewire:exams.index :areas="$areas" />
+<x-main-layout title="Exámenes">
+    <livewire:exams.index :areas="$areas" :categorias="$categorias" :tipos="$tipos" />
 </x-main-layout>

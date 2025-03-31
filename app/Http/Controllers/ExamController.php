@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\Category;
 use App\Models\Exam;
 use App\Models\ExamResult;
 use App\Models\ExamTeam;
@@ -15,48 +16,87 @@ use Illuminate\Support\Facades\DB;
 ini_set('memory_limit', '512M');
 class ExamController extends Controller
 {
-
-    public function index(Request $request)
+    public function index()
     {
         if (Auth::user()->current_team_id === null) {
             return redirect()->route('dashboard')->with('error', 'Selecciona una materia primero');
         }
+        $areas = Area::query()->select('id', 'team_id', 'name')->where('team_id', Auth::user()->current_team_id)->get();
+        $categorias = Category::query()->select('id', 'area_id', 'name')->where('area_id', $areas->first()?->id)->get();
+        $tipos = Tipo::query()->select('id', 'category_id', 'name')->where('category_id', $categorias->first()?->id)->get();
 
-        $areas = Area::with([
-            'categories' => fn($query) => $query->select('id', 'name', 'area_id'),
-            'categories.tipos' => fn($query) => $query->select('id', 'name', 'category_id'),
-            'categories.tipos.questions' => fn($query) => $query
-                ->where('approved', true)
-                ->select('id', 'question', 'answer', 'tipo_id')
-                ->with(['universidades:id,name'])
-        ])
-            ->where('team_id', Auth::user()->current_team_id)
-            ->select('id', 'name', 'team_id')
-            ->get();
-
-        return view('examenes.index', compact('areas'));
+        return view('examenes.index', [
+            'areas' => $areas,
+            'categorias' => $categorias,
+            'tipos' => $tipos,
+        ]);
     }
 
+    public function store(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'No autenticado'], 401);
+        }
+
+        $user = Auth::user();
+
+        if ($user->status == 0) {
+            $currentMonthExamCount = ExamResult::query()->where('user_id', $user->id)
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->count();
+
+            if ($currentMonthExamCount >= 10) {
+                return response()->json([
+                    'error' => 'No puede crear más de 10 exámenes por mes.'
+                ], 403);
+            }
+        }
+        // Crear el examen
+        $exam = new Exam();
+        $exam->title = $request->input('examTitle');
+        $exam->description = '';
+        $exam->time_limit = $request->input('timeExam');
+        $exam->save();
+
+        $allSelectedQuestions = collect();
+
+        // Recorremos cada selección
+        foreach ($request->input('questionSelections') as $key => $selection) {
+            $type = Tipo::with(['questions' => function ($query)  use ($selection){
+                $query->where('approved', 1)
+                    ->inRandomOrder();
+            }])->find($key);
+
+            if (!$type) {
+                continue;
+            }
+
+            $questions = $type->questions;
+            $quantity = $selection['quantity'];
+
+            // Si hay suficientes preguntas y se pidió al menos 1, seleccionamos aleatoriamente la cantidad solicitada.
+            if ($quantity > 0 && $questions->count() >= $quantity) {
+                $selected = $questions->random($quantity);
+            } else {
+                $selected = $questions;
+            }
+
+            $allSelectedQuestions = $allSelectedQuestions->merge($selected);
+        }
+
+        // Adjuntar las preguntas al examen (relación many-to-many)
+        $exam->questions()->attach($allSelectedQuestions->pluck('id')->unique());
+
+        return $this->showExam($exam->id);
+    }
 
     public function createExam(Request $request)
     {
         $user = Auth::user();
         // Si el usuario tiene status 0, se verifica el límite de exámenes del mes actual.
-//        if ($user->status == 0) {
-//            $currentMonthExamCount = ExamResult::query()->where('user_id', $user->id)
-//                ->whereYear('created_at', now()->year)
-//                ->whereMonth('created_at', now()->month)
-//                ->count();
-//
-//            if ($currentMonthExamCount >= 10) {
-//                return response()->json([
-//                    'error' => 'No puede crear más de 10 exámenes por mes.'
-//                ], 403);
-//            }
-//        }
-        if (!auth()->check()) {
-            return response()->json(['error' => 'No autenticado'], 401);
-        }
+
+
 
         $validated = $request->validate([
             'questionSelections'            => 'required|array',
@@ -124,6 +164,22 @@ class ExamController extends Controller
         ]);
     }
 
+    private function prepareQuestions($selections)
+    {
+        return collect($selections)->map(function($selection) {
+            return \App\Models\Question::where('tipo_id', $selection['typeId'])
+                ->approved()
+                ->when($selection['universityId'], function($q) use ($selection) {
+                    $q->whereHas('universidades', fn($q) => $q->where('id', $selection['universityId']));
+                })
+                ->inRandomOrder()
+                ->take($selection['quantity'])
+                ->get()
+                ->map->only('id', 'question', 'answer');
+        })->flatten(1);
+    }
+
+
     public function showExam($id)
     {
         $exam = Exam::query()->with('questions.options')->find($id);
@@ -181,4 +237,9 @@ class ExamController extends Controller
             return response()->json(['error' => 'Ocurrió un error al evaluar el examen'], 500);
         }
     }
+
+
+
+
+
 }
