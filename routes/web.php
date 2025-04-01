@@ -68,6 +68,13 @@ Route::middleware([
         ->name('preguntas.universidad');
 
 
+Route::post('/procesando-pago', function (Request $request) {
+    Log::info("esta es la respuesta del webhook: ".json_encode($request->all()));
+    Log::info('Procesando pago');
+});
+
+
+
 
     Route::get('/preguntas/download', [PreguntasController::class, 'downloadCsvModel'])
         ->middleware('role:root|admin|colab')
@@ -206,10 +213,10 @@ use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 
 Route::get('/pago-exitoso', function (Request $request) {
-//    dd($request->all());
     MercadoPagoConfig::setAccessToken(config('services.mercadopago.token'));
 
-    if (config('app.env') === 'local') {
+    if (config('app.env') !== 'local') {
+        dd('exit');
         try {
             $client = new PreapprovalClient();
             $preapproval = $client->get($request->preapproval_id);
@@ -236,9 +243,10 @@ Route::get('/pago-exitoso', function (Request $request) {
             dd($e->getApiResponse()->getContent(), $e);
         }
     }else{
-
 //      $product = Product::query()->where('price', $request->summarized->charged_amount)->first();
+
         $user = auth()->user();
+        dd($user);
         $user->status = 1;
         $user->save();
         \App\Models\Purchase::create([
