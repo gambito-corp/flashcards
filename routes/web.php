@@ -67,15 +67,6 @@ Route::middleware([
         ->middleware('role:root|admin')
         ->name('preguntas.universidad');
 
-
-Route::post('/procesando-pago', function (Request $request) {
-    Log::info("esta es la respuesta del webhook: ".json_encode($request->all()));
-    Log::info('Procesando pago');
-});
-
-
-
-
     Route::get('/preguntas/download', [PreguntasController::class, 'downloadCsvModel'])
         ->middleware('role:root|admin|colab')
         ->name('csv-model.download');
@@ -261,6 +252,10 @@ Route::get('/pago-exitoso', function (Request $request) {
 
 });
 
+Route::post('/procesando-pago', function (Request $request) {
+    Log::info("esta es la respuesta del webhook: ".json_encode($request->all()));
+    Log::info('Procesando pago');
+});
 
 
 
@@ -316,9 +311,3 @@ if (config('app.env') === 'local')
             : "No se encontró usuarios para actualizar o todas las suscripciones están autorizadas.";
     });
 }
-
-//Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
-//
-//Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-//Route::get('/payment/failure', [PaymentController::class, 'failure'])->name('payment.failure');
-//Route::get('/payment/pending', [PaymentController::class, 'pending'])->name('payment.pending');
