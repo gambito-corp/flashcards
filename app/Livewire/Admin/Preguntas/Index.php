@@ -20,6 +20,13 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function delete($id)
+    {
+        $question = Question::findOrFail($id);
+        $question->delete();
+        session()->flash('message', 'Pregunta eliminada correctamente.');
+    }
+
     public function render()
     {
         $query = Question::query()->with(['universidades', 'user']);
