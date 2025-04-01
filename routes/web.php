@@ -253,8 +253,71 @@ Route::get('/pago-exitoso', function (Request $request) {
 });
 
 Route::post('/procesando-pago', function (Illuminate\Http\Request $request) {
-    Log::info("Contenido crudo del webhook: " . $request->getContent());
-    Log::info('Procesando pago');
+    // Obtén el contenido del header "x-signature"
+    $xSignature = $request->header('x-signature');
+    if (!$xSignature) {
+        Log::error("Falta el header x-signature");
+        return response('Bad Request', 400);
+    }
+
+    // Separa el header por comas para extraer ts y v1
+    $parts = explode(',', $xSignature);
+    $signatureData = [];
+    foreach ($parts as $part) {
+        // Se elimina cualquier espacio en blanco y se separa por "="
+        $kv = explode('=', trim($part), 2);
+        if (count($kv) === 2) {
+            $signatureData[$kv[0]] = $kv[1];
+        }
+    }
+
+    // Extrae el timestamp (ts) y la clave (v1)
+    $ts = $signatureData['ts'] ?? null;
+    $v1 = $signatureData['v1'] ?? null;
+    if (!$ts || !$v1) {
+        Log::error("No se pudo extraer ts o v1 del header x-signature");
+        return response('Bad Request', 400);
+    }
+
+    // Obtén el header "x-request-id"
+    $xRequestId = $request->header('x-request-id');
+
+    // Obtén el parámetro query "data.id". Según la documentación, este valor se debe enviar en minúsculas.
+    $dataId = $request->query('data.id', '');
+    $dataId = strtolower($dataId);
+
+    // Construye el template. Se incluyen únicamente los parámetros que estén presentes.
+    $templateParts = [];
+    if ($dataId !== '') {
+        $templateParts[] = "id:" . $dataId;
+    }
+    if ($xRequestId) {
+        $templateParts[] = "request-id:" . $xRequestId;
+    }
+    if ($ts) {
+        $templateParts[] = "ts:" . $ts;
+    }
+    $template = implode(";", $templateParts) . ";";
+
+    // La clave secreta configurada en Tus integraciones (puedes almacenarla en .env o config)
+    $secretKey = config('services.mercadopago.secret_key');
+
+    // Genera la firma HMAC con SHA256
+    $generatedSignature = hash_hmac('sha256', $template, $secretKey);
+
+    Log::info("Template usado: " . $template);
+    Log::info("Firma generada: " . $generatedSignature);
+    Log::info("Firma recibida (v1): " . $v1);
+
+    // Compara la firma generada con la recibida usando hash_equals para evitar vulnerabilidades de timing
+    if (hash_equals($generatedSignature, $v1)) {
+        Log::info("Validación del webhook exitosa.");
+        // Aquí puedes continuar procesando la notificación
+        return response('OK', 200);
+    } else {
+        Log::error("Falló la validación del webhook.");
+        return response('Unauthorized', 401);
+    }
 });
 
 
