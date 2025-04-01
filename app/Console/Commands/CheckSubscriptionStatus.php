@@ -15,14 +15,16 @@ class CheckSubscriptionStatus extends Command
     public function handle()
     {
         $client = new Client();
-        $accessToken = config('services.mercadopago.access_token');
+        $accessToken = config('services.mercadopago.token');
 
         // Supongamos que cada usuario tiene un campo 'preapproval_id' que guarda el ID de la preaprobación.
-        $users = User::where('status', 1)->whereNotNull('preapproval_id')->get();
+        $users = User::query()->with('purchases')->where('status', 1)->whereHas('purchases', function ($query){
+            $query->whereNotNull('preapproval_id');
+        })->get();
 
         foreach ($users as $user) {
             try {
-                $response = $client->get("https://api.mercadopago.com/preapproval/{$user->preapproval_id}", [
+                $response = $client->get("https://api.mercadopago.com/preapproval/{$user->purchases?->preapproval_id}", [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $accessToken,
                     ]

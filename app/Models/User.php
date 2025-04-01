@@ -94,6 +94,10 @@ class User extends Authenticatable  implements MustVerifyEmail
     {
         return $this->hasMany(Purchase::class);
     }
+    public function latestPurchase()
+    {
+        return $this->hasOne(Purchase::class)->latestOfMany();
+    }
     public function products()
     {
         return $this->hasManyThrough(Product::class, Purchase::class);
