@@ -296,7 +296,8 @@ Route::post('/procesando-pago', function (Request $request) {
     if ($ts) {
         $templateParts[] = "ts:" . $ts;
     }
-    $template = implode(";", $templateParts) . ";";
+    $dataId = strtolower($request->query('data.id', ''));
+    $template = "id:" . $dataId . ";request-id:" . $xRequestId . ";ts:" . $ts . ";";
 
     // Genera la firma HMAC SHA256
     $secretKey = env('MP_SECRET_KEY');
