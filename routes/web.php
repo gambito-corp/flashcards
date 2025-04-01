@@ -252,41 +252,40 @@ Route::get('/pago-exitoso', function (Request $request) {
 
 });
 
-Route::post('/procesando-pago', function (Illuminate\Http\Request $request) {
-    // Obtén el contenido del header "x-signature"
+use Illuminate\Http\Request;
+
+Route::post('/procesando-pago', function (Request $request) {
+    // Obtén headers necesarios
     $xSignature = $request->header('x-signature');
-    if (!$xSignature) {
-        Log::error("Falta el header x-signature");
+    $xRequestId = $request->header('x-request-id');
+
+    if (!$xSignature || !$xRequestId) {
+        Log::error("Faltan headers requeridos.");
         return response('Bad Request', 400);
     }
 
-    // Separa el header por comas para extraer ts y v1
+    // Extrae ts y v1 del header x-signature
     $parts = explode(',', $xSignature);
     $signatureData = [];
     foreach ($parts as $part) {
-        // Se elimina cualquier espacio en blanco y se separa por "="
         $kv = explode('=', trim($part), 2);
         if (count($kv) === 2) {
             $signatureData[$kv[0]] = $kv[1];
         }
     }
 
-    // Extrae el timestamp (ts) y la clave (v1)
     $ts = $signatureData['ts'] ?? null;
     $v1 = $signatureData['v1'] ?? null;
+
     if (!$ts || !$v1) {
-        Log::error("No se pudo extraer ts o v1 del header x-signature");
+        Log::error("No se pudo extraer ts o v1 del header x-signature.");
         return response('Bad Request', 400);
     }
 
-    // Obtén el header "x-request-id"
-    $xRequestId = $request->header('x-request-id');
+    // Obtén data.id desde query params y conviértelo a minúsculas
+    $dataId = strtolower($request->query('data.id', ''));
 
-    // Obtén el parámetro query "data.id". Según la documentación, este valor se debe enviar en minúsculas.
-    $dataId = $request->query('data.id', '');
-    $dataId = strtolower($dataId);
-
-    // Construye el template. Se incluyen únicamente los parámetros que estén presentes.
+    // Construye el template
     $templateParts = [];
     if ($dataId !== '') {
         $templateParts[] = "id:" . $dataId;
@@ -299,26 +298,24 @@ Route::post('/procesando-pago', function (Illuminate\Http\Request $request) {
     }
     $template = implode(";", $templateParts) . ";";
 
-    // La clave secreta configurada en Tus integraciones (puedes almacenarla en .env o config)
-    $secretKey = config('services.mercadopago.secret_key');
-
-    // Genera la firma HMAC con SHA256
+    // Genera la firma HMAC SHA256
+    $secretKey = env('MP_SECRET_KEY');
     $generatedSignature = hash_hmac('sha256', $template, $secretKey);
 
     Log::info("Template usado: " . $template);
     Log::info("Firma generada: " . $generatedSignature);
     Log::info("Firma recibida (v1): " . $v1);
 
-    // Compara la firma generada con la recibida usando hash_equals para evitar vulnerabilidades de timing
+    // Compara las firmas
     if (hash_equals($generatedSignature, $v1)) {
         Log::info("Validación del webhook exitosa.");
-        // Aquí puedes continuar procesando la notificación
         return response('OK', 200);
     } else {
         Log::error("Falló la validación del webhook.");
         return response('Unauthorized', 401);
     }
 });
+
 
 
 
