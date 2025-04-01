@@ -253,7 +253,7 @@ Route::get('/pago-exitoso', function (Request $request) {
 });
 
 Route::post('/procesando-pago', function (Request $request) {
-    Log::info("esta es la respuesta del webhook: ".json_encode($request));
+    Log::info("Contenido crudo del webhook: " . $request->getContent());
     Log::info('Procesando pago');
 });
 
