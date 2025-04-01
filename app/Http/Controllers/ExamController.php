@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Area;
-use App\Models\Category;
-use App\Models\Exam;
-use App\Models\ExamResult;
-use App\Models\ExamTeam;
-use App\Models\Question;
-use App\Models\Team;
-use App\Models\Tipo;
+ini_set('memory_limit', '512M');
+
+use App\Models\{Area,
+Category,
+Exam,
+ExamResult,
+ExamTeam,
+Tipo};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-ini_set('memory_limit', '512M');
 class ExamController extends Controller
 {
+
     public function index()
     {
         if (Auth::user()->current_team_id === null) {
@@ -32,157 +32,73 @@ class ExamController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        if (!auth()->check()) {
-            return response()->json(['error' => 'No autenticado'], 401);
-        }
-
-        $user = Auth::user();
-
-        if ($user->status == 0) {
-            $currentMonthExamCount = ExamResult::query()->where('user_id', $user->id)
-                ->whereYear('created_at', now()->year)
-                ->whereMonth('created_at', now()->month)
-                ->count();
-
-            if ($currentMonthExamCount >= 10) {
-                return response()->json([
-                    'error' => 'No puede crear más de 10 exámenes por mes.'
-                ], 403);
-            }
-        }
-        // Crear el examen
-        $exam = new Exam();
-        $exam->title = $request->input('examTitle');
-        $exam->description = '';
-        $exam->time_limit = $request->input('timeExam');
-        $exam->save();
-
-        $allSelectedQuestions = collect();
-
-        // Recorremos cada selección
-        foreach ($request->input('questionSelections') as $key => $selection) {
-            $type = Tipo::with(['questions' => function ($query)  use ($selection){
-                $query->where('approved', 1)
-                    ->inRandomOrder();
-            }])->find($key);
-
-            if (!$type) {
-                continue;
-            }
-
-            $questions = $type->questions;
-            $quantity = $selection['quantity'];
-
-            // Si hay suficientes preguntas y se pidió al menos 1, seleccionamos aleatoriamente la cantidad solicitada.
-            if ($quantity > 0 && $questions->count() >= $quantity) {
-                $selected = $questions->random($quantity);
-            } else {
-                $selected = $questions;
-            }
-
-            $allSelectedQuestions = $allSelectedQuestions->merge($selected);
-        }
-
-        // Adjuntar las preguntas al examen (relación many-to-many)
-        $exam->questions()->attach($allSelectedQuestions->pluck('id')->unique());
-
-        return $this->showExam($exam->id);
-    }
-
     public function createExam(Request $request)
     {
         $user = Auth::user();
-        // Si el usuario tiene status 0, se verifica el límite de exámenes del mes actual.
-
-
-
         $validated = $request->validate([
-            'questionSelections'            => 'required|array',
-            'questionSelections.*.typeId'     => 'required|integer',
-            'questionSelections.*.quantity'   => 'required|integer|min:0',
-            'questionSelections.*.university' => 'nullable|integer|exists:universidades,id',
-            'time_exam'                     => 'required|integer|min:1',
-            'title'                         => 'required|string',
+            'examCollection' => 'required|json',
+            'examTitle' => 'required|string',
+            'examTime' => 'required|numeric|min:1|max:120',
         ]);
+        $examCollection = json_decode($request->examCollection);
+        $examTitle = $request->examTitle;
+        $examTime = $request->examTime;
 
-        // Crear el examen
-        $exam = new \App\Models\Exam();
-        $exam->title = $validated['title'];
-        $exam->description = ''; // Puedes ajustar la descripción según lo necesites
-        $exam->time_limit = $validated['time_exam'];
-        $exam->save();
+        try {
+            DB::beginTransaction();
+            // Crear el examen
+            $exam = new \App\Models\Exam();
+            $exam->title = $examTitle;
+            $exam->description = ''; // Puedes ajustar la descripción según lo necesites
+            $exam->time_limit = $examTime;
+            $exam->save();
 
-        $allSelectedQuestions = collect();
+            $allSelectedQuestions = collect();
 
-        // Recorremos cada selección
-        foreach ($validated['questionSelections'] as $selection) {
-            // Consultamos el Tipo con sus preguntas aprobadas y en orden aleatorio.
-            // Si se indicó una universidad, filtramos las preguntas por ella.
-            $type = \App\Models\Tipo::with(['questions' => function ($query) use ($selection) {
-                $query->where('approved', 1)
-                    ->when(!empty($selection['university']), function ($q) use ($selection) {
-                        $q->whereHas('universidades', function ($q) use ($selection) {
-                            $q->where('universidades.id', $selection['university']);
-                        });
-                    })
-                    ->inRandomOrder();
-            }])->find($selection['typeId']);
+            // Recorremos cada selección
+            foreach ($examCollection as $selection) {
+                $type = Tipo::with(['questions' => function ($query) use ($selection) {
+                    $query->where('approved', 1)
+                        ->when(!empty($selection->university_id), function ($q) use ($selection) {
+                            $q->whereHas('universidades', function ($q) use ($selection) {
+                                $q->where('universidades.id', $selection->university_id);
+                            });
+                        })
+                        ->inRandomOrder()
+                        ->take($selection->question_count);
+                }])->find($selection->tipo_id);
+                if (!$type) {
+                    continue;
+                }
 
-            if (!$type) {
-                continue;
+                $questions = $type->questions;
+
+                $allSelectedQuestions = $allSelectedQuestions->merge($questions);
             }
 
-            $questions = $type->questions;
-            $quantity = $selection['quantity'];
+            // Definir el límite según el estado del usuario
+            $limit = auth()->user()->status == 1 ? 200 : 10;
 
-            // Si hay suficientes preguntas y se pidió al menos 1, seleccionamos aleatoriamente la cantidad solicitada.
-            if ($quantity > 0 && $questions->count() >= $quantity) {
-                $selected = $questions->random($quantity);
-            } else {
-                $selected = $questions;
+            // Limitar a un máximo global de preguntas según el límite definido
+            if ($allSelectedQuestions->count() > $limit) {
+                $allSelectedQuestions = $allSelectedQuestions->random($limit);
             }
 
-            $allSelectedQuestions = $allSelectedQuestions->merge($selected);
+            // Adjuntar las preguntas al examen (relación many-to-many)
+            $exam->questions()->attach($allSelectedQuestions->pluck('id')->unique());
+            DB::commit();
+        }catch (\Exception $e) {
+            DB::rollBack();
+            dd($e->getMessage());
+
         }
 
-        // Definir el límite según el estado del usuario
-        $limit = auth()->user()->status == 1 ? 200 : 10;
-
-        // Limitar a un máximo global de preguntas según el límite definido
-        if ($allSelectedQuestions->count() > $limit) {
-            $allSelectedQuestions = $allSelectedQuestions->random($limit);
-        }
-
-        // Adjuntar las preguntas al examen (relación many-to-many)
-        $exam->questions()->attach($allSelectedQuestions->pluck('id')->unique());
-
-        return response()->json([
-            'message' => 'Examen creado correctamente',
-            'examen'  => $exam->id,
-        ]);
+        return redirect()->route('examenes.show', $exam)->with('status', 'Examen creado exitosamente.');
     }
 
-    private function prepareQuestions($selections)
+    public function show(Exam $exam)
     {
-        return collect($selections)->map(function($selection) {
-            return \App\Models\Question::where('tipo_id', $selection['typeId'])
-                ->approved()
-                ->when($selection['universityId'], function($q) use ($selection) {
-                    $q->whereHas('universidades', fn($q) => $q->where('id', $selection['universityId']));
-                })
-                ->inRandomOrder()
-                ->take($selection['quantity'])
-                ->get()
-                ->map->only('id', 'question', 'answer');
-        })->flatten(1);
-    }
-
-
-    public function showExam($id)
-    {
-        $exam = Exam::query()->with('questions.options')->find($id);
+        $exam = $exam->load('questions.options');
         return view('examenes.show', compact('exam'));
     }
 
@@ -237,9 +153,4 @@ class ExamController extends Controller
             return response()->json(['error' => 'Ocurrió un error al evaluar el examen'], 500);
         }
     }
-
-
-
-
-
 }

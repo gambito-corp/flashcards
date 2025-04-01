@@ -1,3 +1,6 @@
 <x-main-layout title="Exámenes">
-    <livewire:exams.index :areas="$areas" :categorias="$categorias" :tipos="$tipos" />
+    <livewire:exams.exam-builder/>
 </x-main-layout>
+
+
+
