@@ -203,53 +203,68 @@ use MercadoPago\Client\Preapproval\PreapprovalClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 
-Route::get('/pago-exitoso', function (Request $request) {
-    MercadoPagoConfig::setAccessToken(config('services.mercadopago.token'));
+Route::post('/procesando-pago', function (Request $request) {
+    // Obtén los headers requeridos
+    $xSignature = $request->header('x-signature');
+    $xRequestId = $request->header('x-request-id');
 
-    if (config('app.env') !== 'local') {
-        dd('exit');
-        try {
-            $client = new PreapprovalClient();
-            $preapproval = $client->get($request->preapproval_id);
-//        dd($preapproval);
-            // Verificar estado de la suscripción
-            if ($preapproval->status === 'authorized') {
-                $product = Product::query()->where('price', $request->summarized->charged_amount)->first();
-                $user = auth()->user();
-                $user->status = 1;
-                $user->save();
-                \App\Models\Purchase::create([
-                    'user_id' => auth()->user()->id,
-                    'product_id' => $product->id,
-                    'purchase_at' => now(),
-                    'preaproval_id' => $request->preapproval_id,
-                ]);
-
-                return redirect()->route('dashboard');
-            }
-            return redirect()->route('dashboard');
-
-        } catch (MPApiException $e) {
-            Log::error('Error MercadoPago: '.$e->getApiResponse()->getContent());
-            dd($e->getApiResponse()->getContent(), $e);
-        }
-    }else{
-//      $product = Product::query()->where('price', $request->summarized->charged_amount)->first();
-
-        $user = auth()->user();
-        dd($user);
-        $user->status = 1;
-        $user->save();
-        \App\Models\Purchase::create([
-            'user_id' => auth()->user()->id,
-            'product_id' => 1,
-            'purchase_at' => now(),
-            'preaproval_id' => $request->preapproval_id,
-        ]);
-
-        return redirect()->route('dashboard');
+    if (!$xSignature || !$xRequestId) {
+        Log::error("Faltan headers requeridos.");
+        return response('Bad Request', 400);
     }
 
+    // Extrae ts y v1 del header x-signature (se asume el formato ts=... ,v1=...)
+    $parts = explode(',', $xSignature);
+    $signatureData = [];
+    foreach ($parts as $part) {
+        $kv = explode('=', trim($part), 2);
+        if (count($kv) === 2) {
+            $signatureData[$kv[0]] = $kv[1];
+        }
+    }
+
+    $ts = $signatureData['ts'] ?? null;
+    $v1 = $signatureData['v1'] ?? null;
+
+    if (!$ts || !$v1) {
+        Log::error("No se pudo extraer ts o v1 del header x-signature.");
+        return response('Bad Request', 400);
+    }
+
+    // Obtén el valor de data.id desde los query params; conviértelo a minúsculas
+    // Si no está presente, se omite el campo
+    $dataId = strtolower($request->query('data.id', ''));
+
+    // Construye el template de acuerdo a la especificación:
+    // "id:[data.id_url];request-id:[x-request-id_header];ts:[ts_header];"
+    $templateParts = [];
+    if ($dataId !== '') {
+        $templateParts[] = "id:" . $dataId;
+    }
+    if ($xRequestId) {
+        $templateParts[] = "request-id:" . $xRequestId;
+    }
+    if ($ts) {
+        $templateParts[] = "ts:" . $ts;
+    }
+    $template = implode(";", $templateParts) . ";";
+
+    // Recupera la clave secreta (verifica que en tu .env no tenga comillas alrededor)
+    $secretKey = env('MP_SECRET_KEY');
+    $generatedSignature = hash_hmac('sha256', $template, $secretKey);
+
+    Log::info("Template usado: " . $template);
+    Log::info("Firma generada: " . $generatedSignature);
+    Log::info("Firma recibida (v1): " . $v1);
+
+    // Compara ambas firmas usando hash_equals para evitar vulnerabilidades de timing
+    if (hash_equals($generatedSignature, $v1)) {
+        Log::info("Validación del webhook exitosa.");
+        return response('OK', 200);
+    } else {
+        Log::error("Falló la validación del webhook.");
+        return response('Unauthorized', 401);
+    }
 });
 
 use Illuminate\Http\Request;
