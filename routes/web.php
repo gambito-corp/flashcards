@@ -253,6 +253,62 @@ Route::get('/pago-exitoso', function (Request $request) {
 
 });
 
+
+
+
+
+if (config('app.env') === 'local')
+{
+    Route::get('/test', function () {
+        $client = new GuzzleHttp\Client();
+        $accessToken = config('services.mercadopago.token');
+
+        $users = App\Models\User::with('latestPurchase')
+            ->where('status', 1)
+            ->whereHas('purchases', function ($query) {
+                $query->whereNotNull('preapproval_id');
+            })
+            ->get();
+
+        dd($users);
+
+        $result = [];
+
+        foreach ($users as $user) {
+            try {
+                // Se toma la primera compra disponible
+                $preapproval_id = optional($user->purchases->first())->preapproval_id;
+
+                // Si no se encontró preapproval_id saltamos el usuario
+                if (!$preapproval_id) {
+                    continue;
+                }
+
+                $response = $client->get("https://api.mercadopago.com/preapproval/{$preapproval_id}", [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $accessToken,
+                    ]
+                ]);
+
+                $data = json_decode($response->getBody()->getContents(), true);
+
+                // Si el estado de la preaprobación no es "authorized", se marca como inactivo.
+                if (!isset($data['status']) || $data['status'] !== 'authorized') {
+                    $user->update(['status' => 0]);
+                    $result[] = "Usuario {$user->id} marcado como inactivo (suscripción no autorizada).";
+                }
+            } catch (\Exception $e) {
+                \Log::error("Error al verificar la suscripción del usuario {$user->id}: " . $e->getMessage());
+                $result[] = "Error al verificar suscripción del usuario {$user->id}: " . $e->getMessage();
+            }
+        }
+
+        return count($result) > 0
+            ? implode("<br>", $result)
+            : "No se encontró usuarios para actualizar o todas las suscripciones están autorizadas.";
+    });
+}
+
 //Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
 //
 //Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');

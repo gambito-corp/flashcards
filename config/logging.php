@@ -117,6 +117,11 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
+        'jobs' => [
+            'driver' => 'single',
+            'path'   => storage_path('logs/logJobs.log'),
+            'level'  => 'error',
+        ],
 
         'null' => [
             'driver' => 'monolog',

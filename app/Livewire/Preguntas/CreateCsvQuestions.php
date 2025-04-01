@@ -22,20 +22,16 @@ class CreateCsvQuestions extends Component
         $this->validate([
             'csvFile' => 'required|file|mimes:csv,txt',
         ]);
-        $path = $this->csvFile->getRealPath();
-        if (($handle = fopen($path, 'r')) !== false) {
 
-            stream_filter_append($handle, 'convert.iconv.WINDOWS-1252/UTF-8');
+        // Guarda el archivo en la carpeta 'csv_imports' del storage
+        $filePath = $this->csvFile->store('csv_imports');
 
-            $header = fgetcsv($handle, 1000, ';');
-            while (($data = fgetcsv($handle, 1000, ';')) !== false) {
-                $row = array_combine($header, $data);
-                $this->preguntasSevices->crearPreguntaCSV($row);
-            }
-            fclose($handle);
-            session()->flash('message', 'CSV importado correctamente.');
-        }
+        // Despacha el job principal de importación con procesamiento por chunks puedo agregar un segundo parametro con la cantidad de filas a procesar
+        \App\Jobs\ImportCsvQuestionsJob::dispatch($filePath);
+
+        session()->flash('message', 'La importación se encuentra en proceso.');
     }
+
 
     public function render()
     {
