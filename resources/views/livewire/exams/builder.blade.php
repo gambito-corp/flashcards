@@ -79,7 +79,7 @@
         <label for="university" class="">
             Universidad
         </label>
-        <select id="university" wire:model="selectedUniversity" wire:change="filterQuestions" class="mt-1 block w-full rounded border-gray-300 ">
+        <select id="university" wire:model="selectedUniversity" wire:change="filterQuestions" class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">
             <option value="">Todas las universidades</option>
             @foreach ($universities as $university)
                 <option value="{{ $university->id }}">{{ $university->name }}</option>
@@ -119,7 +119,7 @@
                wire:model="selectedQuestionCount"
                min="1"
                max="{{ $maxQuestions }}"
-               class="mt-1 block w-full rounded border-gray-300 "
+               class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] "
                placeholder="Ingrese el número de preguntas">
         @error('selectedQuestionCount')
         <span class="text-red-600 text-sm">{{ $message }}</span>
@@ -182,7 +182,7 @@
                id="examTitle"
                name="examTitle"
                placeholder="Ingrese el título del examen"
-               class="block w-full px-4 py-2 border border-gray-300 rounded">
+               class="block w-full px-4 py-2 border border-gray-300 rounded focus:border-[#195b81] focus:ring-[#195b81] ">
         @error('examTitle')
         <span class="text-red-600 text-sm">{{ $message }}</span>
         @enderror
@@ -199,7 +199,7 @@
                name="examTime"
                min="1"
                placeholder="Ingrese el tiempo en minutos"
-               class="block w-full px-4 py-2 border border-gray-300 rounded">
+               class="block w-full px-4 py-2 border border-gray-300 rounded focus:border-[#195b81] focus:ring-[#195b81] ">
         @error('examTime')
         <span class="text-red-600 text-sm">{{ $message }}</span>
         @enderror

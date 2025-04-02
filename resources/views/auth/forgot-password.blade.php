@@ -30,7 +30,7 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <x-button>
+                <x-button class="button-primary hover:bg-[#0d3a54]">
                     {{ __('Email Password Reset Link') }}
                 </x-button>
             </div>

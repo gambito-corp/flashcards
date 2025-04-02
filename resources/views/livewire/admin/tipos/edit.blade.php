@@ -18,7 +18,7 @@
                 type="text"
                 id="name"
                 wire:model="name"
-                class="w-full border rounded px-3 py-2 focus:outline-none"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
                 placeholder="Ingresa el nombre del tipo"
             />
             @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -29,7 +29,7 @@
             <label for="team" class="block font-medium text-gray-700 mb-1">
                 Carrera <span class="text-red-500">*</span>
             </label>
-            <select id="team" wire:model="selectedTeam" class="w-full border rounded px-3 py-2 focus:outline-none">
+            <select id="team" wire:model="selectedTeam" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] ">
                 <option value="" disabled>-- Selecciona una carrera --</option>
                 @foreach($teams as $team)
                     <option value="{{ $team->id }}">{{ $team->name }}</option>
@@ -43,7 +43,7 @@
             <label for="area" class="block font-medium text-gray-700 mb-1">
                 Asignatura <span class="text-red-500">*</span>
             </label>
-            <select id="area" wire:model="selectedArea" class="w-full border rounded px-3 py-2 focus:outline-none">
+            <select id="area" wire:model="selectedArea" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] ">
                 <option value="" disabled>-- Selecciona una asignatura --</option>
                 @foreach($areas as $area)
                     <option value="{{ $area->id }}">{{ $area->name }}</option>
@@ -57,7 +57,7 @@
             <label for="category_id" class="block font-medium text-gray-700 mb-1">
                 Categoría <span class="text-red-500">*</span>
             </label>
-            <select id="category_id" wire:model="category_id" class="w-full border rounded px-3 py-2 focus:outline-none">
+            <select id="category_id" wire:model="category_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] ">
                 <option value="" disabled>-- Selecciona una categoría --</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->name }}</option>

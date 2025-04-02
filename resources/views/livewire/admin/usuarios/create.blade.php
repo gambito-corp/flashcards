@@ -1,4 +1,4 @@
-<div class="m-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 container-ask">
+ <div class="m-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 container-ask">
     @if (session()->has('message'))
     <div class="mb-4 p-2 bg-green-100 text-green-700 rounded">
         {{ session('message') }}
@@ -19,7 +19,7 @@
                     id="name"
                     name="name"
                     wire:model.live="name"
-                    class="w-full border rounded px-3 py-2 focus:outline-none"
+                    class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
                     placeholder="Ingresa el nombre del usuario" />
                 @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
@@ -32,7 +32,7 @@
                     id="email"
                     name="email"
                     wire:model.live="email"
-                    class="w-full border rounded px-3 py-2 focus:outline-none"
+                    class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81]  "
                     placeholder="Ingresa el correo electrónico" />
                 @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
@@ -52,7 +52,7 @@
                         id="password"
                         name="password"
                         wire:model.live="password"
-                        class="w-full border rounded px-3 py-2 focus:outline-none"
+                        class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
                         placeholder="Ingresa la contraseña" />
                     <!-- Icono para mostrar/ocultar la contraseña -->
                     <i
@@ -67,7 +67,7 @@
                             id="autoPassword"
                             name="autoPassword"
                             wire:model.live="autoPassword"
-                            class="h-4 w-4 chexbox-f" />
+                            class="h-4 w-4 chexbox-f " />
                         <label for="autoPassword" class="text-sm text-gray-600 label-nm">
                             Generar automáticamente
                         </label>
@@ -152,7 +152,7 @@
                         name="availableSubjects[]"
                         multiple
                         wire:model="selectedToAdd"
-                        class="w-full h-full border rounded px-3 py-2 focus:outline-none h-auto">
+                        class="w-full h-full border rounded px-3 py-2 focus:outline-none h-auto focus:border-[#195b81] focus:ring-[#195b81] ">
                         @forelse (collect($availableSubjects)->reject(fn($subject) => isset($selectedSubjects[$subject->id])) as $subject)
                         <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                         @empty

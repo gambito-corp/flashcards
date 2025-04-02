@@ -16,7 +16,7 @@
                 type="text"
                 id="name"
                 wire:model="name"
-                class="w-full border rounded px-3 py-2 focus:outline-none"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
                 placeholder="Ingresa el nombre de la universidad">
             @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
