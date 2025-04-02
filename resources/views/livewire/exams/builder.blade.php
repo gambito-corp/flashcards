@@ -249,7 +249,7 @@
     z-index: 5;
     width: 30px;
     height: 30px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
     color: white;
     border: none;
     padding: 10px;
