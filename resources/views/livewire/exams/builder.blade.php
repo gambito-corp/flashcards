@@ -246,7 +246,7 @@
 .next {
     position: absolute;
     top: 50%;
-    z-index: 10;
+    z-index: 5;
     width: 30px;
     height: 30px;
     background-color: rgba(0, 0, 0, 0.5);
