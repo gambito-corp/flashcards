@@ -88,7 +88,7 @@
                             type="text"
                             wire:model.defer="newMessage"
                             placeholder="Escribe tu mensaje..."
-                            class="flex-1 h-[70px] md:h-[90px] border-1 border-[#195b81] rounded-[20px] indent-5"
+                            class="flex-1 h-[70px] md:h-[90px] border-1 border-[#195b81] rounded-[20px] indent-5 focus:border-[#195b81] focus:ring-[#195b81] "
                     />
 
                     <button wire:loading.attr="disabled" type="submit" class="bg-[#195b81] w-[30px] md:w-[40px] flex-shrink-0 flex absolute h-[30px] md:h-[40px] justify-center items-center rounded-full right-[15px] bottom-[15px]">

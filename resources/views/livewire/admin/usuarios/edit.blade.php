@@ -15,7 +15,7 @@
                     Nombre <span class="text-red-500">*</span>
                 </label>
                 <input type="text" id="name" name="name" wire:model.live="name"
-                       class="w-full border rounded px-3 py-2 focus:outline-none"
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
                        placeholder="Ingresa el nombre del usuario">
                 @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
@@ -24,7 +24,7 @@
                     Email <span class="text-red-500">*</span>
                 </label>
                 <input type="email" id="email" name="email" wire:model.live="email"
-                       class="w-full border rounded px-3 py-2 focus:outline-none"
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
                        placeholder="Ingresa el correo electrónico">
                 @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
@@ -117,7 +117,7 @@
                 <!-- Izquierda: Select Múltiple con asignaturas disponibles (excluyendo las ya agregadas) -->
                 <div class="w-1/2 h-40">
                     <select id="subjectsLeft" name="availableSubjects[]" multiple wire:model="selectedToAdd"
-                            class="w-full h-full border rounded px-3 py-2 focus:outline-none h-auto">
+                            class="w-full h-full border rounded px-3 py-2 focus:outline-none h-auto focus:border-[#195b81] focus:ring-[#195b81] ">
                         @forelse(collect($availableSubjects)->reject(fn($subject) => isset($selectedSubjects[$subject->id])) as $subject)
                             <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                         @empty

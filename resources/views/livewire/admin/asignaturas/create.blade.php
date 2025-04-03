@@ -18,7 +18,7 @@
                 type="text"
                 id="nombre"
                 wire:model="asignatura.nombre"
-                class="w-full border rounded px-3 py-2 focus:outline-none"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
                 placeholder="Ingresa el nombre de la asignatura"
             />
             @error('asignatura.nombre') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -32,7 +32,7 @@
             <select
                 id="team_id"
                 wire:model="asignatura.team_id"
-                class="w-full border rounded px-3 py-2 focus:outline-none"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:border-[#195b81] focus:ring-[#195b81] "
             >
                 <option value="" disabled>-- Selecciona una carrera --</option>
                 @foreach($teams as $team)

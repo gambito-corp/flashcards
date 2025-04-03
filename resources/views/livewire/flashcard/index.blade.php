@@ -15,7 +15,7 @@
             <div class="mb-4">
                 <label for="categoryName" class="block text-gray-700">Nombre de la Categoría</label>
                 <div class="group-formt">
-                    <input type="text" id="categoryName" wire:model="categoryName" class="mt-1 block w-full rounded border-gray-300   ">
+                    <input type="text" id="categoryName" wire:model="categoryName" class="mt-1 block w-full rounded border-gray-300  focus:border-[#195b81] focus:ring-[#195b81]  ">
                     @error('categoryName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 boton-success-m">Crear Categoría</button>
                 </div>
@@ -35,12 +35,12 @@
 
             <div class="mb-4">
                 <label for="pregunta" class="block text-gray-700">Pregunta <span class="text-red-500">*</span></label>
-                <input type="text" id="pregunta" wire:model="pregunta" class="mt-1 block w-full rounded border-gray-300 ">
+                <input type="text" id="pregunta" wire:model="pregunta" class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">
                 @error('pregunta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div class="mb-4">
                 <label for="respuesta" class="block text-gray-700">Respuesta <span class="text-red-500">*</span></label>
-                <input type="text" id="respuesta" wire:model="respuesta" class="mt-1 block w-full rounded border-gray-300 ">
+                <input type="text" id="respuesta" wire:model="respuesta" class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">
                 @error('respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
@@ -48,24 +48,24 @@
             <div class="group-form">
                 <div class="mb-4">
                     <label for="url" class="block text-gray-700">URL</label>
-                    <input type="text" id="url" wire:model="url" class="mt-1 block w-full rounded border-gray-300  ">
+                    <input type="text" id="url" wire:model="url" class="mt-1 block w-full rounded border-gray-300  focus:border-[#195b81] focus:ring-[#195b81] ">
                     @error('url') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="mb-4">
                     <label for="imagen" class="block text-gray-700">Imagen</label>
-                    <input type="file" id="imagen" wire:model="imagen" accept="image/*" class="w-full text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer">
+                    <input type="file" id="imagen" wire:model="imagen" accept="image/*" class=" w-full text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer">
                     @error('imagen') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
             </div>
             <div class="group-form">
                 <div class="mb-4">
                     <label for="url_respuesta" class="block text-gray-700">URL Respuesta</label>
-                    <input type="text" id="url_respuesta" wire:model="url_respuesta" class="mt-1 block w-full rounded border-gray-300  ">
+                    <input type="text" id="url_respuesta" wire:model="url_respuesta" class="focus:border-[#195b81] focus:ring-[#195b81]  mt-1 block w-full rounded border-gray-300  ">
                     @error('url_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="mb-4">
                     <label for="imagen_respuesta" class="block text-gray-700">Imagen Respuesta</label>
-                    <input type="file" id="imagen_respuesta" wire:model="imagen_respuesta" accept="image/*" class="w-full text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer ">
+                    <input type="file" id="imagen_respuesta" wire:model="imagen_respuesta" accept="image/*" class=" w-full text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-80 file:sky-950 hover:file:cursor-pointer ">
                     @error('imagen_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -75,7 +75,7 @@
                 <div class="mt-2 space-x-4">
                     @foreach ($availableCategories as $category)
                     <label class="inline-flex items-center">
-                        <input type="checkbox" wire:model="selectedCategories" value="{{ $category->id }}" class="rounded border-gray-300 text-indigo-600  checkbox-form ">
+                        <input type="checkbox" wire:model="selectedCategories" value="{{ $category->id }}" class="focus:border-[#195b81] focus:ring-[#195b81]  rounded border-gray-300 text-indigo-600  checkbox-form ">
                         <span class="ml-2">{{ $category->nombre }}</span>
                     </label>
                     @endforeach
