@@ -23,7 +23,7 @@
 {{--                        @else--}}
 {{--                        @endif--}}
 
-                            <a href="{{$plan->url}}" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300 boton-success-m">
+                            <a href="{{route('plan', $plan)}}" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300 boton-success-m">
                                 Seleccionar Plan
                             </a>
                         </div>

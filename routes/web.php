@@ -14,9 +14,11 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MedisearchController;
+use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\MercadoPagoWebhookController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PreguntasController;
+use App\Http\Controllers\WebhookController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -40,8 +42,6 @@ Route::middleware([
     'verified',
 ])->group(callback: function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
-
-    Route::get('/planes', [HomeController::class, 'planes'])->name('planes');
 
     Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.updates');
 //    /*PREGUNTAS*/
@@ -189,201 +189,9 @@ Route::middleware([
 });
 
 
+//Mercado Pago
 Route::middleware(['auth'])->group(function () {
-    // Ruta para iniciar la suscripción pasando el ID del producto
-    Route::get('/subscription/create/{productId}', [PaymentController::class, 'createSubscription'])
-        ->name('mercadopago.createSubscription');
-
-    // Ruta de callback (retorno) de MercadoPago
-    Route::get('/mercadopago/callback', [PaymentController::class, 'callback'])
-        ->name('mercadopago.callback');
+    Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
+    Route::get('/plan/{product}', [MercadoPagoController::class, 'plan'])->name('plan');
+    Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago'])->name('webhooks.mercadopago');
 });
-
-use MercadoPago\Client\Preapproval\PreapprovalClient;
-use MercadoPago\Exceptions\MPApiException;
-use MercadoPago\MercadoPagoConfig;
-
-Route::post('/procesando-pago', function (Request $request) {
-    // Obtén los headers requeridos
-    $xSignature = $request->header('x-signature');
-    $xRequestId = $request->header('x-request-id');
-
-    if (!$xSignature || !$xRequestId) {
-        Log::error("Faltan headers requeridos.");
-        return response('Bad Request', 400);
-    }
-
-    // Extrae ts y v1 del header x-signature (se asume el formato ts=... ,v1=...)
-    $parts = explode(',', $xSignature);
-    $signatureData = [];
-    foreach ($parts as $part) {
-        $kv = explode('=', trim($part), 2);
-        if (count($kv) === 2) {
-            $signatureData[$kv[0]] = $kv[1];
-        }
-    }
-
-    $ts = $signatureData['ts'] ?? null;
-    $v1 = $signatureData['v1'] ?? null;
-
-    if (!$ts || !$v1) {
-        Log::error("No se pudo extraer ts o v1 del header x-signature.");
-        return response('Bad Request', 400);
-    }
-
-    // Obtén el valor de data.id desde los query params; conviértelo a minúsculas
-    // Si no está presente, se omite el campo
-    $dataId = strtolower($request->query('data.id', ''));
-
-    // Construye el template de acuerdo a la especificación:
-    // "id:[data.id_url];request-id:[x-request-id_header];ts:[ts_header];"
-    $templateParts = [];
-    if ($dataId !== '') {
-        $templateParts[] = "id:" . $dataId;
-    }
-    if ($xRequestId) {
-        $templateParts[] = "request-id:" . $xRequestId;
-    }
-    if ($ts) {
-        $templateParts[] = "ts:" . $ts;
-    }
-    $template = implode(";", $templateParts) . ";";
-
-    // Recupera la clave secreta (verifica que en tu .env no tenga comillas alrededor)
-    $secretKey = env('MP_SECRET_KEY');
-    $generatedSignature = hash_hmac('sha256', $template, $secretKey);
-
-    Log::info("Template usado: " . $template);
-    Log::info("Firma generada: " . $generatedSignature);
-    Log::info("Firma recibida (v1): " . $v1);
-
-    // Compara ambas firmas usando hash_equals para evitar vulnerabilidades de timing
-    if (hash_equals($generatedSignature, $v1)) {
-        Log::info("Validación del webhook exitosa.");
-        return response('OK', 200);
-    } else {
-        Log::error("Falló la validación del webhook.");
-        return response('Unauthorized', 401);
-    }
-});
-
-use Illuminate\Http\Request;
-
-Route::post('/procesando-pago', function (Request $request) {
-    // Obtén headers necesarios
-    $xSignature = $request->header('x-signature');
-    $xRequestId = $request->header('x-request-id');
-
-    if (!$xSignature || !$xRequestId) {
-        Log::error("Faltan headers requeridos.");
-        return response('Bad Request', 400);
-    }
-
-    // Extrae ts y v1 del header x-signature
-    $parts = explode(',', $xSignature);
-    $signatureData = [];
-    foreach ($parts as $part) {
-        $kv = explode('=', trim($part), 2);
-        if (count($kv) === 2) {
-            $signatureData[$kv[0]] = $kv[1];
-        }
-    }
-
-    $ts = $signatureData['ts'] ?? null;
-    $v1 = $signatureData['v1'] ?? null;
-
-    if (!$ts || !$v1) {
-        Log::error("No se pudo extraer ts o v1 del header x-signature.");
-        return response('Bad Request', 400);
-    }
-
-    // Obtén data.id desde query params y conviértelo a minúsculas
-    $dataId = strtolower($request->query('data.id', ''));
-
-    // Construye el template
-    $templateParts = [];
-    if ($dataId !== '') {
-        $templateParts[] = "id:" . $dataId;
-    }
-    if ($xRequestId) {
-        $templateParts[] = "request-id:" . $xRequestId;
-    }
-    if ($ts) {
-        $templateParts[] = "ts:" . $ts;
-    }
-    $dataId = strtolower($request->query('data.id', ''));
-    $template = "id:" . $dataId . ";request-id:" . $xRequestId . ";ts:" . $ts . ";";
-
-    // Genera la firma HMAC SHA256
-    $secretKey = env('MP_SECRET_KEY');
-    $generatedSignature = hash_hmac('sha256', $template, $secretKey);
-
-    Log::info("Template usado: " . $template);
-    Log::info("Firma generada: " . $generatedSignature);
-    Log::info("Firma recibida (v1): " . $v1);
-
-    // Compara las firmas
-    if (hash_equals($generatedSignature, $v1)) {
-        Log::info("Validación del webhook exitosa.");
-        return response('OK', 200);
-    } else {
-        Log::error("Falló la validación del webhook.");
-        return response('Unauthorized', 401);
-    }
-});
-
-
-
-
-
-if (config('app.env') === 'local')
-{
-    Route::get('/test', function () {
-        $client = new GuzzleHttp\Client();
-        $accessToken = config('services.mercadopago.token');
-
-        $users = App\Models\User::with('latestPurchase')
-            ->where('status', 1)
-            ->whereHas('purchases', function ($query) {
-                $query->whereNotNull('preapproval_id');
-            })
-            ->get();
-
-        dd($users);
-
-        $result = [];
-
-        foreach ($users as $user) {
-            try {
-                // Se toma la primera compra disponible
-                $preapproval_id = optional($user->purchases->first())->preapproval_id;
-
-                // Si no se encontró preapproval_id saltamos el usuario
-                if (!$preapproval_id) {
-                    continue;
-                }
-
-                $response = $client->get("https://api.mercadopago.com/preapproval/{$preapproval_id}", [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $accessToken,
-                    ]
-                ]);
-
-                $data = json_decode($response->getBody()->getContents(), true);
-
-                // Si el estado de la preaprobación no es "authorized", se marca como inactivo.
-                if (!isset($data['status']) || $data['status'] !== 'authorized') {
-                    $user->update(['status' => 0]);
-                    $result[] = "Usuario {$user->id} marcado como inactivo (suscripción no autorizada).";
-                }
-            } catch (\Exception $e) {
-                \Log::error("Error al verificar la suscripción del usuario {$user->id}: " . $e->getMessage());
-                $result[] = "Error al verificar suscripción del usuario {$user->id}: " . $e->getMessage();
-            }
-        }
-
-        return count($result) > 0
-            ? implode("<br>", $result)
-            : "No se encontró usuarios para actualizar o todas las suscripciones están autorizadas.";
-    });
-}

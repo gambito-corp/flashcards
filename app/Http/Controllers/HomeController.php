@@ -55,12 +55,6 @@ class HomeController extends Controller
         return view('index.dashboard', compact('exams', 'dailyLabels', 'dailyData', 'weeklyLabels', 'weeklyData', 'monthlyLabels', 'monthlyData'));
     }
 
-    public function planes()
-    {
-        $planes = Product::query()->take(2)->get();
-        return view('index.planes', compact('planes'));
-    }
-
     public function landing()
     {
         return view('index.landing');
