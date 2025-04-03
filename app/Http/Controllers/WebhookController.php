@@ -8,6 +8,6 @@ class WebhookController extends Controller
 {
     public function mercadoPago(Request $request)
     {
-        \Log::info($request->all());
+        \Log::info('Webhook MercadoPago');
     }
 }
