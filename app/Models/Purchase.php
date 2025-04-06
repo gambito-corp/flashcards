@@ -16,7 +16,14 @@ class Purchase extends Model
         'user_id',
         'product_id',
         'purchased_at',
-        'preaproval_id'
+        'preaproval',
+        'preaproval_id',
+        'status',
+        'payer_id',
+        'external_reference',
+        'init_point',
+        'payment_method_id',
+        'suscripcionData',
     ];
 
     /**

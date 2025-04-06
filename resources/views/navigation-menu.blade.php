@@ -13,16 +13,12 @@
                 <!-- Enlaces de navegación para escritorio -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     @foreach ($menu as $item)
-                        @if($item['need_premium'] === true && Auth::user()->status == 0)
-                            <x-nav-link href="{{ route('planes') }}" :active="false">
-                                {{ __($item['name']) }}
-                                <span class="ml-1 inline-block bg-yellow-400 text-xs text-white px-1 rounded">PRO</span>
-                            </x-nav-link>
-                        @else
                             <x-nav-link href="{{ route($item['route']) }}" :active="request()->routeIs($item['route'])">
                                 {{ __($item['name']) }}
+                                @if($item['need_premium'] === true && Auth::user()->status == 0)
+                                    <span class="ml-1 inline-block bg-yellow-400 text-xs text-white px-1 rounded">PRO</span>
+                                @endif
                             </x-nav-link>
-                        @endif
                     @endforeach
                 </div>
 

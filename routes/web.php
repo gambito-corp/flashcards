@@ -15,12 +15,13 @@ use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MedisearchController;
 use App\Http\Controllers\MercadoPagoController;
-use App\Http\Controllers\MercadoPagoWebhookController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PreguntasController;
 use App\Http\Controllers\WebhookController;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\MercadoPagoConfig;
 
 Route::redirect('/home', '/dashboard');
 if(config('app.env') === 'production') {
@@ -192,6 +193,13 @@ Route::middleware([
 //Mercado Pago
 Route::middleware(['auth'])->group(function () {
     Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
-    Route::get('/plan/{product}', [MercadoPagoController::class, 'plan'])->name('plan');
-    Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago'])->name('webhooks.mercadopago');
+    Route::post('/subscription/create/{product}', [MercadoPagoController::class, 'createSubscription'])->name('subscription.create');
 });
+Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago'])->name('webhooks.mercadopago');
+
+
+if (config('app.env') === 'local'){
+    Route::get('prueba', function (){
+
+    });
+}

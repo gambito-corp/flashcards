@@ -1,6 +1,4 @@
 <x-app-layout title="Planes">
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-
     <div class="max-w-5xl mx-auto p-4">
         <!-- Contenedor de cards: 1 columna en móviles y 2 en pantallas medianas y superiores -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
@@ -19,21 +17,11 @@
                     </ul>
 
                 </div>
-                <a href="{{$preference->init_point}}" class=""> PAGAR AHORA</a>
+                <a href="{{$preference->init_point}}" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300 boton-success-m">
+                    Pagar Ahora
+                </a>
                 <div id="wallet_container"></div>
             </div>
         </div>
     </div>
-    <script>
-        const mp = new MercadoPago("{{config('services.mercadopago.public_key')}}");
-        const bricksBuilder = mp.bricks();
-        mp.bricks().create("wallet", "wallet_container", {
-            inicialization:{
-                preferenceId: "{{$preferenceId}}",
-            },
-            customization:{
-                theme: 'default',
-            },
-        })
-    </script>
 </x-app-layout>
