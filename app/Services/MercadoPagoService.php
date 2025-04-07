@@ -36,7 +36,7 @@ class MercadoPagoService
         $subscription = new PreApprovalClient();
         return  $this->subscription = $subscription->create($this->preapproval);
     }
-    public function createPurchase()
+    public function createPurchase(): void
     {
         $this->createSubscription();
 
@@ -54,7 +54,7 @@ class MercadoPagoService
             'suscripcionData'    => json_encode($this->preapproval),
         ]);
     }
-    public function updatePurchase(Purchase $purchase)
+    public function updatePurchase(Purchase $purchase): void
     {
         $this->createPurchase();
         $purchase->purchased_at         = now();
@@ -80,7 +80,7 @@ class MercadoPagoService
             ->first();
     }
 
-    public function checkAuthorizedPurchase(): Purchase
+    public function checkAuthorizedPurchase(): Purchase|null
     {
         return $this->purchase =  Purchase::query()
             ->where('user_id', Auth::id())
@@ -92,14 +92,18 @@ class MercadoPagoService
             ->first();
     }
 
-    public function getSubscription(): PreApproval
+    public function getSubscription(): Purchase|null
     {
         $this->authorize();
         $client = new PreApprovalClient();
-        return $this->subscription = $client->get($this->purchase->preaproval_id);
+        if ($this->purchase) {
+            return $this->subscription = $client->get($this->purchase?->preaproval_id);
+        }else{
+            return null;
+        }
     }
 
-    public function checkCronSubscrition(Purchase $purchase): Purchase
+    public function checkCronSubscrition(Purchase $purchase): Purchase|null
     {
         $this->purchase = $purchase;
         $this->getSubscription();
