@@ -16,7 +16,7 @@ class MercadoPagoService
     public array $preapproval;
     public PreApproval $subscription;
 
-    public Purchase $purchase;
+    public Purchase | null $purchase;
 
     public function __construct(){}
 
