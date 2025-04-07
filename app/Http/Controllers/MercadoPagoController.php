@@ -18,17 +18,16 @@ class MercadoPagoController extends Controller
     public function createSubscription(Product $product)
     {
         $this->mercadoPagoService->getPreapproval($product);
-
-        $hasSubscription = $this->mercadoPagoService->checkSuscription();
+        $this->mercadoPagoService->checkSuscription();
 
         try {
-            $hasSubscription
-                ? $this->mercadoPagoService->updatePurchase($hasSubscription)
+            $this->mercadoPagoService->purchase
+                ? $this->mercadoPagoService->updatePurchase($this->mercadoPagoService->purchase)
                 : $this->mercadoPagoService->createPurchase();
 
             return redirect()->away($this->mercadoPagoService->subscription->init_point);
         } catch (\Exception $e) {
-            $action = $hasSubscription ? 'actualizar' : 'crear';
+            $action = $this->mercadoPagoService->purchase ? 'actualizar' : 'crear';
             return response()->json([
                 'success' => false,
                 'message' => "Error al $action la suscripción."

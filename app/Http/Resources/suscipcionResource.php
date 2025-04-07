@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +19,7 @@ class suscipcionResource extends JsonResource
                 "frequency_type" => "months", // Tipo de frecuencia
                 "transaction_amount" =>  $this->getPrice(), // Monto a cobrar
                 "currency_id" => "PEN", // Moneda del cobro
-                "start_date" => (new DateTime())->format('Y-m-d\TH:i:s.v\Z'),
+                "start_date" => now(),
             ],
             'metadata' => [
                 'plan_id'    =>  $this->id,
