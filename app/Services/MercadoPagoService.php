@@ -2,71 +2,126 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Client;
+use App\Http\Resources\suscipcionResource;
+use App\Models\Product;
+use App\Models\Purchase;
+use Illuminate\Support\Facades\Auth;
+use MercadoPago\Client\PreApproval\PreApprovalClient;
 use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Resources\PreApproval;
 
 class MercadoPagoService
 {
-    public function __construct()
-    {
-        // Inicializaciones adicionales, si las hubiera.
-    }
 
-    /**
-     * Configura la autenticación para Mercado Pago.
-     */
-    protected function authenticate()
+    public array $preapproval;
+    public PreApproval $subscription;
+
+    public Purchase | null $purchase;
+
+    public function __construct(){}
+
+    public function authorize(): void
     {
         MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));
-        MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
     }
 
-    /**
-     * Envía una solicitud de preaprobación a Mercado Pago utilizando Guzzle.
-     *
-     * @param array $data Array con la información de la preaprobación.
-     *                    Ejemplo:
-     *                    [
-     *                      "preapproval_plan_id" => "2c938084726fca480172750000000000",
-     *                      "reason" => "Suscripcion Premium mensual",
-     *                      "external_reference" => "1",
-     *                      "payer_email" => "test_user@testuser.com",
-     *                      "card_token_id" => "e3ed6f098462036dd2cbabe314b9de2a",
-     *                      "auto_recurring" => [
-     *                          "frequency" => 1,
-     *                          "frequency_type" => "months",
-     *                          "start_date" => "2020-06-02T13:07:14.260Z",
-     *                          "end_date" => "2022-07-20T15:59:52.581Z",
-     *                          "transaction_amount" => 10,
-     *                          "currency_id" => "ARS"
-     *                      ],
-     *                      "back_url" => "https://www.mercadopago.com.ar",
-     *                      "status" => "authorized"
-     *                    ]
-     *
-     * @return array Respuesta decodificada de la API.
-     *
-     * @throws \Exception En caso de error en la petición.
-     */
-    public function createPreapproval(array $data): array
+    public function getPreapproval(Product $product): array
     {
-        // Autenticamos.
-        $this->authenticate();
-
-        $client = new Client();
-
-        try {
-            $response = $client->post('https://api.mercadopago.com/preapproval', [
-                'headers' => [
-                    'Content-Type'  => 'application/json',
-                    'Authorization' => 'Bearer ' . config('services.mercadopago.access_token'),
-                ],
-                'json' => $data,
-            ]);
-
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            throw new \Exception("Guzzle Error: " . $e->getMessage());
-        }
+        return $this->preapproval = (new suscipcionResource($product))->toArray(request());
     }
+
+    public function createSubscription(): PreApproval
+    {
+        $this->authorize();
+        $subscription = new PreApprovalClient();
+        return  $this->subscription = $subscription->create($this->preapproval);
+    }
+    public function createPurchase()
+    {
+        $this->createSubscription();
+
+        $this->purchase = Purchase::create([
+            'user_id'            => Auth::user()->id,
+            'product_id'         => $this->preapproval['metadata']['plan_id'],
+            'purchased_at'       => now(),
+            'preaproval'         => json_encode($this->subscription),
+            'preaproval_id'      => $this->subscription->id,
+            'status'             => $this->subscription->status,
+            'payer_id'           => $this->subscription->payer_id,
+            'external_reference' => $this->subscription->external_reference,
+            'init_point'         => $this->subscription->init_point,
+            'payment_method_id'  => $this->subscription->payment_method_id,
+            'suscripcionData'    => json_encode($this->preapproval),
+        ]);
+    }
+    public function updatePurchase(Purchase $purchase)
+    {
+        $this->createPurchase();
+        $purchase->purchased_at         = now();
+        $purchase->preaproval           = json_encode($this->subscription);
+        $purchase->preaproval_id        = $this->subscription->id;
+        $purchase->status               = $this->subscription->status;
+        $purchase->payer_id             = $this->subscription->payer_id;
+        $purchase->external_reference   = $this->subscription->external_reference;
+        $purchase->init_point           = $this->subscription->init_point;
+        $purchase->payment_method_id    = $this->subscription->payment_method_id;
+        $purchase->suscripcionData      = json_encode($this->preapproval);
+        $purchase->updated_at           = now();
+        $purchase->save();
+        $this->purchase = $purchase;
+    }
+
+    public function checkSuscription (): Purchase|null
+    {
+        return $this->purchase = Purchase::query()
+            ->where('external_reference', $this->preapproval['external_reference'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->first();
+    }
+
+    public function checkAuthorizedPurchase(): Purchase
+    {
+        return $this->purchase =  Purchase::query()
+            ->where('user_id', Auth::id())
+            ->where(function ($query) {
+                $query->where('status', 'pending')
+                    ->orWhere('status', 'authorized');
+            })
+            ->orderBy('id', 'desc')
+            ->first();
+    }
+
+    public function getSubscription(): PreApproval
+    {
+        $this->authorize();
+        $client = new PreApprovalClient();
+        return $this->subscription = $client->get($this->purchase->preaproval_id);
+    }
+
+    public function checkCronSubscrition(Purchase $purchase): Purchase
+    {
+        $this->purchase = $purchase;
+        $this->getSubscription();
+        $user = Auth::user();
+        $this->updatePurchase($purchase);
+
+        switch ($this->subscription->status) {
+            case 'authorized':
+                $user->status = 1;
+                break;
+            case 'pending':
+            case 'cancelled':
+            case 'paused':
+            case 'suspended':
+                $user->status = 0;
+                break;
+            default:
+                return new Purchase();
+        }
+        $user->save();
+        return $this->purchase;
+    }
+
+
 }

@@ -2,19 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Services\MercadoPagoService;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 
 class MedisearchController extends Controller
 {
 
+    protected MercadoPagoService $mercadoPagoService;
 
-    Public function index(){
-        if (Auth::user()->status === 0){
-            return redirect()->route('planes');
+    public function __construct(MercadoPagoService $mercadoPagoService){$this->mercadoPagoService = $mercadoPagoService;}
+
+    public function index()
+    {
+        $user = Auth::user();
+
+            if (in_array(Auth::user()->id, config('specialUsers.ids'))) {
+                return view('medisearch.index');
+            }
+
+        $purchase = $this->mercadoPagoService->checkAuthorizedPurchase();
+
+        if ($purchase) {
+            $this->mercadoPagoService->getSubscription();
+
+
+            $purchase->status = $this->mercadoPagoService->subscription->status;
+            $purchase->save();
+
+            if ($this->mercadoPagoService->subscription->status === 'authorized') {
+                $user->status = 1;
+                $user->save();
+            }
+            return view('medisearch.index');
         }
-        return view('medisearch.index');
+        return redirect()->route('planes');
     }
 
     public function chat($query){

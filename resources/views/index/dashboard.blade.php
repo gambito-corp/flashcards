@@ -1,22 +1,25 @@
 <x-main-layout title="Bienvenido {{auth()->user()->name}}">
-    <div class=" bg-white border-b border-gray-200  container-ask box-dashboard relative overflow-hidden max-sm:m-5 shadow-md nopadding-dashboard">
-        <div class="mb-4 bg-[radial-gradient(circle, rgb(2,85,91), rgb(1,25,27))]">
-            <div class="grid grid-cols-2 relative">
-                <div class="span-2">
-                    <h2 class="mb-3 text-yellow-500 primary-color title-ask-container color-white">Obtén acceso total</h2>
-                    <hr>
-                    <p class="pb-3"> Lleva tu preparación al siguiente nivel con todas las funcionalidades de medbystudents.</p>
-                    <a href="{{route('planes')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
-                        Más información<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg"/>
-                    </a>
-                    <img class="img-dashboard__regret block" src="/dashboard-img.png" />
-                </div>
-                <div class="col-span-3 flex items-center justify-center">
-                    <i class="fal fa-graduation-cap fa-3x opacity-30"></i>
+
+    @if(Auth::user()->status === 0)
+        <div class=" bg-white border-b border-gray-200  container-ask box-dashboard relative overflow-hidden max-sm:m-5 shadow-md nopadding-dashboard">
+            <div class="mb-4 bg-[radial-gradient(circle, rgb(2,85,91), rgb(1,25,27))]">
+                <div class="grid grid-cols-2 relative">
+                    <div class="span-2">
+                        <h2 class="mb-3 text-yellow-500 primary-color title-ask-container color-white">Obtén acceso total</h2>
+                        <hr>
+                        <p class="pb-3"> Lleva tu preparación al siguiente nivel con todas las funcionalidades de medbystudents.</p>
+                        <a href="{{route('planes')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
+                            Más información<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
+                        </a>
+                        <img class="img-dashboard__regret block" src="/dashboard-img.png"  alt="mas info"/>
+                    </div>
+                    <div class="col-span-3 flex items-center justify-center">
+                        <i class="fal fa-graduation-cap fa-3x opacity-30"></i>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
     <div class="">
 
         <!-- Card 2: Tabla de últimos exámenes realizados -->

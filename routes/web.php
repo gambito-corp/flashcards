@@ -14,11 +14,14 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MedisearchController;
-use App\Http\Controllers\MercadoPagoWebhookController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\PreguntasController;
+use App\Http\Controllers\WebhookController;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\MercadoPagoConfig;
 
 Route::redirect('/home', '/dashboard');
 if(config('app.env') === 'production') {
@@ -40,8 +43,6 @@ Route::middleware([
     'verified',
 ])->group(callback: function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
-
-    Route::get('/planes', [HomeController::class, 'planes'])->name('planes');
 
     Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.updates');
 //    /*PREGUNTAS*/
@@ -66,8 +67,6 @@ Route::middleware([
     Route::get('/preguntas/universidad', [PreguntasController::class, 'universidad'])
         ->middleware('role:root|admin')
         ->name('preguntas.universidad');
-
-
 
     Route::get('/preguntas/download', [PreguntasController::class, 'downloadCsvModel'])
         ->middleware('role:root|admin|colab')
@@ -191,126 +190,16 @@ Route::middleware([
 });
 
 
+//Mercado Pago
 Route::middleware(['auth'])->group(function () {
-    // Ruta para iniciar la suscripción pasando el ID del producto
-    Route::get('/subscription/create/{productId}', [PaymentController::class, 'createSubscription'])
-        ->name('mercadopago.createSubscription');
-
-    // Ruta de callback (retorno) de MercadoPago
-    Route::get('/mercadopago/callback', [PaymentController::class, 'callback'])
-        ->name('mercadopago.callback');
+    Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
+    Route::post('/subscription/create/{product}', [MercadoPagoController::class, 'createSubscription'])->name('subscription.create');
 });
-
-use MercadoPago\Client\Preapproval\PreapprovalClient;
-use MercadoPago\Exceptions\MPApiException;
-use MercadoPago\MercadoPagoConfig;
-
-Route::get('/pago-exitoso', function (Request $request) {
-//    dd($request->all());
-    MercadoPagoConfig::setAccessToken(config('services.mercadopago.token'));
-
-    if (config('app.env') === 'local') {
-        try {
-            $client = new PreapprovalClient();
-            $preapproval = $client->get($request->preapproval_id);
-//        dd($preapproval);
-            // Verificar estado de la suscripción
-            if ($preapproval->status === 'authorized') {
-                $product = Product::query()->where('price', $request->summarized->charged_amount)->first();
-                $user = auth()->user();
-                $user->status = 1;
-                $user->save();
-                \App\Models\Purchase::create([
-                    'user_id' => auth()->user()->id,
-                    'product_id' => $product->id,
-                    'purchase_at' => now(),
-                    'preaproval_id' => $request->preapproval_id,
-                ]);
-
-                return redirect()->route('dashboard');
-            }
-            return redirect()->route('dashboard');
-
-        } catch (MPApiException $e) {
-            Log::error('Error MercadoPago: '.$e->getApiResponse()->getContent());
-            dd($e->getApiResponse()->getContent(), $e);
-        }
-    }else{
-
-//      $product = Product::query()->where('price', $request->summarized->charged_amount)->first();
-        $user = auth()->user();
-        $user->status = 1;
-        $user->save();
-        \App\Models\Purchase::create([
-            'user_id' => auth()->user()->id,
-            'product_id' => 1,
-            'purchase_at' => now(),
-            'preaproval_id' => $request->preapproval_id,
-        ]);
-
-        return redirect()->route('dashboard');
-    }
-
-});
+Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago'])->name('webhooks.mercadopago');
 
 
+if (config('app.env') === 'local'){
+    Route::get('prueba', function (){
 
-
-
-if (config('app.env') === 'local')
-{
-    Route::get('/test', function () {
-        $client = new GuzzleHttp\Client();
-        $accessToken = config('services.mercadopago.token');
-
-        $users = App\Models\User::with('latestPurchase')
-            ->where('status', 1)
-            ->whereHas('purchases', function ($query) {
-                $query->whereNotNull('preapproval_id');
-            })
-            ->get();
-
-        dd($users);
-
-        $result = [];
-
-        foreach ($users as $user) {
-            try {
-                // Se toma la primera compra disponible
-                $preapproval_id = optional($user->purchases->first())->preapproval_id;
-
-                // Si no se encontró preapproval_id saltamos el usuario
-                if (!$preapproval_id) {
-                    continue;
-                }
-
-                $response = $client->get("https://api.mercadopago.com/preapproval/{$preapproval_id}", [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $accessToken,
-                    ]
-                ]);
-
-                $data = json_decode($response->getBody()->getContents(), true);
-
-                // Si el estado de la preaprobación no es "authorized", se marca como inactivo.
-                if (!isset($data['status']) || $data['status'] !== 'authorized') {
-                    $user->update(['status' => 0]);
-                    $result[] = "Usuario {$user->id} marcado como inactivo (suscripción no autorizada).";
-                }
-            } catch (\Exception $e) {
-                \Log::error("Error al verificar la suscripción del usuario {$user->id}: " . $e->getMessage());
-                $result[] = "Error al verificar suscripción del usuario {$user->id}: " . $e->getMessage();
-            }
-        }
-
-        return count($result) > 0
-            ? implode("<br>", $result)
-            : "No se encontró usuarios para actualizar o todas las suscripciones están autorizadas.";
     });
 }
-
-//Route::post('/payment/create', [PaymentController::class, 'createPreference'])->name('payment.create');
-//
-//Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-//Route::get('/payment/failure', [PaymentController::class, 'failure'])->name('payment.failure');
-//Route::get('/payment/pending', [PaymentController::class, 'pending'])->name('payment.pending');

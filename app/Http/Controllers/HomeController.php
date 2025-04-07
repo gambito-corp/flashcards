@@ -4,13 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Exam;
 use App\Models\ExamResult;
-use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Models\Purchase;
+use Illuminate\Support\Facades\Auth;
+use MercadoPago\MercadoPagoConfig;
 
 class HomeController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+        $purchase = Purchase::query()
+            ->where('user_id', $user->id)
+            ->where(function ($query) {
+                $query->where('status', 'pending')
+                    ->orWhere('status', 'authorized');
+            })
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($purchase) {
+            // Configurar el acceso a la API de Mercado Pago y obtener el estado actual de la suscripción
+            MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));
+            $client = new \MercadoPago\Client\PreApproval\PreApprovalClient();
+            $acceptedPurchase = $client->get($purchase->preaproval_id);
+
+            $purchase->status = $acceptedPurchase->status;
+            $purchase->save();
+
+            if ($acceptedPurchase->status === 'authorized') {
+                $user->status = 1;
+                $user->save();
+            }
+        }
+
         $exams = Exam::query()
             ->with('examResults')
             ->whereHas('examResults', function ($query) {
@@ -53,12 +79,6 @@ class HomeController extends Controller
         $monthlyLabels = $monthly->keys();
         $monthlyData   = $monthly->values();
         return view('index.dashboard', compact('exams', 'dailyLabels', 'dailyData', 'weeklyLabels', 'weeklyData', 'monthlyLabels', 'monthlyData'));
-    }
-
-    public function planes()
-    {
-        $planes = Product::query()->take(2)->get();
-        return view('index.planes', compact('planes'));
     }
 
     public function landing()

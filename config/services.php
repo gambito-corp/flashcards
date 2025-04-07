@@ -32,8 +32,8 @@ return [
     ],
     'mercadopago' => [
         'base_url' => env('MP_BASE_URL', 'https://api.mercadopago.com'),
-        'token' => env('MP_TOKEN'),
         'public_key' => env('MP_PUBLIC_KEY'),
+        'access_token' => env('MP_ACCESS_TOKEN'),
         'secret_key' => env('MP_SECRET_KEY'),
         'sandbox' => env('MP_SANDBOX', false),
     ],
