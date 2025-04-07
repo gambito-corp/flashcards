@@ -70,7 +70,7 @@ class MercadoPagoService
         $this->purchase = $purchase;
     }
 
-    public function checkSuscription (): Purchase
+    public function checkSuscription (): Purchase|null
     {
         return $this->purchase = Purchase::query()
             ->where('external_reference', $this->preapproval['external_reference'])
