@@ -91,7 +91,8 @@ class MercadoPagoService
                     ->orWhere('status', 'authorized');
             })
             ->orderBy('id', 'desc')
-            ->first();
+            ->get()
+            ->last();
     }
 
     public function getSubscription(): Purchase|null
