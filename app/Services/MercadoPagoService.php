@@ -95,7 +95,7 @@ class MercadoPagoService
             ->last();
     }
 
-    public function getSubscription(): Purchase|null
+    public function getSubscription(): PreApproval|null
     {
         $this->authorize();
         $client = new PreApprovalClient();
