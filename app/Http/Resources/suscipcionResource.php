@@ -15,7 +15,7 @@ class suscipcionResource extends JsonResource
             "back_url" => config('app.url') . 'dashboard', // URL a redirigir después del pago
             "reason" =>  $this->description, // Descripción de la suscripción
             "auto_recurring" => [
-                "frequency" => 1, // Cada 1 mes
+                "frequency" => $this->id == 1 ? 1 : 6, // Cada 1 mes
                 "frequency_type" => "months", // Tipo de frecuencia
                 "transaction_amount" =>  $this->getPrice(), // Monto a cobrar
                 "currency_id" => "PEN", // Moneda del cobro
