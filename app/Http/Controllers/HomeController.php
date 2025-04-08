@@ -21,7 +21,6 @@ class HomeController extends Controller
             })
             ->orderBy('id', 'desc')
             ->first();
-
         if ($purchase) {
             // Configurar el acceso a la API de Mercado Pago y obtener el estado actual de la suscripción
             MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));

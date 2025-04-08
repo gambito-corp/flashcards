@@ -6,6 +6,7 @@ use App\Http\Resources\suscipcionResource;
 use App\Models\Product;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\Auth;
+use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\PreApproval\PreApprovalClient;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Resources\PreApproval;
@@ -14,7 +15,7 @@ class MercadoPagoService
 {
 
     public array $preapproval;
-    public PreApproval $subscription;
+    public PreApproval | null $subscription;
 
     public Purchase | null $purchase;
 
@@ -38,6 +39,7 @@ class MercadoPagoService
     }
     public function createPurchase(): void
     {
+        $request = new RequestOptions();
         $this->createSubscription();
 
         $this->purchase = Purchase::create([
