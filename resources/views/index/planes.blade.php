@@ -15,13 +15,10 @@
                                 <li>Control y estadisticas de nota</li>
                                 <li>Inteligencia artificial e Medisearch</li>
                             </ul>
-                            <form action="{{ route('subscription.create', $plan) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300">
-                                    Seleccionar Plan
-                                </button>
-                            </form>
-                        </div>
+                            <a  href="{{$plan->url}}" class="w-full inline-block text-center bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors duration-300">
+                                Seleccionar Plan
+                            </a>
+                    </div>
                     </div>
             @empty
                 <h1>No se cargaron planes todavía...</h1>

@@ -12,29 +12,29 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $purchase = Purchase::query()
-            ->where('user_id', $user->id)
-            ->where(function ($query) {
-                $query->where('status', 'pending')
-                    ->orWhere('status', 'authorized');
-            })
-            ->orderBy('id', 'desc')
-            ->first();
-        if ($purchase) {
-            // Configurar el acceso a la API de Mercado Pago y obtener el estado actual de la suscripción
-            MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));
-            $client = new \MercadoPago\Client\PreApproval\PreApprovalClient();
-            $acceptedPurchase = $client->get($purchase->preaproval_id);
-
-            $purchase->status = $acceptedPurchase->status;
-            $purchase->save();
-
-            if ($acceptedPurchase->status === 'authorized') {
-                $user->status = 1;
-                $user->save();
-            }
-        }
+//        $user = Auth::user();
+//        $purchase = Purchase::query()
+//            ->where('user_id', $user->id)
+//            ->where(function ($query) {
+//                $query->where('status', 'pending')
+//                    ->orWhere('status', 'authorized');
+//            })
+//            ->orderBy('id', 'desc')
+//            ->first();
+//        if ($purchase) {
+//            // Configurar el acceso a la API de Mercado Pago y obtener el estado actual de la suscripción
+//            MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));
+//            $client = new \MercadoPago\Client\PreApproval\PreApprovalClient();
+//            $acceptedPurchase = $client->get($purchase->preaproval_id);
+//
+//            $purchase->status = $acceptedPurchase->status;
+//            $purchase->save();
+//
+//            if ($acceptedPurchase->status === 'authorized') {
+//                $user->status = 1;
+//                $user->save();
+//            }
+//        }
 
         $exams = Exam::query()
             ->with('examResults')

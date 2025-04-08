@@ -194,6 +194,53 @@ Route::middleware([
 Route::middleware(['auth'])->group(function () {
     Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
     Route::post('/subscription/create/{product}', [MercadoPagoController::class, 'createSubscription'])->name('subscription.create');
+    Route::get('/pago-exitoso', function (\Illuminate\Http\Request $request){
+        // URL de la API de Mercado Pago
+        // URL de la API de Mercado Pago
+        $url = 'https://api.mercadopago.com/preapproval_plan/search';
+
+        // Realizar la solicitud GET con encabezados
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . env('MP_ACCESS_TOKEN'),
+        ])->get($url);
+
+        // Verificar si la solicitud fue exitosa
+        if ($response->successful()) {
+            // Retornar los datos como JSON
+            $results = $response->json()['results'];
+            $ultimoArray = end($results);
+            $userId = auth()->user()->id;
+            $user = User::find($userId);
+            $user->status = 1;
+            $user->save();
+            $pivot = \App\Models\Purchase::create([
+                'user_id' => $userId,
+                'product_id' => 1,
+                'purchase_at' => now(),
+                'preapproval' => json_encode($request),
+                'preaproval_id' => $request->get('preapproval_id'),
+                'status' => $ultimoArray['status'],
+                'payer_id' => $ultimoArray['collector_id'],
+                'external_reference' => $ultimoArray['external_reference'],
+                'init_point' => $ultimoArray['init_point'],
+                'suscriptionData' => json_encode($ultimoArray),
+            ]);
+            return redirect()->route('dashboard');
+        }
+
+        $userId = auth()->user()->id;
+        $user = User::find($userId);
+        $user->status = 1;
+        $user->save();
+        $pivot = \App\Models\Purchase::create([
+            'user_id' => $userId,
+            'product_id' => 1,
+            'purchase_at' => now(),
+        ]);
+        $user->purchases;
+        dd($request);
+    });
 });
 Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago'])->name('webhooks.mercadopago');
 

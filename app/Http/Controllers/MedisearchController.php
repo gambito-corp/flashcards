@@ -15,28 +15,11 @@ class MedisearchController extends Controller
 
     public function index()
     {
-        $user = Auth::user();
-
-            if (in_array(Auth::user()->id, config('specialUsers.ids'))) {
-                return view('medisearch.index');
-            }
-
-        $purchase = $this->mercadoPagoService->checkAuthorizedPurchase();
-
-        if ($purchase) {
-            $this->mercadoPagoService->getSubscription();
-
-
-            $purchase->status = $this->mercadoPagoService->subscription->status;
-            $purchase->save();
-
-            if ($this->mercadoPagoService->subscription->status === 'authorized') {
-                $user->status = 1;
-                $user->save();
-            }
+        if (in_array(Auth::user()->id, config('specialUsers.ids'))) {
             return view('medisearch.index');
         }
-        return redirect()->route('planes');
+
+        return \auth()->user()->status == 1 ? view('medisearch.index') : redirect()->route('planes');
     }
 
     public function chat($query){
