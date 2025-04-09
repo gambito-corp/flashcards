@@ -770,6 +770,10 @@ nav .text-gray-900 {
 /*NEDIA QUERIES*/
 
 @media (max-width: 620px) {
+    .container-askt,    .container-ask {
+        padding: 30px;
+    }
+    
   .boton-success-m {
         font-size: 14px;
     }

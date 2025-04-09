@@ -4,7 +4,7 @@
     <h1 class="text-2xl font-semibold mb-4 primary-color title-ask-container">Examen</h1>
     <hr>
     <div class="carousel-container overflow-x-auto mb-5 relative">
-    <ul class="carousel-list flex gap-4">
+    <ul class="carousel-list flex gap-4   overflow-x-auto scroll-smooth scroll">
         @foreach ($areas as $area)
             <li
                 class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center items-center font-medium text-center duration-300 ease-in {{ isset($selectedArea) && $selectedArea->id === $area->id
@@ -29,7 +29,7 @@
 
 <!-- Carrusel de Categorías -->
 <div class="carousel-container overflow-x-auto mb-5 relative">
-    <ul class="carousel-list flex space-x-4">
+    <ul class="carousel-list flex space-x-4  overflow-x-auto scroll-smooth">
         @foreach ($categories as $category)
             <li
                 class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center items-center font-medium text-center duration-300 ease-in {{ isset($selectedCategory) && $selectedCategory->id === $category->id
@@ -52,7 +52,7 @@
 
 <!-- Carrusel de Tipos -->
 <div class="carousel-container overflow-x-auto mb-5 relative">
-    <ul class="carousel-list flex space-x-4">
+    <ul class="carousel-list flex space-x-4 overflow-x-auto scroll-smooth">
         @foreach ($tipos as $tipo)
             <li
                 class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center items-center font-medium text-center duration-300 ease-in {{ isset($selectedTipo) && $selectedTipo->id === $tipo->id
@@ -236,6 +236,9 @@
     display: flex;
     transition: transform 0.3s ease-in-out;
 }
+.carousel-list::-webkit-scrollbar{
+    height:0px;
+}
 
 .carousel-item {
     flex-shrink: 0;
@@ -286,61 +289,64 @@
 @endpush
 
 <script>
+function initCarousels() {
+    document.querySelectorAll('.carousel-container').forEach(carousel => {
+        const list = carousel.querySelector('.carousel-list');
+        if (!list) return;
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Seleccionar todos los carruseles
-    const carousels = document.querySelectorAll('.carousel-container');
-    
-    carousels.forEach(carousel => {
-        const carouselList = carousel.querySelector('.carousel-list');
-        const prevButton = carousel.querySelector('.prev');
-        const nextButton = carousel.querySelector('.next');
-        
-        // Mover el carrusel con las flechas
-        let scrollAmount = 0;
-        const itemWidth = carousel.querySelector('.carousel-item').offsetWidth + 16; // Se agrega el padding entre los items
+        const item = list.querySelector('.carousel-item');
+        const itemWidth = item ? item.offsetWidth + 16 : 200;
 
-        nextButton.addEventListener('click', () => {
-            if (scrollAmount < carouselList.scrollWidth - carouselList.offsetWidth) {
-                scrollAmount += itemWidth;
-                carouselList.style.transform = `translateX(-${scrollAmount}px)`;
-            }
+        const prevBtn = carousel.querySelector('.prev');
+        const nextBtn = carousel.querySelector('.next');
+
+        // Asegúrate de quitar listeners anteriores reemplazando nodos
+        const newPrevBtn = prevBtn.cloneNode(true);
+        const newNextBtn = nextBtn.cloneNode(true);
+        prevBtn.replaceWith(newPrevBtn);
+        nextBtn.replaceWith(newNextBtn);
+
+        newNextBtn.addEventListener('click', () => {
+            list.scrollBy({ left: itemWidth, behavior: 'smooth' });
         });
 
-        prevButton.addEventListener('click', () => {
-            if (scrollAmount > 0) {
-                scrollAmount -= itemWidth;
-                carouselList.style.transform = `translateX(-${scrollAmount}px)`;
-            }
+        newPrevBtn.addEventListener('click', () => {
+            list.scrollBy({ left: -itemWidth, behavior: 'smooth' });
         });
 
-        // Funcionalidad de arrastre
+        // Arrastre con mouse
         let isDown = false;
         let startX;
         let scrollLeft;
 
-        carouselList.addEventListener('mousedown', (e) => {
+        list.addEventListener('mousedown', (e) => {
             isDown = true;
-            startX = e.pageX - carouselList.offsetLeft;
-            scrollLeft = carouselList.scrollLeft;
+            startX = e.pageX - list.offsetLeft;
+            scrollLeft = list.scrollLeft;
         });
 
-        carouselList.addEventListener('mouseleave', () => {
-            isDown = false;
-        });
+        list.addEventListener('mouseleave', () => isDown = false);
+        list.addEventListener('mouseup', () => isDown = false);
 
-        carouselList.addEventListener('mouseup', () => {
-            isDown = false;
-        });
-
-        carouselList.addEventListener('mousemove', (e) => {
+        list.addEventListener('mousemove', (e) => {
             if (!isDown) return;
             e.preventDefault();
-            const x = e.pageX - carouselList.offsetLeft;
-            const walk = (x - startX) * 2; // 2 es la velocidad de arrastre
-            carouselList.scrollLeft = scrollLeft - walk;
+            const x = e.pageX - list.offsetLeft;
+            const walk = (x - startX) * 2;
+            list.scrollLeft = scrollLeft - walk;
         });
     });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCarousels();
 });
+
+if (window.Livewire) {
+    Livewire.hook('message.processed', () => {
+        initCarousels();
+    });
+}
+
 
 </script>
