@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\MercadoPagoService;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class MedisearchController extends Controller
 {
@@ -25,7 +26,7 @@ class MedisearchController extends Controller
     public function chat($query){
         try
         {
-            $resultados = $this->buscarMedisearchGuzzle($query);
+            $resultados = $this->buscarOpenAI($query);
             dump($resultados);
         }catch
         (\Exception $e) {
@@ -50,5 +51,27 @@ class MedisearchController extends Controller
 
         $body = $response->getBody();
         return json_decode($body, true);
+    }
+    public function buscarOpenAI($query){
+        $apiKey = config('services.openAI.token'); // Reemplaza con tu API Key
+        $client = new Client([
+            'base_uri' => config('services.openAI.base_url'),
+            'headers' => [
+                'Authorization' => 'Bearer ' . config('services.openAI.token'),
+                'Content-Type' => 'application/json',
+            ]
+        ]);
+
+        dd($query);
+        $response = $client->post('completions', [
+            'json' => [
+                'model' => 'text-davinci-003', // Modelo avanzado para medicina.
+                'prompt' => $prompt,
+                'max_tokens' => 1000,
+                'temperature' => 0.7,
+            ],
+        ]);
+
+        dd($query);
     }
 }

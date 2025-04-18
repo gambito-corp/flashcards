@@ -21,7 +21,11 @@
                 <x-section-border />
             @endif
 
-
+            @if(Auth::user()->status == 1)
+                <livewire:profile.subscription-manager/>
+            @endif
+                <br>
+                <hr>
             <div class="mt-10 sm:mt-0">
                 @livewire('profile.logout-other-browser-sessions-form')
             </div>

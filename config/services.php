@@ -41,5 +41,12 @@ return [
         'base_url' => env('MEDSEARCH_BASE_URL', 'https://api.medisearch.com'),
         'token' => env('MEDSEARCH_TOKEN'),
     ],
-
+    'openAI' => [
+        'base_url' => env('OPENAI_BASE_URL', 'https://api.medisearch.com'),
+        'token' => env('OPENAI_TOKEN'),
+    ],
+    'elsevier' => [
+        'base_url' => env('ELSEVIER_BASE_URL', 'https://api.medisearch.com'),
+        'token' => env('ELSEVIER_API_KEY'),
+    ],
 ];

@@ -11,6 +11,7 @@ class MedisearchQuestion extends Model
     protected $fillable = [
         'user_id',
         'chat_id',
+        'model',
         'query',
         'response',
     ];

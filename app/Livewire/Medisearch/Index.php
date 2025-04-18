@@ -2,21 +2,48 @@
 
 namespace App\Livewire\Medisearch;
 
+use App\Http\Resources\IA\AIResponseResourceFactory;
+use App\Services\DeepseekService;
+use App\Services\MedisearchService;
+use App\Services\OpenAiService;
+use App\Services\PerplexityService;
+use GuzzleHttp\Client;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
 use App\Models\MedisearchChat;
 use App\Models\MedisearchQuestion;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class Index extends Component
 {
+    protected OpenAiService $openAiService;
+    protected MedisearchService $medisearchService;
+    protected DeepseekService $deepseekService;
+    protected PerplexityService $perplexityService;
+
     public $newMessage = '';
     public $messages = [];
     public $activeChatId = null; // ID del chat activo
     public $chatHistory = [];    // Historial de chats del usuario
     public $queryCount = 0;      // Contador de preguntas del mes
+    public $modelosIA = ['medisearch' => 'Medisearch', 'MBIA' => 'MBIA'];
+    public $modeloIA = 'MBIA'; // Valor por defecto, puedes cambiarlo
+    public $investigacionProfunda = false;
 
+    public function boot(
+        OpenAiService $openAiService,
+        MedisearchService $medisearchService,
+        DeepseekService $deepseekService,
+        PerplexityService $perplexityService,
+    )
+    {
+        $this->openAiService = $openAiService;
+        $this->medisearchService = $medisearchService;
+        $this->deepseekService = $deepseekService;
+        $this->perplexityService = $perplexityService;
+    }
     public function mount()
     {
         $this->updateQueryCount();
@@ -26,6 +53,11 @@ class Index extends Component
         $this->activeChatId = session('activeChatId', null);
         if ($this->activeChatId) {
             $this->loadChatMessages($this->activeChatId);
+        }
+        if ($this->modeloIA == 'medisearch') {
+            $this->investigacionProfunda = true;
+        } else {
+            $this->investigacionProfunda = false;
         }
     }
 
@@ -66,7 +98,6 @@ class Index extends Component
                 'from' => 'user',
                 'text' => $question->query,
             ];
-
             // Procesamos la respuesta almacenada (asumiendo que viene con artículos y respuesta llm)
             $data = $question->response;
             if (isset($data['data']['resultados'])) {
@@ -76,13 +107,34 @@ class Index extends Component
                             'from' => 'articles',
                             'data' => $item['articulos'],
                         ];
-                    } elseif ($item['tipo'] === 'llm_response') {
+                    }elseif ($item['tipo'] === 'llm_response') {
                         $this->messages[] = [
                             'from' => 'bot',
                             'text' => $item['respuesta'],
                         ];
+                    }elseif ($item['clean_text']) {
+                        $this->messages[] = [
+                            'from' => 'bot',
+                            'text' => $item['clean_text'],
+                        ];
+                    }elseif ($item['urls']) {
+                        $this->messages[] = [
+                            'from' => 'articles',
+                            'data' => $item['urls'],
+                        ];
                     }
                 }
+            }
+            if (isset($data['clean_text'])) {
+                $this->messages[] = [
+                    'from' => 'bot',
+                    'text' => $data['clean_text'],
+                    ];
+            }elseif (isset($data['urls'])) {
+                $this->messages[] = [
+                    'from' => 'articles',
+                    'text' => $data['urls'],
+                ];
             }
         }
         $this->activeChatId = $chatId;
@@ -125,39 +177,37 @@ class Index extends Component
         }
 
         // Agrega el mensaje del usuario a la conversación (interfaz)
+
         $this->messages[] = [
             'from' => 'user',
             'text' => $query,
         ];
 
-        // Llama a la API del servicio Python enviando el mensaje en el query param
-        $endpoint = 'https://appbanqueo.medbystudents.com/api/python/search';
-        $response = Http::get($endpoint, [
-            'q' => $query,
-        ]);
-        $data = $response->json();
+        $data = match ($this->modeloIA) {
+            'medisearch' => $this->medisearchService->search($query, $this->investigacionProfunda),
+            'MBIA' => $this->openAiService->search($query, $this->investigacionProfunda),
+        };
 
-        // Procesa la respuesta
-        if (isset($data['data']['resultados'])) {
-            foreach ($data['data']['resultados'] as $item) {
-                if ($item['tipo'] === 'articles') {
-                    $this->messages[] = [
-                        'from' => 'articles',
-                        'data' => $item['articulos'],
-                    ];
-                } elseif ($item['tipo'] === 'llm_response') {
-                    $this->messages[] = [
-                        'from' => 'bot',
-                        'text' => $item['respuesta'],
-                    ];
-                }
+        $resource = new AIResponseResourceFactory($data);
+        $resource = $resource->getResource($this->modeloIA, $data);
+        $processedMessages = $resource->resolve(request());
+
+        // Agregar los mensajes procesados
+        foreach ($processedMessages as $message) {
+            $clave = $message->tipo == 'articles' ? 'data' : 'text';
+            if ($message->tipo == 'articles') {
             }
+            $this->messages[] = [
+                'from' => $message->tipo,
+                $clave => $message->resource,
+            ];
         }
 
-        // Guarda la pregunta y la respuesta en la base de datos, asociándola al chat activo
+        // Guardar en la base de datos
         MedisearchQuestion::create([
             'user_id'  => $user->id,
             'chat_id'  => $this->activeChatId,
+            'model'    => $this->modeloIA,
             'query'    => $query,
             'response' => $data,
         ]);
@@ -170,4 +220,88 @@ class Index extends Component
     {
         return view('livewire.medisearch.index');
     }
+
+
+
+    /*
+     * public function sendMessage()
+    {
+        $user = Auth::user();
+
+        // Verifica límite de 100 preguntas mensuales para usuarios que no sean root
+        if (!$user->hasRole('root')) {
+            if ($this->queryCount >= 100) {
+                $this->messages[] = [
+                    'from' => 'bot',
+                    'text' => 'Has alcanzado el límite de 100 preguntas por mes. Por favor, revisa nuestros planes de suscripción.',
+                ];
+                $this->newMessage = '';
+                return;
+            }
+        }
+
+        $query = $this->newMessage;
+
+        // Si no hay chat activo, se crea uno
+        if (!$this->activeChatId) {
+            $chat = MedisearchChat::create([
+                'user_id' => $user->id,
+                'title'   => 'Chat ' . now()->toDateTimeString(),
+            ]);
+            $this->activeChatId = $chat->id;
+            session(['activeChatId' => $chat->id]);
+            $this->loadChatHistory(); // Actualiza el historial
+        }
+
+        // Agrega el mensaje del usuario a la conversación (interfaz)
+        $this->messages[] = [
+            'from' => 'user',
+            'text' => $query,
+        ];
+
+        $response =  $this->openAiService->buscarOpenAI($query, 2);
+        dd($response);
+        // Transformamos la estructura:
+        $transformedResponse = [
+            "data" => [
+                "query" => "¿Por qué la respuesta inmunológica ante el parásito de Naegleria fowleri provoca más daño en lugar de ayudar? Responde completo y no tan largo patogénicamente.",
+                "resultados" => [
+                    [
+                        "tipo" => "llm_response",
+                        "respuesta" => trim($response["clean_text"])
+                    ],
+                    [
+                        "tipo" => "articles",
+                        "articulos" => array_map(function ($url) {
+                            return [
+                                "url" => $url["url"],
+                                "tldr" => $url["description"],
+                                "year" => "", // Si tienes información del año, inclúyelo aquí.
+                                "title" => $url["title"],
+                                "authors" => [], // Si tienes autores, puedes añadirlos aquí.
+                                "journal" => ""  // Si tienes información del journal, inclúyela aquí.
+                            ];
+                        }, $response["urls"])
+                    ]
+                ]
+            ]
+        ];
+
+        dd($transformedResponse);
+
+        if (isset($response['clean_text'])){
+            $this->messages[] = [
+                'from' => 'bot',
+                'text' => $response['clean_text'],
+            ];
+            foreach ($response['urls'] as $url) {
+                $this->messages[] = [
+                    'from' => 'articles',
+                    'data' => $url,
+                ];
+            }
+        }
+
+    }
+    */
 }
