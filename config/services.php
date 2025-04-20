@@ -37,6 +37,10 @@ return [
         'secret_key' => env('MP_SECRET_KEY'),
         'sandbox' => env('MP_SANDBOX', false),
     ],
+    'ai_api' => [
+        'base_url' => env('AI_API_BASE_URL', 'https://api.ai.net'),
+        'token' => env('AI_API_TOKEN', ''),
+    ],
     'medisearch' => [
         'base_url' => env('MEDSEARCH_BASE_URL', 'https://api.medisearch.com'),
         'token' => env('MEDSEARCH_TOKEN'),

@@ -7,6 +7,7 @@ use App\Services\DeepseekService;
 use App\Services\MedisearchService;
 use App\Services\OpenAiService;
 use App\Services\PerplexityService;
+use App\Services\Usuarios\MBIAService;
 use GuzzleHttp\Client;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
@@ -22,6 +23,7 @@ class Index extends Component
     protected MedisearchService $medisearchService;
     protected DeepseekService $deepseekService;
     protected PerplexityService $perplexityService;
+    protected MBIAService $MBIAService;
 
     public $newMessage = '';
     public $messages = [];
@@ -33,12 +35,14 @@ class Index extends Component
     public $investigacionProfunda = false;
 
     public function boot(
+        MBIAService $MBIAService,
         OpenAiService $openAiService,
         MedisearchService $medisearchService,
         DeepseekService $deepseekService,
         PerplexityService $perplexityService,
     )
     {
+        $this->MBIAService = $MBIAService;
         $this->openAiService = $openAiService;
         $this->medisearchService = $medisearchService;
         $this->deepseekService = $deepseekService;
@@ -112,29 +116,8 @@ class Index extends Component
                             'from' => 'bot',
                             'text' => $item['respuesta'],
                         ];
-                    }elseif ($item['clean_text']) {
-                        $this->messages[] = [
-                            'from' => 'bot',
-                            'text' => $item['clean_text'],
-                        ];
-                    }elseif ($item['urls']) {
-                        $this->messages[] = [
-                            'from' => 'articles',
-                            'data' => $item['urls'],
-                        ];
                     }
                 }
-            }
-            if (isset($data['clean_text'])) {
-                $this->messages[] = [
-                    'from' => 'bot',
-                    'text' => $data['clean_text'],
-                    ];
-            }elseif (isset($data['urls'])) {
-                $this->messages[] = [
-                    'from' => 'articles',
-                    'text' => $data['urls'],
-                ];
             }
         }
         $this->activeChatId = $chatId;
@@ -183,26 +166,35 @@ class Index extends Component
             'text' => $query,
         ];
 
-        $data = match ($this->modeloIA) {
-            'medisearch' => $this->medisearchService->search($query, $this->investigacionProfunda),
-            'MBIA' => $this->openAiService->search($query, $this->investigacionProfunda),
-        };
 
-        $resource = new AIResponseResourceFactory($data);
-        $resource = $resource->getResource($this->modeloIA, $data);
-        $processedMessages = $resource->resolve(request());
 
-        // Agregar los mensajes procesados
-        foreach ($processedMessages as $message) {
-            $clave = $message->tipo == 'articles' ? 'data' : 'text';
-            if ($message->tipo == 'articles') {
+        // Prepara el payload para el backend Python
+        $payload = [
+            'provider' => $this->modeloIA,
+            'query' => $query,
+            'model' => '',
+            'include_articles' =>  $this->investigacionProfunda,
+            'system_prompt' => '',
+            'conversation_id' => '',
+        ];
+
+        $data = $this->MBIAService->search($payload);
+
+        if (isset($data['data']['resultados'])) {
+            foreach ($data['data']['resultados'] as $item) {
+                if ($item['tipo'] === 'articles') {
+                    $this->messages[] = [
+                        'from' => 'articles',
+                        'data' => $item['articulos'],
+                    ];
+                }elseif ($item['tipo'] === 'llm_response') {
+                    $this->messages[] = [
+                        'from' => 'bot',
+                        'text' => $item['respuesta'],
+                    ];
+                }
             }
-            $this->messages[] = [
-                'from' => $message->tipo,
-                $clave => $message->resource,
-            ];
         }
-
         // Guardar en la base de datos
         MedisearchQuestion::create([
             'user_id'  => $user->id,
