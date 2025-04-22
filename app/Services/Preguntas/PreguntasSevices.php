@@ -100,10 +100,10 @@ class PreguntasSevices
 
 
 
-    public function crearPreguntaCSV($row)
+    public function crearPreguntaCSV($row, $user)
     {
         try {
-            $approved =(auth()->user()->hasRole('admin') || auth()->user()->hasRole('root')) ? 1 : 0;
+            $approved = ($user->hasRole('admin') || $user->hasRole('root')) ? 1 : 0;
 
             $tipoIds = array_filter(array_map('intval', explode(',', $row['tipos'])));
             $universidadIds = array_filter(array_map('intval', explode(',', $row['universidades'])));
@@ -114,7 +114,7 @@ class PreguntasSevices
                 'media_url' => $row['url'],
                 'media_iframe' => $row['iframe'],
                 'approved' => $approved,
-                'user_id' => auth()->id(),
+                'user_id' => $user->id,
             ]);
         }catch (\Exception $e){
             dd($e->getMessage(),  $row);

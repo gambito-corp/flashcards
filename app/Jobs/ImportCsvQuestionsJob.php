@@ -3,22 +3,26 @@
 namespace App\Jobs;
 
 use App\Jobs\ProcessCsvChunkJob;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ImportCsvQuestionsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected string $filePath;
+    protected User $user;
     protected int $chunkSize;
 
-    public function __construct(string $filePath, int $chunkSize = 100)
+    public function __construct(string $filePath, User $user, int $chunkSize = 100)
     {
         $this->filePath = $filePath;
+        $this->user = $user;
         $this->chunkSize = $chunkSize;
     }
 
@@ -42,14 +46,15 @@ class ImportCsvQuestionsJob implements ShouldQueue
 
                 if (count($rows) >= $this->chunkSize) {
                     // Despacha un job para el bloque actual de filas
-                    ProcessCsvChunkJob::dispatch($rows);
+                    Log::info('Usuario: ', [$this->user->id]);
+                    ProcessCsvChunkJob::dispatch($rows, $this->user);
                     $rows = [];
                 }
             }
 
             // Si quedan filas pendientes, despacha un último job
             if (!empty($rows)) {
-                ProcessCsvChunkJob::dispatch($rows);
+                ProcessCsvChunkJob::dispatch($rows, $this->user);
             }
 
             fclose($handle);

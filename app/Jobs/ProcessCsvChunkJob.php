@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use App\Services\Preguntas\PreguntasSevices;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,10 +15,12 @@ class ProcessCsvChunkJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected array $rows;
+    protected User $user;
 
-    public function __construct(array $rows)
+    public function __construct(array $rows, User $user)
     {
         $this->rows = $rows;
+        $this->user = $user;
     }
 
     public function handle(PreguntasSevices $preguntasSevices)
@@ -25,7 +28,7 @@ class ProcessCsvChunkJob implements ShouldQueue
         foreach ($this->rows as $row) {
             try {
                 // Procesa cada fila utilizando tu servicio
-                $preguntasSevices->crearPreguntaCSV($row);
+                $preguntasSevices->crearPreguntaCSV($row, $this->user);
             } catch (\Exception $e) {
                 \Log::channel('jobs')->error('Error procesando fila CSV.', [
                     'row'   => $row,
