@@ -170,11 +170,12 @@ class Index extends Component
 
         // Prepara el payload para el backend Python
         $payload = [
-            'provider' => $this->modeloIA,
+            'client' => $this->modeloIA,
             'query' => $query,
+            'image' =>'',
+            'audio' =>'',
             'model' => '',
             'include_articles' =>  $this->investigacionProfunda,
-            'system_prompt' => '',
             'conversation_id' => '',
         ];
 

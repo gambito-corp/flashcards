@@ -60,7 +60,7 @@
                 <hr class="w-full ">
                 @elseif($message['from'] === 'bot')
                     <div class="flex justify-start ">
-                        <span  class="bot-text text-[15px] md:text-[16px] text-[#333333] leading-[32px] mb-5 font-medium">"{{ $message['text'] }}"</span>
+                        <span  class="bot-text text-[15px] md:text-[16px] text-[#333333] leading-[32px] mb-5 font-medium">"{!! $message['text']  !!} "</span>
                     </div>
                 @endif
             @endforeach
