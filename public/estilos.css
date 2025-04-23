@@ -691,30 +691,31 @@ nav .text-gray-900 {
     box-shadow: none;
     border-radius: 15px;
     padding: 60px 40px;
-}
-.box-answer img {
+
+}    
+.icon-card__answer {
     margin-bottom: 15px;
     width: 35px;
 }
-.answer-c img {
+/*.answer-c img {
     margin-bottom: 15px;
     width: 45px;
-}
+}*/
 
-.answer-c h2 {
+/*.answer-c h2 {
     font-size: 17px;
     font-weight: 500;
-}
+}*/
 .form-container-ask label.label-nm {
     margin-bottom: 0;
 }
 .box-answer,.answer-c{
     flex-wrap: wrap;
 }
-.box-answer .box-content-answer,.button-revelar{
+/*.box-answer .box-content-answer,.button-revelar{
     width: 100%;
-}
-.button-revelar button {
+}*/
+/*.button-revelar button {
     color: #195b81;
     font-weight: 700;
     margin-top: 39px;
@@ -725,7 +726,7 @@ nav .text-gray-900 {
     background-color: #ffffff;
     opacity: 0.8;
 
-}
+}*/
 
 /* RESULTADOS */
 .results-content {
@@ -738,7 +739,16 @@ nav .text-gray-900 {
     display: flex;
 }
 
-.img-answer {
+.img-answer{
+        display: block;
+
+        border-radius: 15px;
+        object-fit: cover;
+        height: 250px;
+        width: 195px;
+}
+
+/*.img-answer {
     width: 350px !important;
     margin-bottom: 0 !important;
     position: absolute;
@@ -746,10 +756,10 @@ nav .text-gray-900 {
     right: 21px;
     height: 220px;
     object-fit: cover;
-}
-.box-content-answer {
+}*/
+/*.box-content-answer {
     padding-top: 171px;
-}
+}*/
 
 .results-content p {
     color: #7a7a7a;
@@ -777,9 +787,9 @@ nav .text-gray-900 {
   .boton-success-m {
         font-size: 14px;
     }
-    .box-content-answer {
+    /*.box-content-answer {
         padding-top: 120px;
-    }
+    }*/
     .button-incorrect{
         margin-left: 0 !important;
         margin-top: 10px;
@@ -870,13 +880,13 @@ nav .text-gray-900 {
     .box-flashcard-game {
         margin-left: 0px !important;
     }
-    .img-answer {
+    /*.img-answer {
         width: 86% !important;
         display: block;
         right: 0;
         left: 50%;
         transform: translateX(-50%);
-    }
+    }*/
 
     .button-c-i {
         gap: 15px;
