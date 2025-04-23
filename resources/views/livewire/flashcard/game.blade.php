@@ -82,7 +82,7 @@
 
                             <div class="flex justify-end">
                                 <!-- Aseguramos que la imagen de respuesta siempre se vea -->
-                                @dump($currentCard->id, $currentCard->imagen_respuesta)
+                               
                                 @if ($currentCard->imagen_respuesta)
                                     <img class="img-answer img-answer-response " src="{{ Storage::disk('s3')->temporaryUrl($currentCard->imagen_respuesta, now()->addMinutes(10)) }}" alt="Imagen de la respuesta" onclick="openModal(this)">
                                 @elseif($currentCard->url)
