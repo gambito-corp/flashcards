@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AsignaturasController;
 use App\Http\Controllers\Admin\CarrerasController;
 use App\Http\Controllers\Admin\CategoriasController;
 use App\Http\Controllers\Admin\MainController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TiposController;
 use App\Http\Controllers\Admin\UniversidadesController;
 use App\Http\Controllers\Admin\UserController;
@@ -95,6 +96,16 @@ Route::middleware([
             // Ruta principal (dashboard) del panel de administración
             Route::get('/', [MainController::class, 'index'])->name('index');
 
+            Route::prefix('roles')
+                ->as('roles.')
+                ->middleware('role:root|admin')
+                ->group(callback: function () {
+                    Route::get('', [RoleController::class, 'index'])->name('index');
+                    Route::get('create', [RoleController::class, 'create'])->name('create');
+                    Route::post('', [RoleController::class, 'store'])->name('store');
+                    Route::get('{role}/edit', [RoleController::class, 'edit'])->name('edit');
+                    Route::put('{role}', [RoleController::class, 'update'])->name('update');
+                });
             // Grupo de rutas para "usuarios"
             Route::prefix('usuarios')
                 ->as('usuarios.')

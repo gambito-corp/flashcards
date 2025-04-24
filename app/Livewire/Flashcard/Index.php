@@ -70,7 +70,7 @@ class Index extends Component
         $this->validate();
 
         // Validación: si el usuario no es premium (status == 0) y ya tiene 50 flashcards, no permitir crear más
-        if (auth()->user()->status == 0) {
+        if (auth()->user()->status == 0 || !auth()->user()->hasAnyRole(['root', 'admin', 'colab', 'Rector'])) {
             $currentCount = FcCard::query()->where('user_id', auth()->id())->count();
             if ($currentCount >= 50) {
                 session()->flash('error', 'Has alcanzado el límite de 50 flashcards. Adquiere premium para crear más.');

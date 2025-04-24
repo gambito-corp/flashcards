@@ -52,8 +52,10 @@ class ExamBuilder extends Component
             return;
         }
         $this->selectedArea = $area;
-        $this->categories = Category::query()->where('area_id', $area_id)->get();
+        $this->categories = Category::query()->with('tipos')->where('area_id', $area_id)->get();
         $this->selectedCategory = $this->categories->first();
+        $this->selectedTipo = $this->selectedCategory?->tipos->first();
+        $this->loadQuestionsAndUniversities();
     }
 
     public function getTypes($category_id)

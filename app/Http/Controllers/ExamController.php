@@ -78,6 +78,9 @@ class ExamController extends Controller
 
             // Definir el límite según el estado del usuario
             $limit = auth()->user()->status == 1 ? 200 : 10;
+            if(\auth()->user()->hasAnyRole('root', 'admin', 'colab', 'Rector')){
+                $limit = 200;
+            }
 
             // Limitar a un máximo global de preguntas según el límite definido
             if ($allSelectedQuestions->count() > $limit) {

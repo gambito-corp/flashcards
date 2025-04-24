@@ -15,8 +15,10 @@
                     @foreach ($menu as $item)
                             <x-nav-link href="{{ route($item['route']) }}" :active="request()->routeIs($item['route'])">
                                 {{ __($item['name']) }}
-                                @if($item['need_premium'] === true && Auth::user()->status == 0)
-                                    <span class="ml-1 inline-block bg-yellow-400 text-xs text-white px-1 rounded">PRO</span>
+                                @if(!auth()->user()->hasAnyRole('admin', 'root', 'colab', 'Rector'))
+                                    @if(($item['need_premium'] === true && Auth::user()->status == 0))
+                                        <span class="ml-1 inline-block bg-yellow-400 text-xs text-white px-1 rounded">PRO</span>
+                                    @endif
                                 @endif
                             </x-nav-link>
                     @endforeach

@@ -20,7 +20,7 @@ class MedisearchController extends Controller
             return view('medisearch.index');
         }
 
-        return \auth()->user()->status == 1 ? view('medisearch.index') : redirect()->route('planes');
+        return (\auth()->user()->status == 1 || \auth()->user()->hasAnyRole('admin', 'root', 'colab', 'Rector')) ? view('medisearch.index') : redirect()->route('planes');
     }
 
     public function chat($query){

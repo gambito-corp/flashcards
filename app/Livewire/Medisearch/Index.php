@@ -69,7 +69,7 @@ class Index extends Component
     public function updateQueryCount()
     {
         $user = Auth::user();
-        if (!$user->hasRole('root')) {
+        if (!$user->hasAnyRole('root', 'admin', 'colab', 'Rector')) {
             $this->queryCount = MedisearchQuestion::where('user_id', $user->id)
                 ->where('created_at', '>=', Carbon::now()->startOfMonth())
                 ->count();
@@ -135,7 +135,7 @@ class Index extends Component
         $user = Auth::user();
 
         // Verifica límite de 100 preguntas mensuales para usuarios que no sean root
-        if (!$user->hasRole('root')) {
+        if (!$user->hasAnyRole('root', 'admin', 'colab', 'Rector')) {
             if ($this->queryCount >= 100) {
                 $this->messages[] = [
                     'from' => 'bot',
@@ -213,88 +213,4 @@ class Index extends Component
     {
         return view('livewire.medisearch.index');
     }
-
-
-
-    /*
-     * public function sendMessage()
-    {
-        $user = Auth::user();
-
-        // Verifica límite de 100 preguntas mensuales para usuarios que no sean root
-        if (!$user->hasRole('root')) {
-            if ($this->queryCount >= 100) {
-                $this->messages[] = [
-                    'from' => 'bot',
-                    'text' => 'Has alcanzado el límite de 100 preguntas por mes. Por favor, revisa nuestros planes de suscripción.',
-                ];
-                $this->newMessage = '';
-                return;
-            }
-        }
-
-        $query = $this->newMessage;
-
-        // Si no hay chat activo, se crea uno
-        if (!$this->activeChatId) {
-            $chat = MedisearchChat::create([
-                'user_id' => $user->id,
-                'title'   => 'Chat ' . now()->toDateTimeString(),
-            ]);
-            $this->activeChatId = $chat->id;
-            session(['activeChatId' => $chat->id]);
-            $this->loadChatHistory(); // Actualiza el historial
-        }
-
-        // Agrega el mensaje del usuario a la conversación (interfaz)
-        $this->messages[] = [
-            'from' => 'user',
-            'text' => $query,
-        ];
-
-        $response =  $this->openAiService->buscarOpenAI($query, 2);
-        dd($response);
-        // Transformamos la estructura:
-        $transformedResponse = [
-            "data" => [
-                "query" => "¿Por qué la respuesta inmunológica ante el parásito de Naegleria fowleri provoca más daño en lugar de ayudar? Responde completo y no tan largo patogénicamente.",
-                "resultados" => [
-                    [
-                        "tipo" => "llm_response",
-                        "respuesta" => trim($response["clean_text"])
-                    ],
-                    [
-                        "tipo" => "articles",
-                        "articulos" => array_map(function ($url) {
-                            return [
-                                "url" => $url["url"],
-                                "tldr" => $url["description"],
-                                "year" => "", // Si tienes información del año, inclúyelo aquí.
-                                "title" => $url["title"],
-                                "authors" => [], // Si tienes autores, puedes añadirlos aquí.
-                                "journal" => ""  // Si tienes información del journal, inclúyela aquí.
-                            ];
-                        }, $response["urls"])
-                    ]
-                ]
-            ]
-        ];
-
-        dd($transformedResponse);
-
-        if (isset($response['clean_text'])){
-            $this->messages[] = [
-                'from' => 'bot',
-                'text' => $response['clean_text'],
-            ];
-            foreach ($response['urls'] as $url) {
-                $this->messages[] = [
-                    'from' => 'articles',
-                    'data' => $url,
-                ];
-            }
-        }
-
-    }
-    */
 }

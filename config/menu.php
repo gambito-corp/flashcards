@@ -6,7 +6,7 @@ return [
         'name'          => 'Dashboard',
         'route'         => 'dashboard',
         'active'        => 'dashboard',
-        'roles'         => ['admin', 'root', 'colab', 'user'],
+        'roles'         => ['admin', 'root', 'colab', 'Rector', 'user'],
         'need_premium'  => false
     ],
     [
@@ -24,7 +24,7 @@ return [
         'name'   => 'Examenes',
         'route'  => 'examenes.index',
         'active' => 'examenes.index',
-        'roles'  => ['admin', 'root', 'colab', 'user'],
+        'roles'  => ['admin', 'root', 'colab', 'Rector', 'user'],
         'need_premium' => false
     ],
     [
@@ -32,7 +32,7 @@ return [
         'name'   => 'Flashcard',
         'route'  => 'flashcard.index',
         'active' => 'flashcard.index',
-        'roles'  => ['admin', 'root', 'colab', 'user'],
+        'roles'  => ['admin', 'root', 'colab', 'Rector', 'user'],
         'need_premium' => false
     ],
     [
@@ -40,11 +40,19 @@ return [
         'name'   => 'MediSearch',
         'route'  => 'medisearch.index',
         'active' => 'medisearch.index',
-        'roles'  => ['admin', 'root', 'colab', 'user'],
+        'roles'  => ['admin', 'root', 'colab', 'Rector', 'user'],
         'need_premium' => true
     ],
 
     // ELEMENTOS EXCLUSIVOS VISTA ADMINISTRACIÓN
+    [
+        'group'  => 'admin',
+        'name'   => 'Roles',
+        'route'  => 'admin.roles.index',
+        'active' => 'admin.roles.index',
+        'roles'  => ['admin', 'root', 'colab'],
+        'need_premium' => false
+    ],
     [
         'group'  => 'admin',
         'name'   => 'Usuarios',

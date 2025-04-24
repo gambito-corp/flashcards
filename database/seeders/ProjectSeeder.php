@@ -12,7 +12,7 @@ class ProjectSeeder extends Seeder
     public function run(): void
     {
         // Crear Roles y Permisos
-        $roles = ['root', 'admin', 'colab', 'user'];
+        $roles = ['root', 'admin', 'colab', 'Rector', 'user'];
         foreach ($roles as $role) {
             Role::query()->create(['name' => $role, 'guard_name' => 'web']);
         }

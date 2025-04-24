@@ -41,7 +41,7 @@ class Category extends Model
             'question_tipo',
             'question_id', // Foreign key en la tabla pivot para Question
             'tipo_id'      // Foreign key en la tabla pivot para Tipo
-        )->withPivot('cr'); // Añade esto si hay columnas adicionales en la pivot
+        ); // Añade esto si hay columnas adicionales en la pivot
     }
 
 }
