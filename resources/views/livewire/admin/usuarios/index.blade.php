@@ -13,15 +13,15 @@
 
         <!-- Select de paginación e Input de búsqueda (50% cada uno) -->
         <div class="flex w-full mb-4 gap-2 form-container-ask form-table">
-            <select class="w-1/2 border rounded px-2 py-1 focus:outline-none">
-                <option value="10">10 por página</option>
-                <option value="20">20 por página</option>
-                <option value="50">50 por página</option>
-                <option value="100">100 por página</option>
-                <option value="all">Todos</option>
+            <select wire:model.live="paginate" class="w-1/2 border rounded px-2 py-1 focus:outline-none">
+                <option value="10" {{$this->paginate == 10 ? 'selected' : ''}}>10 por página</option>
+                <option value="20" {{$this->paginate == 20 ? 'selected' : ''}}>20 por página</option>
+                <option value="50" {{$this->paginate == 50 ? 'selected' : ''}}>50 por página</option>
+                <option value="100" {{$this->paginate == 100 ? 'selected' : ''}}>100 por página</option>
             </select>
             <input
                 type="text"
+                wire:model.live="search"
                 placeholder="Buscar..."
                 class="w-1/2 border rounded px-2 py-1 focus:outline-none search-input"
             />
@@ -103,7 +103,10 @@
                     </tr>
                 @endforeach
                 </tbody>
-        </table>
+            </table>
+        </div>
+        <div class="mt-4">
+            {{$data->links()}}
+        </div>
     </div>
-</div>
 </div>

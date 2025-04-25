@@ -8,9 +8,11 @@ use Livewire\Component;
 class Index extends Component
 {
     public $usuarios;
+    public $search = '';
+    public $paginate = 10;
     public function render()
     {
-        $data = User::all();
+        $data = User::query()->where('name', 'LIKE', '%'.$this->search.'%')->orWhere('email', 'LIKE', '%'.$this->search.'%')->paginate($this->paginate);
         return view('livewire.admin.usuarios.index', compact('data'));
     }
     public function Asignaturas($team)
