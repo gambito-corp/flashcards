@@ -141,9 +141,6 @@
             });
         </script>
     @endif
-
-
-
 </head>
 <body class="font-sans antialiased">
 <!-- Texto flotante para entorno PRE -->
@@ -153,7 +150,6 @@
     </div>
 @endif
 <x-banner />
-
 <div class="min-h-screen bg-[#f7f7f7] body-content">
     <livewire:nav-link/>
 
@@ -172,15 +168,14 @@
     @endif
 
     <!-- Page Content -->
-<!-- Modal -->
-<div id="lightboxModal" class="lightbox-modal" onclick="closeModal()">
-    <span class="close-btn">&times;</span>
-    <img class="modal-content" id="modalImage" alt="as">
-</div>
+    <!-- Modal -->
+    <div id="lightboxModal" class="lightbox-modal" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <img class="modal-content" id="modalImage" alt="as">
+    </div>
 
     <main class="">
         {{ $slot }}
-
     </main>
 
     <!-- Footer -->

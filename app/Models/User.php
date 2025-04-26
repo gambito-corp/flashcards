@@ -33,8 +33,21 @@ class User extends Authenticatable  implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'current_team_id', 'status'
+        'name', 'email', 'password', 'current_team_id', 'status', 'premium_at'
     ];
+
+    protected static function booted()
+    {
+        static::saving(function ($user) {
+            if ($user->status == 1 && is_null($user->premium_at)) {
+                $user->premium_at = now();
+            }
+            if ($user->status == 0 && !is_null($user->premium_at)) {
+                $user->premium_at = null;
+            }
+        });
+    }
+
 
 
     public function sendPasswordResetNotification($token)
