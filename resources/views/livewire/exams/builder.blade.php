@@ -100,11 +100,15 @@
     <div class="mt-2 mb-6">
         <p class="bg-[#e4f1f1] rounded-md p-4 text-[#333333] text-sm font-normal">
             Preguntas Disponibles:
-            @if(count($categories) > 0 || count($tipos) >0)
-                @if($selectedUniversity)
-                    {{ optional($questions->firstWhere('universidad_id', $selectedUniversity))->question_count ?? 0 }}
+            @if(count($categories) > 0)
+                @if(count($tipos) > 0)
+                    @if($selectedUniversity)
+                        {{ optional($questions->firstWhere('universidad_id', $selectedUniversity))->question_count ?? 0 }}
+                    @else
+                        {{ optional($questions->firstWhere('universidad_id', null))->question_count ?? 0 }}
+                    @endif
                 @else
-                    {{ optional($questions->firstWhere('universidad_id', null))->question_count ?? 0 }}
+                    0
                 @endif
             @else
                 0
