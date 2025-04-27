@@ -13,14 +13,14 @@
                 <livewire:admin.chart.new-premium-users-chart />
             </div>
 
+            <!-- Exámenes por usuario -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <livewire:admin.chart.exams-per-user-chart />
+            </div>
+
             <!-- Conversión Premium -->
             <div class="bg-white rounded-lg shadow p-4">
 {{--                <livewire:admin.premium-conversion-rate />--}}
-            </div>
-
-            <!-- Exámenes por usuario -->
-            <div class="bg-white rounded-lg shadow p-4">
-{{--                <livewire:admin.exams-per-user-chart />--}}
             </div>
 
             <!-- Flashcards por media -->
