@@ -6,135 +6,136 @@ use App\Models\Area;
 use Livewire\Component;
 use App\Models\Category;
 use App\Models\Tipo;
-use App\Models\Question;
-use App\Models\Exam;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ExamBuilder extends Component
 {
-    public $areas;
-    public $categories = [];
-    public $tipos = [];
-    public $universities = [];
-    public $questions = [];
-    public $selectedArea = null;
-    public $selectedCategory = null;
-    public $selectedTipo = null;
-    public $selectedUniversity = null;
-    public $selectedQuestionCount;
-    public $examCollection = [];
-    public $examTitle = 'Examen de Prueba';
-    public $examTime = 60;
+    public $areas, $categories = [], $tipos = [], $universities = [], $questions = [];
+    public $selectedArea, $selectedCategory, $selectedTipo, $selectedUniversity;
+    public $examCollection = [], $selectedQuestionCount, $examTitle = 'Examen de Prueba', $examTime = 60;
 
     public function mount()
     {
-        $this->areas = Area::query()->select('id', 'team_id', 'name')->where('team_id', Auth::user()->current_team_id)->get();
-        $this->selectedArea = $this->areas->first();
-        $this->categories = Category::query()->select('id', 'area_id', 'name')->where('area_id', $this->selectedArea?->id)->get();
-        $this->selectedCategory = $this->categories->first();
-        $this->tipos = Tipo::query()->select('id', 'category_id', 'name')->where('category_id',  $this->selectedCategory?->id)->get();
-        $this->selectedTipo = $this->tipos->first();
-
-        $this->loadQuestionsAndUniversities();
-
+        $this->areas = Area::where('team_id', Auth::user()->current_team_id)->get();
+        $this->autoSelectArea($this->areas->first());
     }
-
     public function render()
     {
         return view('livewire.exams.builder');
     }
-
-    public function getCategories($area_id)
+    public function autoSelectArea($area)
     {
-        $area = Area::query()->find($area_id);
-        if (!$area) {
-            return;
-        }
         $this->selectedArea = $area;
-        $this->categories = Category::query()->with('tipos')->where('area_id', $area_id)->get();
-        $this->selectedCategory = $this->categories->first();
-        $this->selectedTipo = $this->selectedCategory?->tipos->first();
+        $this->categories = Category::where('area_id', $area->id)->get();
+        $this->autoSelectCategory($this->categories->first());
+    }
+    // AutoSeleccionar Tipo al seleccionar categoría
+    public function autoSelectCategory($category)
+    {
+        $this->selectedCategory = $category;
+        if ($category) {
+            $this->tipos = Tipo::where('category_id', $category->id)->get();
+            $this->selectedTipo = $this->tipos->first();
+            $this->selectedUniversity = null;
+            $this->loadQuestionsAndUniversities();
+        }
+    }
+    // Eventos click:
+    public function selectArea($areaId)
+    {
+        $area = Area::find($areaId);
+        if ($area) $this->autoSelectArea($area);
+    }
+
+    public function selectCategory($categoryId)
+    {
+        $category = Category::find($categoryId);
+        if ($category) $this->autoSelectCategory($category);
+    }
+
+    public function selectTipo($tipoId)
+    {
+        $tipo = Tipo::find($tipoId);
+        if ($tipo) $this->selectedTipo = $tipo;
+        $this->selectedUniversity = null;
         $this->loadQuestionsAndUniversities();
     }
 
-    public function getTypes($category_id)
-    {
-        $category = Category::query()->find($category_id);
-        if (!$category) {
-            return;
-        }
-        $this->selectedCategory = $category;
-        $this->tipos = Tipo::query()->where('category_id', $category_id)->get();
-        $this->selectedTipo = $this->tipos->first();
-        // Cargamos las preguntas y universidades disponibles para el tipo seleccionado
-        $this->loadQuestionsAndUniversities();
-    }
-    public function setTypes($tipo_id)
-    {
-        $tipo = Tipo::query()->find($tipo_id);
-        if (!$tipo) {
-            return;
-        }
-        $this->selectedTipo = $tipo;
-    }
+
+
+
+//
+//    public function getCategories($area_id)
+//    {
+//        $area = Area::query()->find($area_id);
+//        if (!$area) {
+//            return;
+//        }
+//        $this->selectedArea = $area;
+//        $this->categories = Category::query()->with('tipos')->where('area_id', $area_id)->get();
+//        $this->selectedCategory = $this->categories->first();
+//        $this->selectedTipo = $this->selectedCategory?->tipos->first();
+//        $this->loadQuestionsAndUniversities();
+//    }
+//
+//    public function getTypes($category_id)
+//    {
+//        $category = Category::query()->find($category_id);
+//        if (!$category) {
+//            return;
+//        }
+//        $this->selectedCategory = $category;
+//        $this->tipos = Tipo::query()->where('category_id', $category_id)->get();
+//        $this->selectedTipo = $this->tipos->first();
+//        // Cargamos las preguntas y universidades disponibles para el tipo seleccionado
+//        $this->loadQuestionsAndUniversities();
+//    }
+//    public function setTypes($tipo_id)
+//    {
+//        $tipo = Tipo::query()->find($tipo_id);
+//        if (!$tipo) {
+//            return;
+//        }
+//        $this->selectedTipo = $tipo;
+//    }
+
+
+
 
     public function loadQuestionsAndUniversities()
     {
-        if (!$this->selectedTipo) {
-            return;
-        }
+        if (!$this->selectedTipo) return;
 
-        // Primer Query: Conteo de preguntas agrupadas por universidad, aplicando filtro
         $query = DB::table('questions')
             ->join('question_tipo', 'questions.id', '=', 'question_tipo.question_id')
             ->join('question_universidad', 'questions.id', '=', 'question_universidad.question_id')
             ->where('question_tipo.tipo_id', $this->selectedTipo->id);
 
-        if ($this->selectedUniversity) {
+        if ($this->selectedUniversity)
             $query->where('question_universidad.universidad_id', $this->selectedUniversity);
-        }
 
-        // Se agrupa por universidad y cuenta las preguntas (usando COUNT DISTINCT para evitar duplicados)
         $countData = $query->select(
             'question_universidad.universidad_id',
             DB::raw('COUNT(DISTINCT questions.id) as question_count')
-        )
-            ->groupBy('question_universidad.universidad_id')
-            ->get();
+        )->groupBy('question_universidad.universidad_id')->get();
 
-        // Query para obtener el total global de preguntas para el tipo seleccionado (sin filtro de universidad)
         $totalCount = DB::table('questions')
             ->join('question_tipo', 'questions.id', '=', 'question_tipo.question_id')
             ->where('question_tipo.tipo_id', $this->selectedTipo->id)
-            ->select(DB::raw('COUNT(DISTINCT questions.id) as total_count'))
-            ->value('total_count');
+            ->count(DB::raw('DISTINCT questions.id'));
 
-        // Agrega un elemento a la colección para representar el conteo global (universidad_id null)
-        $countData->push((object)[
-            'universidad_id' => null,
-            'question_count' => $totalCount,
-        ]);
+        $countData->push((object)['universidad_id' => null, 'question_count' => $totalCount]);
 
-        // Almacena el resultado en la propiedad $questions
         $this->questions = $countData;
 
-        // Segundo Query: Obtener todas las universidades disponibles para el tipo seleccionado
-        // (ignora el filtro actual, así el select siempre muestra todas)
-        $universityIds = DB::table('questions')
-            ->join('question_tipo', 'questions.id', '=', 'question_tipo.question_id')
-            ->join('question_universidad', 'questions.id', '=', 'question_universidad.question_id')
-            ->where('question_tipo.tipo_id', $this->selectedTipo->id)
-            ->whereNotNull('question_universidad.universidad_id')
-            ->select('question_universidad.universidad_id')
-            ->distinct()
-            ->pluck('question_universidad.universidad_id')
-            ->toArray();
-
         $this->universities = DB::table('universidades')
-            ->whereIn('id', $universityIds)
-            ->get();
+            ->whereIn('id', DB::table('question_universidad')
+                ->whereIn('question_id', DB::table('question_tipo')->where('tipo_id', $this->selectedTipo->id)->pluck('question_id'))
+                ->pluck('universidad_id'))->distinct()->get();
     }
+
+
 
     public function filterQuestions()
     {

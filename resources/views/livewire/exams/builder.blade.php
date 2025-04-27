@@ -7,10 +7,13 @@
     <ul class="carousel-list flex gap-4   overflow-x-auto scroll-smooth scroll">
         @foreach ($areas as $area)
             <li
-                class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center items-center font-medium text-center duration-300 ease-in {{ isset($selectedArea) && $selectedArea->id === $area->id
+                class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex
+                justify-center items-center font-medium text-center duration-300 ease-in
+                {{ isset($selectedArea) && $selectedArea->id === $area->id
                     ? 'font-semibold bg-[#195b81] text-white'
-                    : 'bg-[#f7f7f7] border-transparent text-gray-600 hover:text-white hover:bg-[#195b81]' }}"
-                wire:click="getCategories({{ $area->id }})">
+                    : 'bg-[#f7f7f7] border-transparent text-gray-600 hover:text-white hover:bg-[#195b81]' }}
+                    "
+                wire:click="selectArea({{$area->id}})">
                 {{ $area->name }}
             </li>
         @endforeach
@@ -32,10 +35,12 @@
     <ul class="carousel-list flex space-x-4  overflow-x-auto scroll-smooth">
         @foreach ($categories as $category)
             <li
-                class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center items-center font-medium text-center duration-300 ease-in {{ isset($selectedCategory) && $selectedCategory->id === $category->id
+                class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center
+                 items-center font-medium text-center duration-300 ease-in
+                 {{ isset($selectedCategory) && $selectedCategory->id === $category->id
                     ? 'font-semibold bg-[#157b80] text-white'
                     : 'bg-[#f7f7f7] border-transparent text-gray-600 hover:text-white hover:bg-[#157b80]' }}"
-                wire:click="getTypes({{ $category->id }})">
+                wire:click="selectCategory({{$category->id}})">
                 {{ $category->name }}
             </li>
         @endforeach
@@ -53,15 +58,17 @@
 <!-- Carrusel de Tipos -->
 <div class="carousel-container overflow-x-auto mb-5 relative">
     <ul class="carousel-list flex space-x-4 overflow-x-auto scroll-smooth">
-        @foreach ($tipos as $tipo)
-            <li
-                class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center items-center font-medium text-center duration-300 ease-in {{ isset($selectedTipo) && $selectedTipo->id === $tipo->id
-                    ? 'font-semibold bg-[#5b8080] text-white'
-                    : 'bg-[#f7f7f7] border-transparent text-gray-600 hover:text-white hover:bg-[#5b8080]' }}"
-                wire:click="setTypes({{ $tipo->id }})">
-                {{ $tipo->name }}
-            </li>
-        @endforeach
+        @if(count($categories) > 0)
+            @foreach ($tipos as $tipo)
+                <li
+                    class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center items-center font-medium text-center duration-300 ease-in {{ isset($selectedTipo) && $selectedTipo->id === $tipo->id
+                        ? 'font-semibold bg-[#5b8080] text-white'
+                        : 'bg-[#f7f7f7] border-transparent text-gray-600 hover:text-white hover:bg-[#5b8080]' }}"
+                    wire:click="selectTipo({{$tipo->id}})">
+                    {{ $tipo->name }}
+                </li>
+            @endforeach
+        @endif
     </ul>
 
     <!-- Flechas de navegación -->
@@ -74,31 +81,37 @@
 </div>
 
 
+    @if(count($categories) > 0)
+        <div class="mt-10 form-container-ask ">
+            <label for="university" class="">
+                Universidad
+            </label>
+            <select id="university" wire:model="selectedUniversity" wire:change="filterQuestions" class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">
+                <option value="">Todas las universidades</option>
+                @foreach ($universities as $university)
+                    <option value="{{ $university->id }}">{{ $university->name }}</option>
+                @endforeach
+            </select>
+        </div>
+    @endif
 
-    <div class="mt-10 form-container-ask ">
-        <label for="university" class="">
-            Universidad
-        </label>
-        <select id="university" wire:model="selectedUniversity" wire:change="filterQuestions" class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">
-            <option value="">Todas las universidades</option>
-            @foreach ($universities as $university)
-                <option value="{{ $university->id }}">{{ $university->name }}</option>
-            @endforeach
-        </select>
-    </div>
 
     <!-- Texto que muestra el total de preguntas disponibles -->
     <div class="mt-2 mb-6">
         <p class="bg-[#e4f1f1] rounded-md p-4 text-[#333333] text-sm font-normal">
             Preguntas Disponibles:
-            @if($selectedUniversity)
-                {{ optional($questions->firstWhere('universidad_id', $selectedUniversity))->question_count ?? 0 }}
+            @if(count($categories) > 0 || count($tipos) >0)
+                @if($selectedUniversity)
+                    {{ optional($questions->firstWhere('universidad_id', $selectedUniversity))->question_count ?? 0 }}
+                @else
+                    {{ optional($questions->firstWhere('universidad_id', null))->question_count ?? 0 }}
+                @endif
             @else
-                {{ optional($questions->firstWhere('universidad_id', null))->question_count ?? 0 }}
+                0
             @endif
         </p>
     </div>
-
+    @if(count($categories) > 0)
     @php
         // Se obtiene el conteo de preguntas disponibles según la selección actual.
         $availableCount = $selectedUniversity
@@ -132,7 +145,7 @@
             Agregar Combinación
         </button>
     </div>
-
+    @endif
     <!-- Mensajes de error o éxito -->
     @if(session()->has('error'))
         <div class="mt-2 text-red-600">
@@ -225,128 +238,123 @@
 
 
 @push('styles')
+    <style>
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
 
-<style>
-.carousel-container {
-    position: relative;
-    overflow: hidden;
-}
+        .carousel-list {
+            display: flex;
+            transition: transform 0.3s ease-in-out;
+        }
+        .carousel-list::-webkit-scrollbar{
+            height:0px;
+        }
 
-.carousel-list {
-    display: flex;
-    transition: transform 0.3s ease-in-out;
-}
-.carousel-list::-webkit-scrollbar{
-    height:0px;
-}
+        .carousel-item {
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
 
-.carousel-item {
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
-}
+        .prev,
+        .next {
+            position: absolute;
+            top: 50%;
+            z-index: 5;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
 
-.prev,
-.next {
-    position: absolute;
-    top: 50%;
-    z-index: 5;
-    width: 30px;
-    height: 30px;
-    background-color: rgba(0, 0, 0, 0.4);
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 50%;
-    transform: translateY(-50%);
-}
+        @media (min-width:992px){
+        .prev,
+        .next {
 
-@media (min-width:992px){
-.prev,
-.next {
-  
-    display: none;
-}
-}
-.carousel-container button i {
-    line-height: 12px;
-    font-size: 12px;
-}
+            display: none;
+        }
+        }
+        .carousel-container button i {
+            line-height: 12px;
+            font-size: 12px;
+        }
 
-.prev:hover,
-.next:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
+        .prev:hover,
+        .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
 
-/* Mostrar flechas cuando sea necesario */
-.carousel-container:hover .prev,
-.carousel-container:hover .next {
-    display: block;
-}
+        /* Mostrar flechas cuando sea necesario */
+        .carousel-container:hover .prev,
+        .carousel-container:hover .next {
+            display: block;
+        }
 
 
-</style>
+    </style>
 @endpush
 
 <script>
-function initCarousels() {
-    document.querySelectorAll('.carousel-container').forEach(carousel => {
-        const list = carousel.querySelector('.carousel-list');
-        if (!list) return;
+    function initCarousels() {
+        document.querySelectorAll('.carousel-container').forEach(carousel => {
+            const list = carousel.querySelector('.carousel-list');
+            if (!list) return;
 
-        const item = list.querySelector('.carousel-item');
-        const itemWidth = item ? item.offsetWidth + 16 : 200;
+            const item = list.querySelector('.carousel-item');
+            const itemWidth = item ? item.offsetWidth + 16 : 200;
 
-        const prevBtn = carousel.querySelector('.prev');
-        const nextBtn = carousel.querySelector('.next');
+            const prevBtn = carousel.querySelector('.prev');
+            const nextBtn = carousel.querySelector('.next');
 
-        // Asegúrate de quitar listeners anteriores reemplazando nodos
-        const newPrevBtn = prevBtn.cloneNode(true);
-        const newNextBtn = nextBtn.cloneNode(true);
-        prevBtn.replaceWith(newPrevBtn);
-        nextBtn.replaceWith(newNextBtn);
+            // Asegúrate de quitar listeners anteriores reemplazando nodos
+            const newPrevBtn = prevBtn.cloneNode(true);
+            const newNextBtn = nextBtn.cloneNode(true);
+            prevBtn.replaceWith(newPrevBtn);
+            nextBtn.replaceWith(newNextBtn);
 
-        newNextBtn.addEventListener('click', () => {
-            list.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            newNextBtn.addEventListener('click', () => {
+                list.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            });
+
+            newPrevBtn.addEventListener('click', () => {
+                list.scrollBy({ left: -itemWidth, behavior: 'smooth' });
+            });
+
+            // Arrastre con mouse
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            list.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - list.offsetLeft;
+                scrollLeft = list.scrollLeft;
+            });
+
+            list.addEventListener('mouseleave', () => isDown = false);
+            list.addEventListener('mouseup', () => isDown = false);
+
+            list.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - list.offsetLeft;
+                const walk = (x - startX) * 2;
+                list.scrollLeft = scrollLeft - walk;
+            });
         });
+    }
 
-        newPrevBtn.addEventListener('click', () => {
-            list.scrollBy({ left: -itemWidth, behavior: 'smooth' });
-        });
-
-        // Arrastre con mouse
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-
-        list.addEventListener('mousedown', (e) => {
-            isDown = true;
-            startX = e.pageX - list.offsetLeft;
-            scrollLeft = list.scrollLeft;
-        });
-
-        list.addEventListener('mouseleave', () => isDown = false);
-        list.addEventListener('mouseup', () => isDown = false);
-
-        list.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - list.offsetLeft;
-            const walk = (x - startX) * 2;
-            list.scrollLeft = scrollLeft - walk;
-        });
+    document.addEventListener('livewire:navigated', function(){
+        initCarousels();
     });
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-    initCarousels();
-});
-
-if (window.Livewire) {
     Livewire.hook('message.processed', () => {
         initCarousels();
     });
-}
-
-
 </script>
