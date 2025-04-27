@@ -111,7 +111,7 @@
                         </button>
                     </div>
                     <div class="max-w- mx-auto 67rem">
-                        <div class="absolute top-0 left-0 mt-6 ml-6 max-w-xs p-3 bg-white shadow rounded-lg bocadillo bocadillo-left">
+                        <div class="absolute left-0 mt-6 ml-6 max-w-xs p-3 bg-white shadow rounded-lg bocadillo bocadillo-left">
                             <p class="text-sm text-[#333]">
                                 👋 El modelo MBIA es Optimo Para consultas Rapidas y
                                 completas, puedes seleccionar la opcion investigacion profunda para que adjunte los Links
@@ -119,7 +119,7 @@
                             </p>
                         </div>
 
-                        <div class="absolute top-0 right-0 mb-6 mr-6 max-w-xs p-3 bg-[#195b81] shadow rounded-lg text-white bocadillo bocadillo-right">
+                        <div class="absolute  right-0 mb-6 mr-6 max-w-xs p-3 bg-[#195b81] shadow rounded-lg text-white bocadillo bocadillo-right">
                             <p class="text-sm">
                                 📌 El Modelo Medisearch es perfecto para consultas de investigacion mas detalladas,
                                 aunque puede ser mas Lento en consulta pero adjunta papers de investigacion de fuentes
