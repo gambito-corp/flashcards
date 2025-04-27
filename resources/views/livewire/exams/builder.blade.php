@@ -7,6 +7,7 @@
     <ul class="carousel-list flex gap-4   overflow-x-auto scroll-smooth scroll">
         @foreach ($areas as $area)
             <li
+                title="{{ $area->description }}"
                 class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex
                 justify-center items-center font-medium text-center duration-300 ease-in
                 {{ isset($selectedArea) && $selectedArea->id === $area->id
@@ -35,6 +36,7 @@
     <ul class="carousel-list flex space-x-4  overflow-x-auto scroll-smooth">
         @foreach ($categories as $category)
             <li
+                title="{{ $category->description }}"
                 class="carousel-item min-w-fit cursor-pointer pb-4 pt-4 pl-6 pr-6 rounded-[5px] text-sm flex justify-center
                  items-center font-medium text-center duration-300 ease-in
                  {{ isset($selectedCategory) && $selectedCategory->id === $category->id
