@@ -76,6 +76,24 @@
         <div class="p-4">
             <form wire:submit.prevent="sendMessage" class="flex flex-col gap-2 relative">
                 @if(($queryCount <= 99))
+                    <div class="max-w- mx-auto 67rem">
+                        <div class="absolute top-0 left-0 mt-6 ml-6 max-w-xs p-3 bg-white shadow rounded-lg bocadillo bocadillo-left">
+                            <p class="text-sm text-[#333]">
+                                👋 El modelo MBIA es Optimo Para consultas Rapidas y
+                                completas, puedes seleccionar la opcion investigacion profunda para que adjunte los Links
+                                de Investigacion.
+                            </p>
+                        </div>
+
+                        <div class="absolute top-0 right-0 mb-6 mr-6 max-w-xs p-3 bg-[#195b81] shadow rounded-lg text-white bocadillo bocadillo-right">
+                            <p class="text-sm">
+                                📌 El Modelo Medisearch es perfecto para consultas de investigacion mas detalladas,
+                                aunque puede ser mas Lento en consulta pero adjunta papers de investigacion de fuentes
+                                pubmed, elsevier, scopus, google scholar, web of science, ect...
+                            </p>
+                        </div>
+                    </div>
+                    <br><br><br><br><br><br>
                     <div class="flex gap-3 mb-3 items-center">
                         <div>
                             <label class="block text-xs text-[#195b81] font-semibold mb-1">Modelo IA</label>
