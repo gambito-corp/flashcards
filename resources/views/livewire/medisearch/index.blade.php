@@ -99,13 +99,6 @@
 
                             @endif
                         </div>
-                    @else
-                        <div class="flex gap-3 mb-3 items-center">
-                            <span>
-                                Temporalmente todas las consultas se haran por medisearch por defecto, estamos trabajando
-                                para restablecer nuestra Red Neuronal MBIA
-                            </span>
-                        </div>
                     @endif
 
                     <div class="flex relative">
