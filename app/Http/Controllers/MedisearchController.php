@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MedisearchChat;
 use App\Services\MercadoPagoService;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use OpenAI\Laravel\Facades\OpenAI;
 
@@ -53,25 +55,35 @@ class MedisearchController extends Controller
         return json_decode($body, true);
     }
     public function buscarOpenAI($query){
-        $apiKey = config('services.openAI.token'); // Reemplaza con tu API Key
-        $client = new Client([
-            'base_uri' => config('services.openAI.base_url'),
-            'headers' => [
-                'Authorization' => 'Bearer ' . config('services.openAI.token'),
-                'Content-Type' => 'application/json',
-            ]
-        ]);
+//        $apiKey = config('services.openAI.token'); // Reemplaza con tu API Key
+//        $client = new Client([
+//            'base_uri' => config('services.openAI.base_url'),
+//            'headers' => [
+//                'Authorization' => 'Bearer ' . config('services.openAI.token'),
+//                'Content-Type' => 'application/json',
+//            ]
+//        ]);
+//        $response = $client->post('completions', [
+//            'json' => [
+//                'model' => 'text-davinci-003', // Modelo avanzado para medicina.
+//                'prompt' => $prompt,
+//                'max_tokens' => 1000,
+//                'temperature' => 0.7,
+//            ],
+//        ]);
+//
+//        dd($query);
+    }
+    public function conversation(Request $request, $chatId)
+    {
+        if($request->headers->get('key') === null)
+            return response('Unauthorized.', 401);
 
-        dd($query);
-        $response = $client->post('completions', [
-            'json' => [
-                'model' => 'text-davinci-003', // Modelo avanzado para medicina.
-                'prompt' => $prompt,
-                'max_tokens' => 1000,
-                'temperature' => 0.7,
-            ],
-        ]);
-
-        dd($query);
+        $chat = MedisearchChat::query()->with('questions')->where('id', $chatId)->first();
+        $historial = collect();
+        $chat->questions->each(function ($item) use ($historial){
+            $historial->push($item->toConversationEntry());
+        });
+        return response()->json($historial);
     }
 }

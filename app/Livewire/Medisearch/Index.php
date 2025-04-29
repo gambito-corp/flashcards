@@ -166,21 +166,21 @@ class Index extends Component
             'text' => $query,
         ];
 
-
+        $conversationId = $this->getConversationId($this->activeChatId);
 
         // Prepara el payload para el backend Python
         $payload = [
             'client' => $this->modeloIA,
             'query' => $query,
             'image' =>'',
+            'chat_id' => $this->activeChatId,
             'audio' =>'',
             'model' => '',
             'include_articles' =>  $this->investigacionProfunda,
-            'conversation_id' => '',
+            'conversation_id' => $conversationId,
         ];
 
         $data = $this->MBIAService->search($payload);
-
         if (isset($data['data']['resultados'])) {
             foreach ($data['data']['resultados'] as $item) {
                 if ($item['tipo'] === 'articles') {
@@ -195,6 +195,7 @@ class Index extends Component
                     ];
                 }
             }
+            $data['data']['query'] = $query;
         }
         // Guardar en la base de datos
         MedisearchQuestion::create([
@@ -212,5 +213,13 @@ class Index extends Component
     public function render()
     {
         return view('livewire.medisearch.index');
+    }
+
+    private function getConversationId(mixed $activeChatId)
+    {
+        $message = MedisearchQuestion::query()->where('chat_id', $this->activeChatId)->get()->last();
+        if (!empty($message) && !empty($message->response['data']) && !empty($message->response['data']['conversation_id'])) {
+            return $message->response['data'] != null ?   : '' ;
+        }
     }
 }

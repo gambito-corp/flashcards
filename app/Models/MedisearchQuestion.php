@@ -24,6 +24,14 @@ class MedisearchQuestion extends Model
         'response' => 'array',
     ];
 
+    public function toConversationEntry(): array
+    {
+        return [
+            'user' => $this->query,
+            'system' => $this->response['data']['resultados'][0]['respuesta'] ?? '' // Asume que response es un array con clave 'response'
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
