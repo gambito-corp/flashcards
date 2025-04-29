@@ -3,6 +3,7 @@
 namespace App\Livewire\Medisearch;
 
 use App\Http\Resources\IA\AIResponseResourceFactory;
+use App\Models\Config;
 use App\Services\DeepseekService;
 use App\Services\MedisearchService;
 use App\Services\OpenAiService;
@@ -33,6 +34,7 @@ class Index extends Component
     public $modelosIA = ['medisearch' => 'Medisearch', 'MBIA' => 'MBIA'];
     public $modeloIA = 'MBIA'; // Valor por defecto, puedes cambiarlo
     public $investigacionProfunda = false;
+    public $config = true;
 
     public function boot(
         MBIAService $MBIAService,
@@ -52,6 +54,12 @@ class Index extends Component
     {
         $this->updateQueryCount();
         $this->loadChatHistory();
+        $config = Config::query()->where('tipo', 'services.MBAI.openai_quota_exceeded')->first();
+        if ($config->value === 'true') {
+            $this->modelosIA = ['medisearch' => 'Medisearch'];
+            $this->modeloIA = 'medisearch';
+            $this->config = false;
+        }
 
         // Si existe un chat activo en sesión, se carga
         $this->activeChatId = session('activeChatId', null);

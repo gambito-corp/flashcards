@@ -76,28 +76,37 @@
         <div class="p-4">
             <form wire:submit.prevent="sendMessage" class="flex flex-col gap-2 relative">
                 @if(($queryCount <= 99))
-                    <div class="flex gap-3 mb-3 items-center">
-                        <div>
-                            <label class="block text-xs text-[#195b81] font-semibold mb-1">Modelo IA</label>
-                            <select wire:model.live="modeloIA" class="border rounded-md px-2 py-1 text-sm">
-                                @foreach($modelosIA as $key => $modelo)
-                                    <option value="{{ $key }}" @if($modeloIA == $key) selected @endif>{{ $modelo }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @if ($this->modeloIA != 'medisearch')
-                            <div class="flex items-center gap-2">
-                                <input type="checkbox" id="investigacionProfunda" wire:model.live="investigacionProfunda" class="accent-[#195b81]" @if ($this->modeloIA == 'medisearch') disabled @endif>
-                                <label for="investigacionProfunda" class="text-xs text-[#195b81] font-semibold cursor-pointer">
-                                    Investigación profunda
-                                </label>
+                    @if($config)
+                        <div class="flex gap-3 mb-3 items-center">
+                            <div>
+                                <label class="block text-xs text-[#195b81] font-semibold mb-1">Modelo IA</label>
+                                <select wire:model.live="modeloIA" class="border rounded-md px-2 py-1 text-sm">
+                                    @foreach($modelosIA as $key => $modelo)
+                                        <option value="{{ $key }}" @if($modeloIA == $key) selected @endif>{{ $modelo }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <span>
+                            @if ($this->modeloIA != 'medisearch')
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="investigacionProfunda" wire:model.live="investigacionProfunda" class="accent-[#195b81]" @if ($this->modeloIA == 'medisearch') disabled @endif>
+                                    <label for="investigacionProfunda" class="text-xs text-[#195b81] font-semibold cursor-pointer">
+                                        Investigación profunda
+                                    </label>
+                                </div>
+                                <span>
                                 Modelo de IA Experimental los Resultados o la Funcionabilidad podria no ser 100% precisa Todavia en Entrenamiento.
                             </span>
 
-                        @endif
-                    </div>
+                            @endif
+                        </div>
+                    @else
+                        <div class="flex gap-3 mb-3 items-center">
+                            <span>
+                                Temporalmente todas las consultas se haran por medisearch por defecto, estamos trabajando
+                                para restablecer nuestra Red Neuronal MBIA
+                            </span>
+                        </div>
+                    @endif
 
                     <div class="flex relative">
                         <input

@@ -53,4 +53,8 @@ return [
         'base_url' => env('ELSEVIER_BASE_URL', 'https://api.medisearch.com'),
         'token' => env('ELSEVIER_API_KEY'),
     ],
+    'notifications' => [
+        'admin_email' => env('ADMIN_EMAIL', ''),
+        'admin2_email' => env('ADMIN2_EMAIL', ''),
+    ],
 ];
