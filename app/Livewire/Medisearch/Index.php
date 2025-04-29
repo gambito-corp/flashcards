@@ -55,7 +55,7 @@ class Index extends Component
         $this->updateQueryCount();
         $this->loadChatHistory();
         $config = Config::query()->where('tipo', 'services.MBAI.openai_quota_exceeded')->first();
-        if ($config->value === 'true') {
+        if (isset($config) && $config->value === 'true') {
             $this->modelosIA = ['medisearch' => 'Medisearch'];
             $this->modeloIA = 'medisearch';
             $this->config = false;
