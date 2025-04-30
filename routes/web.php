@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminPreguntasController;
 use App\Http\Controllers\Admin\AsignaturasController;
 use App\Http\Controllers\Admin\CarrerasController;
 use App\Http\Controllers\Admin\CategoriasController;
+use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TiposController;
@@ -105,6 +106,13 @@ Route::middleware([
                     Route::post('', [RoleController::class, 'store'])->name('store');
                     Route::get('{role}/edit', [RoleController::class, 'edit'])->name('edit');
                     Route::put('{role}', [RoleController::class, 'update'])->name('update');
+                });
+            Route::prefix('config')
+                ->as('config.')
+                ->middleware('role:root|admin')
+                ->group(callback: function () {
+                    Route::get('', [ConfigController::class, 'index'])->name('index');
+                    Route::get('{config}/edit', [ConfigController::class, 'edit'])->name('edit');
                 });
             // Grupo de rutas para "usuarios"
             Route::prefix('usuarios')

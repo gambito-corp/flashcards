@@ -43,8 +43,15 @@ return [
         'roles'  => ['admin', 'root', 'colab', 'Rector', 'user'],
         'need_premium' => true
     ],
-
     // ELEMENTOS EXCLUSIVOS VISTA ADMINISTRACIÓN
+    [
+        'group'  => 'admin',
+        'name'   => 'Config',
+        'route'  => 'admin.config.index',
+        'active' => 'admin.config.index',
+        'roles'  => ['admin', 'root'],
+        'need_premium' => false
+    ],
     [
         'group'  => 'admin',
         'name'   => 'Roles',
