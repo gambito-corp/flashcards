@@ -13,15 +13,17 @@ class MBIAService
 {
     public function search(array $payload)
     {
+
         // Verificar si el flag de quota excedido está activo
-        $config = Config::query()->where('tipo', 'services.openai.quota_exceeded')->first();
-        if (isset($config) && $config->value === 'true') {
-            $payload['client'] !== 'medisearch';
-        }
+//        $config = Config::query()->where('tipo', 'services.openai.quota_exceeded')->first();
+//
+//        if (isset($config) && $config->value === 'true') {
+//            $payload['client'] !== 'medisearch';
+//        }
         try {
             $payload['include_articles'] = $payload['include_articles'] ? 'true' : 'false';
             $request = Http::asForm()->withHeaders([
-                'Authorization' => 'Bearer ' . config('services.ai_api.token'), // Pon tu token en config/services.php
+                'Authorization' => 'Bearer ' . config('services.ai_api.token'),
             ])->post(config('services.ai_api.base_url'), $payload);
             $data = json_decode($request->body(), true);
             // Detectar error 429 en la estructura real

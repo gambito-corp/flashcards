@@ -1,298 +1,287 @@
-<div class="max-w-[67rem] mx-auto p-4 pt-[40px] md:pt-[70px] h-full main-chat-bot-mbs">
-<div class="overlay"></div>
-    <!-- Sección de Historial de Chats -->
-    <div class="sidebar-chat bg-white z-0   p-9 m-0 fixed    rounded-[0px] md:rounded-[20px] z-10 left-5 transform md:-translate-x-[0%] -translate-x-[109%]">
+<div class="fixed inset-0 top-[80px] left-0 right-0 bottom-0 z-10 bg-[#f3f8fd] flex">
+    <div class="w-10/12 h-[calc(100vh-75px)] flex ml-40 bg-[#f3f8fd]">
+        <!-- Overlay para sidebar en móvil -->
+        <div id="sidebarOverlay" class="fixed inset-0 z-20 hidden bg-black overlay bg-opacity-30" onclick="closeSidebar()"></div>
 
-        <h3 class="text-lg font-bold mb-4 text-[#195b81]">Historial</h3>
-        <hr>
-        <div class="  flex flex-col overflow-hidden gap-[12px] text-center mt-2 w-full">
-            @foreach($chatHistory as $chat)
-                <button wire:click="selectChat({{ $chat->id }})"
-                        class="border-0 w-full text-gray-800 flex mb-1 items-center  text-sm font-medium  py-1  font-semibold chat-history md:hover:bg-[#f3f6fb] md:rounded-[20px] md:p-[10px_15px]
-                        {{ $activeChatId == $chat->id ?  : '' }} "><i class="fa-regular fa-message mr-3"></i>
-                    Chat #{{ $chat->id }} <br>
-                    <span class="text-xs ml-3">{{ $chat->created_at->format('d/m/Y') }}</span>
-                </button>
-            @endforeach
-        </div>
-    </div>
-    <!-- Boton historial movil -->
-    <div class="history-chat-button fixed left-[20px] bottom-[15px] bg-white z-[999] px-[25px] py-[10px] rounded-full text-[14px] shadow-md md:hidden block"><i class="fa-regular fa-message mr-1"></i>Historial</div>
-    <!-- Área del Chat -->
-    <div class=" flex flex-col  mt-4  rounded-2xl content-chat__mbs">
-        <!-- Chat Header -->
-        <div class="p-4 md-4  md:mt-[0px]">
-        <h2 class="text-[24px] md:text-[30px] font-extrabold text-[#195b81]" >¿En qué puedo ayudarte?</h2>
-        <span class="md:text-[17px] text-[15px] text-[#333333] font-medium">Escribe para poder ayudarte</span>
-        </div>
-        <hr>
-
-        <!-- Área de Mensajes -->
-        <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chat-messages">
-            @foreach($messages as $message)
-
-                @if($message['from'] === 'user')
-                    <div class="pt-3 flex">
-                        <div class=" text-[17px]   py-2  my-2 w-fit text-[#195b81] font-semibold "><i class="fa-regular fa-comment mr-1"></i>
-                            {{ $message['text'] }}
-                        </div>
-                    </div>
-                @elseif($message['from'] === 'articles')
-                <div class="flex flex-wrap gap-4 relative article-section">
-                    @foreach($message['data'] as $index => $article)
-                        <div class="md:w-[15rem] w-full md-1 md:mb-4 bg-white p-3 h-[85px] rounded-[15px] article-card {{ $index > 3 ? 'hidden' : '' }}">
-                            <a href="{{ $article['url'] }}" class="text-sm" target="_blank">
-                                <h3 class="font-bold text-[13px] leading-[18px] text-[#195b81] line-clamp-2">
-                                    {{ $article['title'] }}
-                                </h3>
-                                <p class="text-xs text-gray-500 line-clamp-1">
-                                    {{ $article['journal'] }} - {{ $article['year'] }}
-                                </p>
-                            </a>
-                        </div>
-                        @if ($index === 3)
-                            <button class="verMas absolute bottom-[12px] right-[-7px] w-[23px] h-[23px] bg-[#195b81] rounded-full">
-                                <i class="fa-solid fa-plus text-white"></i>
+        
+        <!-- Sidebar con resizer -->
+        <div class="flex-shrink-0 basis-1/8 min-w-[180px] max-w-[320px] h-full bg-white border-r border-[#e0e7ef] flex flex-col">
+            <aside id="sidebar" class="fixed left-0 z-30 flex flex-col transition-all duration-300 bg-white shadow-lg sidebar-chat">
+                <!-- Botón "+" para nuevo chat -->
+                <div class="flex items-center justify-between px-3 pt-3 pb-2">
+                    <span class="font-bold text-[#195b81] text-lg">Chats</span>
+                    <button wire:click="createNewChat"
+                            class="bg-[#195b81] text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-[#1a6ca6] transition"
+                            title="Nuevo chat">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <hr class="mb-2">
+                <!-- Lista de chats -->
+                <nav class="flex-1 px-3 overflow-y-auto">
+                    @foreach($groupedChats as $group => $chats)
+                        <div class="mt-4">
+                            <button type="button"
+                                    wire:click="toggleChatGroup('{{ $group }}')"
+                                    class="flex items-center w-full gap-2 px-2 mb-2 text-xs font-medium tracking-wider text-gray-500 uppercase select-none focus:outline-none">
+                                <i class="fa-solid transition-transform duration-200 {{ $chatGroupsOpen[$group] ? 'fa-chevron-down' : 'fa-chevron-right' }}"></i>
+                                {{ $group }}
                             </button>
-                        @endif
-                    @endforeach
-                </div>
-                <hr class="w-full ">
-                @elseif($message['from'] === 'bot')
-                    <div class="flex justify-start ">
-                        <span  class="bot-text text-[15px] md:text-[16px] text-[#333333] leading-[32px] mb-5 font-medium">"{!! $message['text']  !!} "</span>
-                    </div>
-                @endif
-            @endforeach
-            <!-- Mensaje de "Razonando..." mientras se procesa el envío -->
-            <div wire:loading.delay wire:target="sendMessage" class="flex justify-start">
-                <div class="flex items-center bg-[#dfe9ef] text-gray-800 px-4 py-2 rounded-lg my-2">
-                <i class="fa-regular fa-hourglass animate-spin-360 text-xl  mr-4"></i>
-                <span class="mr-2">Respondiendo<span class="dots"></span></span>
-                </div>
-            </div>
-        </div>
-        <!-- Formulario de Envío -->
-        <div class="p-4">
-            <form wire:submit.prevent="sendMessage" class="flex flex-col gap-2 relative">
-                @if(($queryCount <= 99))
-                    @if($config)
-                        <div class="flex gap-3 mb-3 items-center">
-                            <div>
-                                <label class="block text-xs text-[#195b81] font-semibold mb-1">Modelo IA</label>
-                                <select wire:model.live="modeloIA" class="border rounded-md px-2 py-1 text-sm">
-                                    @foreach($modelosIA as $key => $modelo)
-                                        <option value="{{ $key }}" @if($modeloIA == $key) selected @endif>{{ $modelo }}</option>
-                                    @endforeach
-                                </select>
+                            <div class="transition-all duration-200" style="{{ $chatGroupsOpen[$group] ? '' : 'display:none;' }}">
+                                @foreach($chats as $chat)
+                                    <div class="flex items-center group">
+                                        <button wire:click="selectChat({{ $chat->id }})"
+                                                class="flex-1 w-full text-left flex items-center gap-2 px-2 py-2 mb-1 rounded-lg
+                            transition hover:bg-[#f3f6fb]
+                            {{ $activeChatId == $chat->id ? 'bg-[#f3f6fb] text-[#195b81] font-bold' : 'text-gray-800' }}">
+                                            <i class="fa-regular fa-message"></i>
+                                            <span class="truncate">{{ $chat->title ?? "Chat #{$chat->id}" }}</span>
+                                        </button>
+                                        <!-- Botón lápiz -->
+                                        <button wire:click="openEditModal({{ $chat->id }})"
+                                                class="ml-2 text-[#195b81] opacity-70 hover:opacity-100 transition"
+                                                title="Editar nombre">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                    </div>
+                                @endforeach
                             </div>
-                            @if ($this->modeloIA != 'medisearch')
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" id="investigacionProfunda" wire:model.live="investigacionProfunda" class="accent-[#195b81]" @if ($this->modeloIA == 'medisearch') disabled @endif>
-                                    <label for="investigacionProfunda" class="text-xs text-[#195b81] font-semibold cursor-pointer">
-                                        Investigación profunda
-                                    </label>
-                                </div>
-                                <span>
-                                Modelo de IA Experimental los Resultados o la Funcionabilidad podria no ser 100% precisa Todavia en Entrenamiento.
-                            </span>
-
-                            @endif
                         </div>
-                    @endif
+                    @endforeach
+                </nav>
+                <!-- Barra para redimensionar -->
+                <div id="sidebarResizer" class="sidebar-resizer"></div>
+            </aside>
+            <!-- Botón hamburguesa para mostrar/ocultar sidebar -->
+            <button id="sidebarToggle" class="sidebar-toggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
 
-                    <div class="flex relative">
-                        <input
-                            type="text"
-                            wire:model.defer="newMessage"
-                            placeholder="Escribe tu mensaje..."
-                            class="flex-1 h-[70px] md:h-[90px] border-1 border-[#195b81] rounded-[20px] indent-5 focus:border-[#195b81] focus:ring-[#195b81] "
-                        />
-                        <button wire:loading.attr="disabled" type="submit" class="bg-[#195b81] w-[30px] md:w-[40px] flex-shrink-0 flex absolute h-[30px] md:h-[40px] justify-center items-center rounded-full right-[15px] bottom-[15px]">
-                            <i class="fa-solid fa-arrow-right text-white"></i>
+        <!-- Botón para abrir sidebar en móvil -->
+        <button class="history-chat-button fixed left-4 bottom-4 bg-white z-40 px-5 py-2 rounded-full text-[14px] shadow-md md:hidden flex items-center gap-2"
+                onclick="openSidebar()">
+            <i class="fa-regular fa-message"></i> Historial
+        </button>
+
+        <!-- Área principal del chat -->
+        <div class="flex flex-col flex-1 h-full">
+            <div class="bg-black">
+                <p class="text-white" wire:loading='sendMessage'>HOLA MUNDO</p>
+            </div>
+            @if($messages->isEmpty())
+                <!-- Estado 1: Pantalla de bienvenida -->
+                <div class="flex flex-col items-center justify-center h-full w-full bg-[#f3f8fd]">
+                    <!-- Logo y título -->
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-[#195b81] mb-2">DoctorMBS</h1>
+                    <div class="text-lg md:text-xl text-[#195b81] font-semibold mb-1">Respuestas <span class="text-[#3b82f6]">científicas</span> a preguntas médicas</div>
+
+                    <div class="w-full max-w-2xl mt-8 mb-4">
+                        <div class="flex items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-6 py-4 shadow-lg">
+                            <input type="text"
+                                   wire:model.defer="newMessage"
+                                   class="flex-1 text-lg bg-transparent border-0 focus:ring-0 focus:outline-none text-[#195b81] placeholder-[#b0b8c1]"
+                                   placeholder="Haz una pregunta de salud o biociencia...">
+                            <button wire:click='openFilters' class="ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold">
+                                <i class="fa-solid fa-sliders"></i>
+                                <span class="ml-1">Filtros</span>
+                            </button>
+                            <label class="flex items-center ml-4 cursor-pointer select-none">
+                                <span class="text-sm text-[#b0b8c1] font-bold mr-1">Investigacion Profunda </span>
+                                <input wire:model.live='deepResearch' type="checkbox" class="accent-[#195b81] scale-125">
+                            </label>
+                            <button wire:click='sendMessage' class="ml-4 bg-[#3b82f6] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition">
+                                <i class="text-lg fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sugerencias -->
+                    <div class="w-full max-w-2xl mt-6">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center gap-2 mb-1 text-sm font-semibold text-gray-600">
+                                <i class="fa-regular fa-lightbulb"></i>
+                                Comienza con preguntas comunes
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                <button wire:click="setQuestion('¿El deporte aumenta la esperanza de vida?')"
+                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
+                                    ¿El deporte aumenta la esperanza de vida?
+                                </button>
+                                <button wire:click="setQuestion('¿Cuáles son las probabilidades de contraer cáncer?')"
+                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
+                                    ¿Cuáles son las probabilidades de contraer cáncer?
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2 mb-1 text-sm font-semibold text-gray-600">
+                                <i class="fa-solid fa-flask"></i>
+                                Profundiza en preguntas complejas
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button wire:click="setQuestion('¿La vacuna contra el COVID empeora la artritis?')"
+                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
+                                    ¿La vacuna contra el COVID empeora la artritis?
+                                </button>
+                                <button wire:click="setQuestion('¿El control de la natalidad hormonal puede afectar la demografía?')"
+                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
+                                    ¿El control de la natalidad hormonal puede afectar la demografía?
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enlace informativo -->
+                    <div class="mt-10">
+                        <a href="#" class="text-[#3b82f6] text-sm underline hover:text-[#195b81] transition">¿Qué es MediSearch?</a>
+                    </div>
+                </div>
+
+            @else
+                <!-- Estado 2: Chat activo -->
+                <div class="flex flex-col h-full bg-[#f3f8fd]">
+                    <!-- Encabezado del chat -->
+                    <div class="flex items-center justify-between p-4 bg-white shadow">
+                        <h2 class="text-xl ml-12 font-bold text-[#195b81]">
+                            {{ $activeChatTitle }}
+                        </h2>
+                        <button class="bg-gradient-to-r from-[#6a5af9] to-[#38bdf8] text-white px-6 py-2 rounded-full font-bold shadow hover:scale-105 transition">
+                            <i class="mr-1 fa-solid fa-star"></i> Actualizar a Pro
                         </button>
                     </div>
-                    <div class="max-w- mx-auto 67rem">
-                        <div class="absolute left-0 mt-6 ml-6 max-w-xs p-3 bg-white shadow rounded-lg bocadillo bocadillo-left">
-                            <p class="text-sm text-[#333]">
-                                👋 El modelo MBIA es Optimo Para consultas Rapidas y
-                                completas, puedes seleccionar la opcion investigacion profunda para que adjunte los Links
-                                de Investigacion.
-                            </p>
-                        </div>
 
-                        <div class="absolute  right-0 mb-6 mr-6 max-w-xs p-3 bg-[#195b81] shadow rounded-lg text-white bocadillo bocadillo-right">
-                            <p class="text-sm">
-                                📌 El Modelo Medisearch es perfecto para consultas de investigacion mas detalladas,
-                                aunque puede ser mas Lento en consulta pero adjunta papers de investigacion de fuentes
-                                pubmed, elsevier, scopus, google scholar, web of science, ect...
-                            </p>
+                    <!-- Área de mensajes -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f3f8fd]">
+                        @foreach($messages as $message)
+                            @if($message['from'] === 'user')
+                                <div class="flex justify-end mr-10">
+                                    <div class="flex justify-end w-4/5">
+                                        <div class="bg-[#195b81] text-white p-4 rounded-2xl shadow text-right">
+                                            {{ $message['text'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif($message['from'] === 'bot')
+                                <div class="flex justify-start ml-10">
+                                    <div class="flex justify-start w-4/5">
+                                        <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
+                                            <div class="text-[#195b81]">
+                                                {!! $message['text'] !!}
+                                            </div>
+                                            @if(!empty($message['references']))
+                                                <div class="flex flex-wrap gap-2 mt-2">
+                                                    @foreach($message['references'] as $ref)
+                                                        <span class="bg-[#d9e6f7] text-[#195b81] px-3 py-1 rounded-full text-xs">
+                                                            {{ $ref }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif($message['from'] === 'articles' && !empty($message['data']))
+                                <div class="flex justify-center w-full">
+                                    <div class="w-4/5 max-w-2xl">
+                                        <div class="bg-[#eaf4fb] p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
+                                            <div class="font-semibold text-[#195b81] mb-2">
+                                                Artículos relacionados:
+                                            </div>
+                                            <div class="grid gap-3">
+                                                @foreach($message['data'] as $article)
+                                                    <div class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition">
+                                                        <a href="{{ $article['url'] ?? '#' }}" target="_blank" class="block">
+                                                            <h4 class="font-bold text-[#195b81] text-sm">Titulo de Prueba</h4>
+                                                            <div class="mt-1 text-xs text-gray-500">
+                                                                Autor de Prueba
+                                                                @if(!empty($article['journal'] ?? ''))
+                                                                    · journal de Prueba
+                                                                @endif
+                                                                @if(!empty($article['fecha'] ?? ''))
+                                                                    · fecha de Prueba
+                                                                @endif
+                                                            </div>
+                                                            @if(!empty($article['tipo_estudio']))
+                                                                <span class="inline-block bg-[#d9e6f7] text-[#195b81] px-2 py-0.5 rounded-full text-xs mt-2">
+                                                                    estudio de Prueba
+                                                                </span>
+                                                            @endif
+                                                        </a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            @endif
+                        @endforeach
+                        <div wire:loading="sendMessage" class="flex justify-start ml-10">
+                            <div class="flex justify-start w-4/5">
+                                <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
+                                    <div class="text-[#195b81] animate-pulse">
+                                        <i class="mr-2 fa-solid fa-spinner fa-spin"></i> cargando...
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-               @endif
-            </form>
-        @if(!Auth::user()->hasRole('root'))
-                <div class="p-2 text-sm text-gray-600 border-b border-gray-200">
-                    Has realizado {{ $queryCount }} preguntas este mes. Te quedan {{ 100 - $queryCount }}.
-                    @if($queryCount >= 100)
-                        Puedes volver a preguntar en
-                        {{ \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::now()->endOfMonth()) }} días.
-                    @endif
+                    <!-- Input de seguimiento -->
+                    <div class="p-4 bg-white border-t border-[#d9e6f7]">
+                        <div class="flex items-center px-6 py-4 bg-white shadow rounded-2xl">
+                            <input type="text"
+                                   wire:model.live="newMessage"
+                                   class="flex-1 text-lg bg-transparent border-0 focus:ring-0 focus:outline-none text-[#195b81]"
+                                   placeholder="Haz una pregunta de seguimiento...">
+                                <button wire:click='openFilters' class="ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold">
+                                    <i class="fa-solid fa-sliders"></i>
+                                    <span class="ml-1">Filtros</span>
+                                </button>
+                                <label class="flex items-center ml-4 cursor-pointer select-none">
+                                    <span class="text-sm text-[#b0b8c1] font-bold mr-1">Investigacion Profunda </span>
+                                    <input wire:model='deepResearch' type="checkbox" class="accent-[#195b81] scale-125">
+                                </label>
+                            <button wire:click="sendMessage"
+                                    class="ml-3 bg-[#195b81] text-white px-4 py-2 rounded-full font-bold shadow hover:bg-[#1a6ca6] transition">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>
     </div>
-</div>
 
-@push('styles')
-    <style>
-        @media (min-width: 768px) {
-            .main-chat-bot {
-                width: 100%;
-                max-width: 100%;
-                display: flex;
-                justify-content: end;
-                padding-right: 20vw;
-            }
-            .main-chat-bot-mbs {
-                max-width: 100%;
-            }
-            .box-chat {
-                width: calc(100% - 410px);
-            }
-        }
-        @media (max-width: 1640px) and (min-width: 769px) {
-            .main-chat-bot {
-                padding-right: 9vw;
-            }
-            .main-chat-bot-mbs {
-                max-width: 100%;
-            }
-            .box-chat {
-                width: calc(100% - 300px);
-            }
-        }
-        .header-mbs{
-            position: fixed;
-            width: 100%;
-            top: 0;
-        }
-        .footer-mbs{
-            display: none;
-        }
-        .activo-sidebar {
-            transform: translateX(0%);
-            transition: .3s all ease-in-out;
-            z-index: 999999;
-            height: 100%;
-            top: 0;
-            left: 0;
-        }
-        .overlay{
-            position: fixed;
-            background-color: rgba(0, 0, 0, 0.7);
-            opacity: 0;
-            transition: opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1), z-index 0s cubic-bezier(0.19, 1, 0.22, 1) 0.5s, top 0s cubic-bezier(0.19, 1, 0.22, 1) 0.5s;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            visibility: hidden;
-            left: 0;
-            z-index: 1;
-        }
-        .active-overlay.overlay{
-            visibility: visible;
-            opacity: 1;
-        }
-        hr{
-            margin-bottom: 0px !important;
-        }
-        .article-card {
-            opacity: 1;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .article-card.hidden {
-            opacity: 0;
-            display: none;
-        }
-        @keyframes spin360 {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-        .animate-spin-360 {
-            animation: spin360 2s linear infinite;
-        }
-        /* Animación para los puntos suspensivos */
-        .dots::after {
-            content: '.';
-            animation: dotsAnimation 1.5s infinite steps(1) 1s;
-        }
-        .dots::before {
-            content: '';
-            animation: dotsAnimation 1.5s infinite steps(1) 0.5s;
-        }
-        @keyframes dotsAnimation {
-            0% {
-                content: '.';
-            }
-            33% {
-                content: '..';
-            }
-            66% {
-                content: '...';
-            }
-            100% {
-                content: '.';
-            }
-        }
-        /*Sidebar historial */
-        @media (min-width:620px){
-            .chat-history{
-                width: 200px;
-            }
-        }
-        .sidebar-chat {
-            overflow-y: auto;
-        }
-        @media (min-width:992px){
-            .sidebar-chat {
-                min-width: fit-content;
-                max-height: 620px;
-            }
-            /* Barra de desplazamiento */
-            .sidebar-chat::-webkit-scrollbar{
-                width: 8px;
-                background-color: #dedede;
-                border-radius: 20px;
-            }
-            .sidebar-chat::-webkit-scrollbar:window-inactive {
-                display: none;
-            }
-            .sidebar-chat::-webkit-scrollbar-thumb  {
-                background-color: #5b8080;
-                border-radius: 6px;
-            }
-        }
-        .card-ati{
-            opacity: 0;
-            visibility: hidden;
-            transition: .3s all ease-in;
-        }
-        .active-card{
-            opacity: 1;
-            visibility: visible;
-            transition: .3s all ease-in;
-        }
-    </style>
-@endpush
 
-<script>
-    // Animar texto bot
-    document.addEventListener("DOMContentLoaded", function () {
+    @if($showEditModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="relative w-full max-w-sm p-6 bg-white shadow-lg rounded-xl">
+                <button class="absolute text-gray-400 top-3 right-3 hover:text-gray-600"
+                        wire:click="closeEditModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <h2 class="text-lg font-bold text-[#195b81] mb-4">Editar nombre del chat</h2>
+                <form wire:submit.prevent="saveChatName">
+                    <input type="text"
+                           wire:model.defer="editChatName"
+                           class="w-full border rounded-lg px-3 py-2 mb-4 focus:border-[#195b81] focus:ring-[#195b81]"
+                           placeholder="Nuevo nombre para el chat"
+                           maxlength="50"
+                           required
+                    >
+                    <div class="flex justify-end gap-2">
+                        <button type="button" wire:click="closeEditModal"
+                                class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancelar</button>
+                        <button type="submit"
+                                class="px-4 py-2 rounded-md bg-[#195b81] text-white hover:bg-[#1a6ca6]">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    <script>
+// ===================Lettering===================
+document.addEventListener("DOMContentLoaded", function () {
         let observer = new MutationObserver(() => {
             const botMessages = document.querySelectorAll(".bot-text");
             if (botMessages.length === 0) return;
@@ -334,63 +323,176 @@
             typeWriter();
         }
     });
-    //Mostrar el boton ver mas articulos
-    document.addEventListener("DOMContentLoaded", function () {
-        function actualizarBotones() {
-            document.querySelectorAll(".article-section").forEach(section => {
-                const articles = section.querySelectorAll(".article-card.hidden");
-                const verMasButton = section.querySelector(".verMas");
-                if (!verMasButton) return;
-                if (articles.length === 0) {
-                    verMasButton.classList.add("hidden");
-                } else {
-                    verMasButton.classList.remove("hidden");
-                }
-                verMasButton.onclick = function () {
-                    articles.forEach(article => article.classList.remove("hidden"));
-                    this.style.display = "none";
-                };
+    // ======================== Fin del Lettering ?==============================
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const resizer = document.getElementById('sidebarResizer');
+            const toggle = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+            let isResizing = false;
+
+            // Función para redimensionar
+            resizer.addEventListener('mousedown', function(e) {
+                isResizing = true;
+                document.body.style.cursor = 'ew-resize';
             });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isResizing) return;
+                let newWidth = e.clientX;
+                if (newWidth < 180) newWidth = 180;
+                if (newWidth > 350) newWidth = 350;
+                sidebar.style.width = newWidth + 'px';
+                // Actualiza la posición del botón solo si el sidebar está visible
+                if (!sidebar.classList.contains('collapsed')) {
+                    toggle.style.left = (newWidth + 15) + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', function() {
+                isResizing = false;
+                document.body.style.cursor = '';
+            });
+
+            // Colapsar/expandir sidebar
+            toggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                toggle.classList.toggle('collapsed');
+            });
+
+            // Funciones para móvil
+            window.openSidebar = function() {
+                sidebar.classList.add('active');
+                overlay.classList.remove('hidden');
+            }
+
+            window.closeSidebar = function() {
+                sidebar.classList.remove('active');
+                overlay.classList.add('hidden');
+            }
+        });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+
+            sidebar.classList.toggle('collapsed');
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggle.style.left = '10px'; // Posición cuando está colapsado
+            } else {
+                // Recupera la posición normal basada en el ancho del sidebar
+                toggle.style.left = (sidebar.offsetWidth + 15) + 'px';
+            }
         }
-        // Llamamos a la función al cargar la página
-        actualizarBotones();
-        // Observamos cambios en el DOM
-        const observer = new MutationObserver(actualizarBotones);
-        observer.observe(document.body, { childList: true, subtree: true });
-    });
-    // Agregar fondo a toda la pagina
-    document.querySelectorAll('.body-content').forEach(element => {
-        element.style.background = '#f3f6fb';
-    });
-    //Activar boton historial
-    document.querySelectorAll(".history-chat-button").forEach(button => {
-        button.addEventListener("click", () => {
-            document.querySelector(".sidebar-chat").classList.add("activo-sidebar");
-            document.querySelector(".overlay").classList.add("active-overlay");
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const footer = document.querySelector('footer'); // O el selector de tu footer
+            const sidebar = document.getElementById('sidebar');
+
+            window.addEventListener('scroll', function() {
+                const footerRect = footer.getBoundingClientRect();
+                const sidebarRect = sidebar.getBoundingClientRect();
+
+                // Si el footer es visible en la ventana
+                if (footerRect.top < window.innerHeight) {
+                    const overlap = window.innerHeight - footerRect.top;
+                    sidebar.style.maxHeight = `calc(100vh - 75px - ${overlap}px)`;
+                } else {
+                    sidebar.style.maxHeight = 'calc(100vh - 75px)';
+                }
+            });
         });
-    });
-    document.querySelectorAll(".overlay, .chat-history").forEach(element => {
-        element.addEventListener("click", () => {
-            const sidebar = document.querySelector(".sidebar-chat");
-            const overlay = document.querySelector(".overlay");
-            // Agregar transición antes de quitar las clases
-            sidebar.style.transition = "transform 0.5s ease-in-out, opacity 0.5s ease-in-out";
-            overlay.style.transition = "opacity 0.5s ease-in-out";
-            // Aplicar animación antes de quitar las clases
-            sidebar.style.transform = "translateX(-100%)";
-            sidebar.style.opacity = "0";
-            overlay.style.opacity = "0";
-            // Esperar la animación antes de quitar las clases
-            setTimeout(() => {
-                sidebar.classList.remove("activo-sidebar");
-                overlay.classList.remove("active-overlay");
-                // Resetear estilos inline para que pueda seguir funcionando con Tailwind u otros estilos
-                sidebar.style.transition = "";
-                sidebar.style.transform = "";
-                sidebar.style.opacity = "";
-                overlay.style.transition = "";
-                overlay.style.opacity = "";
-            }, 500); // Debe coincidir con la duración de la transición
+        document.addEventListener('livewire:load', function() {
+            Livewire.on('new-message', function() {
+                const chatContainer = document.querySelector('.overflow-y-auto');
+                if (chatContainer) {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            });
         });
-    });
-</script>
+    </script>
+</div>
+
+@push('styles')
+    <style>
+        .sidebar-chat {
+            top: 75px; /* ajusta a la altura de tu navbar */
+            left: 0;
+            height: calc(100vh - 75px);
+            width: 350px; /* ancho inicial */
+            min-width: 180px;
+            max-width: 350px;
+            overflow-y: auto;
+            background-color: #fff;
+            transition: width 0.2s, transform 0.3s ease;
+            border-right: 1px solid #e0e7ef;
+        }
+
+        .sidebar-resizer {
+            width: 5px;
+            cursor: ew-resize;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            background-color: transparent;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar-resizer:hover {
+            background-color: #e0e7ef;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 85px;
+            left: 365px; /* ancho inicial + margen */
+            z-index: 31;
+            background: #195b81;
+            color: #fff;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: left 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+
+        .sidebar-chat.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-toggle.collapsed {
+            left: 10px;
+        }
+
+        .overlay {
+            transition: opacity 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-chat {
+                transform: translateX(-100%);
+            }
+            .sidebar-chat.active {
+                transform: translateX(0);
+            }
+            .sidebar-toggle {
+                display: none;
+            }
+        }
+    </style>
+@endpush
