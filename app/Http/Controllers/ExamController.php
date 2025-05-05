@@ -43,7 +43,6 @@ class ExamController extends Controller
         $examCollection = json_decode($request->examCollection);
         $examTitle = $request->examTitle;
         $examTime = $request->examTime;
-
         try {
             DB::beginTransaction();
             // Crear el examen

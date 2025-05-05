@@ -86,7 +86,7 @@ Route::middleware([
     Route::get('/flashcard/game/result', [FlashcardController::class, 'result'])->name('flashcard.results');
 
     /*MEDISEARCH API*/
-    Route::get('/medisearch', [MedisearchController::class, 'index'])->name('medisearch.index');
+    Route::get('/doctor-mbs', [MedisearchController::class, 'index'])->name('medisearch.index');
 
 
     Route::prefix('admin')

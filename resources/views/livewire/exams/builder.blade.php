@@ -229,8 +229,8 @@
         @csrf
         @method('POST')
         <input type="hidden" name="examCollection" value="{{ json_encode($examCollection) }}"/>
-        <input type="hidden" name="examTitle" value="{{ $examTitle }}"/>
-        <input type="hidden" name="examTime" value="{{ $examTime }}"/>
+        <input wire:model.live="examTitle" type="hidden" name="examTitle" value="{{ $examTitle }}"/>
+        <input wire:model.live="examTime" type="hidden" name="examTime" value="{{ $examTime }}"/>
         @error('examCollection')
         <span class="text-red-600 text-sm">{{ $message }}</span>
         @enderror

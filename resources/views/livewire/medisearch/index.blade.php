@@ -3,7 +3,7 @@
         <!-- Overlay para sidebar en móvil -->
         <div id="sidebarOverlay" class="fixed inset-0 z-20 hidden bg-black overlay bg-opacity-30" onclick="closeSidebar()"></div>
 
-        
+
         <!-- Sidebar con resizer -->
         <div class="flex-shrink-0 basis-1/8 min-w-[180px] max-w-[320px] h-full bg-white border-r border-[#e0e7ef] flex flex-col">
             <aside id="sidebar" class="fixed left-0 z-30 flex flex-col transition-all duration-300 bg-white shadow-lg sidebar-chat">
