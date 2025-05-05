@@ -62,47 +62,6 @@ class ExamBuilder extends Component
         $this->loadQuestionsAndUniversities();
     }
 
-
-
-
-//
-//    public function getCategories($area_id)
-//    {
-//        $area = Area::query()->find($area_id);
-//        if (!$area) {
-//            return;
-//        }
-//        $this->selectedArea = $area;
-//        $this->categories = Category::query()->with('tipos')->where('area_id', $area_id)->get();
-//        $this->selectedCategory = $this->categories->first();
-//        $this->selectedTipo = $this->selectedCategory?->tipos->first();
-//        $this->loadQuestionsAndUniversities();
-//    }
-//
-//    public function getTypes($category_id)
-//    {
-//        $category = Category::query()->find($category_id);
-//        if (!$category) {
-//            return;
-//        }
-//        $this->selectedCategory = $category;
-//        $this->tipos = Tipo::query()->where('category_id', $category_id)->get();
-//        $this->selectedTipo = $this->tipos->first();
-//        // Cargamos las preguntas y universidades disponibles para el tipo seleccionado
-//        $this->loadQuestionsAndUniversities();
-//    }
-//    public function setTypes($tipo_id)
-//    {
-//        $tipo = Tipo::query()->find($tipo_id);
-//        if (!$tipo) {
-//            return;
-//        }
-//        $this->selectedTipo = $tipo;
-//    }
-
-
-
-
     public function loadQuestionsAndUniversities()
     {
         if (!$this->selectedTipo) return;
@@ -134,8 +93,6 @@ class ExamBuilder extends Component
                 ->whereIn('question_id', DB::table('question_tipo')->where('tipo_id', $this->selectedTipo->id)->pluck('question_id'))
                 ->pluck('universidad_id'))->distinct()->get();
     }
-
-
 
     public function filterQuestions()
     {
@@ -215,7 +172,7 @@ class ExamBuilder extends Component
             'questions' => $this->examCollection,
             'user_id' => Auth::user()->id,
         ];
-
+        dd($request);
         session()->flash('success', 'Examen creado correctamente: ' . $this->examTitle);
 
         // Reiniciar las propiedades para volver al estado inicial.
