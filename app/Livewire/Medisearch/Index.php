@@ -31,10 +31,11 @@ class Index extends Component
     public $activeChatId = null; // ID del chat activo
     public $chatHistory = [];    // Historial de chats del usuario
     public $queryCount = 0;      // Contador de preguntas del mes
-    public $modelosIA = ['medisearch' => 'Medisearch', 'MBIA' => 'MBIA'];
+    public $modelosIA = ['medisearch' => 'MBIA', 'MBIA' => 'MBIA Experimental'];
     public $modeloIA = 'MBIA'; // Valor por defecto, puedes cambiarlo
     public $investigacionProfunda = false;
     public $config = true;
+    public $limit = 20;
 
     public function boot(
         MBIAService $MBIAService,
@@ -56,7 +57,7 @@ class Index extends Component
         $this->loadChatHistory();
         $config = Config::query()->where('tipo', 'services.MBAI.openai_quota_exceeded')->first();
         if (isset($config) && $config->value === 'true') {
-            $this->modelosIA = ['medisearch' => 'Medisearch'];
+            $this->modelosIA = ['medisearch' => 'MBIA'];
             $this->modeloIA = 'medisearch';
             $this->config = false;
         }
@@ -142,12 +143,13 @@ class Index extends Component
     {
         $user = Auth::user();
 
-        // Verifica límite de 100 preguntas mensuales para usuarios que no sean root
+        // Verifica límite de $limit  o 20 para los normales preguntas mensuales para usuarios que no sean root
         if (!$user->hasAnyRole('root', 'admin', 'colab', 'Rector')) {
-            if ($this->queryCount >= 100) {
+            $this->limit = Auth::user()->status == 0 ? 20 : 100;
+            if ($this->queryCount >= $this->limit) {
                 $this->messages[] = [
                     'from' => 'bot',
-                    'text' => 'Has alcanzado el límite de 100 preguntas por mes. Por favor, revisa nuestros planes de suscripción.',
+                    'text' => 'Has alcanzado el límite de '.$this->limit.' preguntas por mes. Por favor, revisa nuestros planes de suscripción.',
                 ];
                 $this->newMessage = '';
                 return;

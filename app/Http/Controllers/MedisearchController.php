@@ -18,11 +18,7 @@ class MedisearchController extends Controller
 
     public function index()
     {
-        if (in_array(Auth::user()->id, config('specialUsers.ids'))) {
-            return view('medisearch.index');
-        }
-
-        return (\auth()->user()->status == 1 || \auth()->user()->hasAnyRole('admin', 'root', 'colab', 'Rector')) ? view('medisearch.index') : redirect()->route('planes');
+        return view('medisearch.index');
     }
 
     public function chat($query){

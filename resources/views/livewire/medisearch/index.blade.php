@@ -112,10 +112,21 @@
                             <i class="fa-solid fa-arrow-right text-white"></i>
                         </button>
                     </div>
+                        <br>
+                        @if(!Auth::user()->hasRole('root'))
+                            <div class="p-2 text-sm text-gray-600 border-b border-gray-200">
+                                Has realizado {{ $queryCount }} preguntas este mes. Te quedan {{ $limit - $queryCount }}.
+                                @if($queryCount >= $limit)
+                                    Puedes volver a preguntar en
+                                    {{ \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::now()->endOfMonth()) }} días.
+                                @endif
+                            </div>
+                        @endif
+                        <br>
                     <div class="max-w- mx-auto 67rem">
                         <div class="absolute left-0 mt-6 ml-6 max-w-xs p-3 bg-white shadow rounded-lg bocadillo bocadillo-left">
                             <p class="text-sm text-[#333]">
-                                👋 El modelo MBIA es Optimo Para consultas Rapidas y
+                                👋 El modelo MBIA Experimental es Optimo Para consultas Rapidas y
                                 completas, puedes seleccionar la opcion investigacion profunda para que adjunte los Links
                                 de Investigacion.
                             </p>
@@ -123,7 +134,7 @@
 
                         <div class="absolute  right-0 mb-6 mr-6 max-w-xs p-3 bg-[#195b81] shadow rounded-lg text-white bocadillo bocadillo-right">
                             <p class="text-sm">
-                                📌 El Modelo Medisearch es perfecto para consultas de investigacion mas detalladas,
+                                📌 El Modelo MBIA es perfecto para consultas de investigacion mas detalladas,
                                 aunque puede ser mas Lento en consulta pero adjunta papers de investigacion de fuentes
                                 pubmed, elsevier, scopus, google scholar, web of science, ect...
                             </p>
@@ -131,15 +142,6 @@
                     </div>
                @endif
             </form>
-        @if(!Auth::user()->hasRole('root'))
-                <div class="p-2 text-sm text-gray-600 border-b border-gray-200">
-                    Has realizado {{ $queryCount }} preguntas este mes. Te quedan {{ 100 - $queryCount }}.
-                    @if($queryCount >= 100)
-                        Puedes volver a preguntar en
-                        {{ \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::now()->endOfMonth()) }} días.
-                    @endif
-                </div>
-            @endif
         </div>
     </div>
 </div>

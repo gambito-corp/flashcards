@@ -37,11 +37,11 @@ return [
     ],
     [
         'group'  => 'user',
-        'name'   => 'MediSearch',
+        'name'   => 'DoctorMBS',
         'route'  => 'medisearch.index',
         'active' => 'medisearch.index',
         'roles'  => ['admin', 'root', 'colab', 'Rector', 'user'],
-        'need_premium' => true
+        'need_premium' => false
     ],
     // ELEMENTOS EXCLUSIVOS VISTA ADMINISTRACIÓN
     [

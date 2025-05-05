@@ -5,11 +5,13 @@
 
             <!-- Usuarios nuevos -->
             <div class="bg-white rounded-lg shadow p-4">
+                Usuarios Totales: {{ $totalUsers }}
                 <livewire:admin.chart.new-users-chart />
             </div>
 
             <!-- Usuarios Premium nuevos -->
             <div class="bg-white rounded-lg shadow p-4">
+                Usuarios Premiun Totales: {{ $totalPremiumUsers }}
                 <livewire:admin.chart.new-premium-users-chart />
             </div>
 
