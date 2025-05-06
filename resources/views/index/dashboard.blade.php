@@ -19,16 +19,16 @@
                 </div>
             </div>
         </div>
-    @else 
+    @else
     <div class=" bg-white border-b border-gray-200  container-ask box-dashboard relative overflow-hidden max-sm:m-5 shadow-md nopadding-dashboard">
             <div class="mb-4 bg-[radial-gradient(circle, rgb(2,85,91), rgb(1,25,27))]">
                 <div class="grid grid-cols-2 relative">
                     <div class="span-2">
-                        <h2 class="mb-3 text-yellow-500 primary-color title-ask-container color-white">¿Tienes dudas médicas? ¡Pregúntale a MediSearch!</h2>
+                        <h2 class="mb-3 text-yellow-500 primary-color title-ask-container color-white">¿Tienes dudas médicas? ¡Pregúntale a DoctorMBS!</h2>
                         <hr>
                         <p class="pb-3">Con nuestro chatbot inteligente, obtén respuestas rápidas, confiables y claras sobre temas de salud, medicamentos, síntomas y mucho más.</p>
                         <a href="{{route('medisearch.index')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
-                            Ir a MediSearch<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
+                            Ir a DoctorMBS<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
                         </a>
                         <img class="img-dashboard__regret block w-[410px]" src="/chat-bot-medisearch.webp"  alt="mas info"/>
                     </div>
