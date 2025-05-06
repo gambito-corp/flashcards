@@ -79,6 +79,7 @@
                         <div class="flex absolute items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-6 py-4 shadow-lg">
                             <input type="text"
                                    wire:model.defer="newMessage"
+                                   wire:keydown.enter="sendMessage"
                                    class="relative flex-1 text-lg bg-transparent border-0 focus:ring-0 focus:outline-none text-[#195b81] placeholder-[#b0b8c1]"
                                    placeholder="Haz una pregunta de salud o biociencia...">
                             <button wire:click='openFilters' class="relative ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold">
@@ -89,42 +90,90 @@
                                 <span class="text-sm text-[#b0b8c1] font-bold mr-1">Investigacion Profunda </span>
                                 <input wire:model.live='deepResearch' type="checkbox" class="accent-[#195b81] scale-125">
                             </label>
-                            <button wire:click='sendMessage' wire:key.enter='sendMessage' class="relative ml-4 bg-[#3b82f6] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition">
+                            <button wire:click='sendMessage' class="relative ml-4 bg-[#3b82f6] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition">
                                 <i class="text-lg fa-solid fa-magnifying-glass"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Sugerencias -->
-                    <div class="w-full max-w-2xl mt-20">
-                        <div class="flex flex-col gap-3">
-                            <div class="flex items-center gap-2 mb-1 text-sm font-semibold text-gray-600">
+                    <div class="w-full max-w-2xl mt-20 space-y-8">
+
+                        {{-- Carrusel 1: Preguntas comunes --}}
+                        <div x-data="{
+                            questions: [
+                                '¿El deporte aumenta la esperanza de vida?',
+                                '¿Cuáles son las probabilidades de contraer cáncer?'
+                            ],
+                            current: 0
+                        }" class="space-y-2">
+                            <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
                                 <i class="fa-regular fa-lightbulb"></i>
                                 Comienza con preguntas comunes
                             </div>
-                            <div class="flex flex-wrap gap-2 mb-2">
-                                <button wire:click="setQuestion('¿El deporte aumenta la esperanza de vida?')"
-                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
-                                    ¿El deporte aumenta la esperanza de vida?
-                                </button>
-                                <button wire:click="setQuestion('¿Cuáles son las probabilidades de contraer cáncer?')"
-                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
-                                    ¿Cuáles son las probabilidades de contraer cáncer?
-                                </button>
+                    
+                            <div class="relative w-full max-w-md mx-auto overflow-hidden">
+                                <template x-for="(question, index) in questions" :key="index">
+                                    <div x-show="current === index" class="transition-all duration-300">
+                                        <button
+                                            @click="$wire.set('question', question)"
+                                            class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
+                                            <span x-text="question"></span>
+                                        </button>
+                                    </div>
+                                </template>
+                    
+                                <div class="absolute left-0 -translate-y-1/2 top-1/2">
+                                    <button @click="current = (current > 0) ? current - 1 : questions.length - 1"
+                                            class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+                                        ‹
+                                    </button>
+                                </div>
+                                <div class="absolute right-0 -translate-y-1/2 top-1/2">
+                                    <button @click="current = (current < questions.length - 1) ? current + 1 : 0"
+                                            class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+                                        ›
+                                    </button>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2 mb-1 text-sm font-semibold text-gray-600">
+                        </div>
+                    
+                        {{-- Carrusel 2: Preguntas complejas --}}
+                        <div x-data="{
+                            questions: [
+                                '¿La vacuna contra el COVID empeora la artritis?',
+                                '¿El control de la natalidad hormonal puede afectar la demografía?'
+                            ],
+                            current: 0
+                        }" class="space-y-2">
+                            <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
                                 <i class="fa-solid fa-flask"></i>
                                 Profundiza en preguntas complejas
                             </div>
-                            <div class="flex flex-wrap gap-2">
-                                <button wire:click="setQuestion('¿La vacuna contra el COVID empeora la artritis?')"
-                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
-                                    ¿La vacuna contra el COVID empeora la artritis?
-                                </button>
-                                <button wire:click="setQuestion('¿El control de la natalidad hormonal puede afectar la demografía?')"
-                                        class="bg-white border border-[#b0b8c1] text-[#195b81] rounded-full px-4 py-2 text-sm shadow hover:bg-[#f3f6fb] transition">
-                                    ¿El control de la natalidad hormonal puede afectar la demografía?
-                                </button>
+                    
+                            <div class="relative w-full max-w-md mx-auto overflow-hidden">
+                                <template x-for="(question, index) in questions" :key="index">
+                                    <div x-show="current === index" class="transition-all duration-300">
+                                        <button
+                                            @click="$wire.set('question', question)"
+                                            class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
+                                            <span x-text="question"></span>
+                                        </button>
+                                    </div>
+                                </template>
+                    
+                                <div class="absolute left-0 -translate-y-1/2 top-1/2">
+                                    <button @click="current = (current > 0) ? current - 1 : questions.length - 1"
+                                            class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+                                        ‹
+                                    </button>
+                                </div>
+                                <div class="absolute right-0 -translate-y-1/2 top-1/2">
+                                    <button @click="current = (current < questions.length - 1) ? current + 1 : 0"
+                                            class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+                                        ›
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -163,8 +212,17 @@
                                 <div id="answer-content" class="flex justify-start ml-48">
                                     <div class="flex justify-start w-4/5">
                                         <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
-                                            <div class="text-[#195b81]">
-                                                {!! $message['text'] !!}
+                                            @php
+                                                $content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $message['text']);
+                                            @endphp
+
+                                            <div id="answer-div"
+                                                class="text-[#195b81] answer-div"
+                                                x-data="typingEffectWithHtml()"
+                                                x-bind:data-content='@json($content)' 
+                                                x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
+                                            >
+                                                <span x-html="displayedHtml"></span>
                                             </div>
                                             @if(!empty($message['references']))
                                                 <div class="flex flex-wrap gap-2 mt-2">
@@ -277,6 +335,68 @@
             </div>
         </div>
     @endif
+    @if($openModalFilter)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+            <div class="bg-white w-[90vw] max-w-md rounded-2xl p-6 shadow-lg animate-in fade-in zoom-in-95 overflow-y-auto max-h-[90vh]">
+                {{-- Header --}}
+                <div class="flex items-center justify-between pb-3 mb-4 border-b">
+                    <h2 class="text-xl font-bold">Filtrar artículos</h2>
+                    <button wire:click="closeFilters" class="text-2xl text-gray-600 hover:text-gray-800">&times;</button>
+                </div>
+        
+                {{-- Filtro de fechas --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Desde</label>
+                    <input type="date" wire:model="from_date" class="w-full p-2 mt-1 border rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Hasta</label>
+                    <input type="date" wire:model="to_date" class="w-full p-2 mt-1 border rounded-md">
+                </div>
+        
+                {{-- Seleccionar/Deseleccionar todos --}}
+                <div class="flex justify-between mb-2">
+                    <button wire:click="selectAll" class="text-sm text-blue-600 hover:underline">Seleccionar todos</button>
+                    <button wire:click="deselectAll" class="text-sm text-red-600 hover:underline">Deseleccionar todos</button>
+                </div>
+        
+                {{-- Opciones de checkboxes --}}
+                <div class="space-y-2">
+                    <label class="block mb-1 font-medium">Fuentes</label>
+                    @foreach($fontOptions as $option)
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" wire:model="selectedOptions" value="{{ $option }}">
+                            <span>{{ $option }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                
+                {{-- Seleccionar/Deseleccionar todos --}}
+                <div class="flex justify-between mb-2">
+                    <button wire:click="selectTypeAll" class="text-sm text-blue-600 hover:underline">Seleccionar todos</button>
+                    <button wire:click="deselectTypeAll" class="text-sm text-red-600 hover:underline">Deseleccionar todos</button>
+                </div>
+        
+                {{-- Opciones de checkboxes --}}
+                <div class="space-y-2">
+                    <label class="block mb-1 font-medium">Tipo de artículos científicos</label>
+                    @foreach($typeOptions as $option)
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" wire:model="selectedTypeOptions" value="{{ $option }}">
+                            <span>{{ $option }}</span>
+                        </label>
+                    @endforeach
+                </div>
+        
+                {{-- Botón aplicar (opcional) --}}
+                <div class="flex justify-end mt-6">
+                    <button wire:click="closeFilters" class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Aplicar filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <script>
 // ===================Lettering===================
@@ -305,22 +425,48 @@
                 lastMessage.classList.add("animated");
             }
         });
-        observer.observe(document.getElementById("chat-messages"), { childList: true, subtree: true });
-        function animateText(element, callback) {
-            const message = element.textContent;
-            element.textContent = "";
-            let index = 0;
-            function typeWriter() {
-                if (index < message.length) {
-                    element.textContent += message.charAt(index);
-                    index++;
-                    setTimeout(typeWriter, 10);
-                } else if (callback) {
-                    callback(); // Ejecutar el callback después de la animación
+
+        function typeEffect(element, speed) {
+        const text = element.innerHTML;
+        element.innerHTML = "";
+        let i = 0;
+
+        function typing() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typing, speed);
+            }
+        }
+
+        typing();
+    }
+
+    const observera = new MutationObserver(function(mutationsList) {
+        for (const mutation of mutationsList) {
+            console.log(mutation);
+            // Detectar cambios en texto o nodos
+            if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                const answerDiv = document.getElementById("answer-div");
+                if (answerDiv && !answerDiv.dataset.animated) {
+                    console.log("Nuevo contenido detectado, aplicando efecto");
+                    answerDiv.dataset.animated = "true";
+                    typeEffect(answerDiv, 30);
                 }
             }
-            typeWriter();
         }
+    });
+
+    // Observar el contenedor general
+    const container = document.getElementById("answer-content");
+    if (container) {
+        observera.observe(container, { 
+            childList: true, 
+            subtree: true,
+            characterData: true // Escuchar también cambios de texto
+        });
+    }
+
     });
     // ======================== Fin del Lettering ?==============================
 
@@ -366,6 +512,7 @@
             toggle.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
                 toggle.classList.toggle('collapsed');
+                updateTogglePosition();
             });
 
             // Funciones para móvil
@@ -465,18 +612,35 @@
             window.addEventListener('resize', adjustContentMargin);
 
             adjustContentMargin();
+
+            const answerDivs = document.querySelectorAll('#answer-div');
+    
+            answerDivs.forEach(div => {
+                const text = div.innerHTML;
+                div.innerHTML = '';
+                
+                let i = 0;
+                const speed = 20; // Velocidad en milisegundos
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        div.innerHTML += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, speed);
+                    }
+                }
+                
+                typeWriter();
+            });
         });
 
-        function toggleSidebar() {
+        function updateTogglePosition() {
             const sidebar = document.getElementById('sidebar');
             const toggle = document.getElementById('sidebarToggle');
 
-            sidebar.classList.toggle('collapsed');
-
             if (sidebar.classList.contains('collapsed')) {
-                toggle.style.left = '10px'; // Posición cuando está colapsado
+                toggle.style.left = '10px';
             } else {
-                // Recupera la posición normal basada en el ancho del sidebar
                 toggle.style.left = (sidebar.offsetWidth + 15) + 'px';
             }
         }
@@ -507,6 +671,32 @@
                 }
             });
         });
+        function typingEffectWithHtml() {
+            return {
+                fullHtml: '',
+                displayedHtml: '',
+                currentIndex: 0,
+
+                startTyping(html) {
+                    this.fullHtml = html;
+                    this.typeNextCharacter();
+                },
+
+                typeNextCharacter() {
+                    if (this.currentIndex < this.fullHtml.length) {
+                        this.displayedHtml += this.fullHtml[this.currentIndex];
+                        this.currentIndex++;
+                        setTimeout(() => this.typeNextCharacter(), 20);
+                    }
+                }
+            };
+        }
+
+        function decodeHTMLEntities(str) {
+            let textarea = document.createElement('textarea');
+            textarea.innerHTML = str;
+            return textarea.value;
+        }
     </script>
 </div>
 
@@ -572,6 +762,9 @@
             transition: opacity 0.3s;
         }
 
+        .bg-\[\#f3f8fd\] {
+            z-index: auto;
+        }
         @media (max-width: 768px) {
             .sidebar-chat {
                 transform: translateX(-100%);
@@ -582,6 +775,49 @@
             .sidebar-toggle {
                 display: none;
             }
+        }
+        /* estilos del contenido de las respuestas*/
+        h1 {
+            color: #2a5d84; 
+        }
+        h2 {
+            color: #3a7ca5; 
+        }
+        p {
+            font-size: 1.1em; 
+        }
+        ul {
+            margin-left: 20px; 
+        }
+        .referencias { 
+            margin-top: 30px; background: #eaf1f8; padding: 15px; border-radius: 8px; 
+        }
+        .referencias h3 { 
+            color: #2a5d84; 
+        }
+        .referencias li { 
+            font-size: 0.98em; 
+        }
+        /*lettering */
+        .typewriter {
+            overflow: hidden; /* Oculta el texto que aún no aparece */
+            border-right: .15em solid #195b81; /* Efecto cursor */
+            white-space: pre-wrap; /* Mantiene los saltos de línea y espacios */
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+
+        /* Animación de tipeo */
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        /* Efecto de cursor parpadeando */
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #195b81; }
         }
     </style>
 @endpush

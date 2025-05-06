@@ -25,6 +25,25 @@ class Index extends Component
     public int|null $activeChatId, $editChatId;
     public string $editChatName, $activeChatTitle, $newMessage;
     public array $groupedChats, $chatGroupsOpen, $suggestedQuestions;
+    public $from_date;
+    public $to_date;
+    public $fromTypeDate;
+    public $toTypeDate;
+    public array $fontOptions = [
+        'Articulos cientificos',
+        'Libros',
+        'Directrices internacionales de salud',
+        'Guías de medicina',
+        'healthline',
+    ];
+    public array $typeOptions = [
+        'Metalanasis',
+        'Articulos de revisión',
+        'Ensayos clínicos',
+        'Otros',
+    ];
+    public array $selectedOptions = [];
+    public array $selectedTypeOptions = [];
 
 
     public function boot(
@@ -55,7 +74,7 @@ class Index extends Component
     }
     private function createFirstChat()
     {
-        $newChat = $this->chatService->createNewChat(
+        $firstChat = $this->chatService->createNewChat(
                 userId: Auth::id(),
                 title: 'Nuevo Chat ' . now()->format('d/m H:i')
             );
@@ -159,7 +178,8 @@ class Index extends Component
     }
     public function openFilters()
     {
-        dd($this->openModalFilter);
+        $this->openModalFilter = true;
+        //dd($this->openModalFilter);
     }
     public function closeEditModal()
     {
@@ -169,7 +189,8 @@ class Index extends Component
     }
     public function closeFilters()
     {
-        dd($this->openModalFilter);
+        $this->openModalFilter = false;
+        //dd($this->openModalFilter);
     }
     public function saveChatName()
     {
@@ -303,6 +324,26 @@ class Index extends Component
         $this->messages = collect();
         $this->openModalFilter = false;
         $this->deepResearch = false;
+    }
+
+    public function selectAll()
+    {
+        $this->selectedOptions = $this->fontOptions;
+    }
+
+    public function deselectAll()
+    {
+        $this->selectedOptions = [];
+    }
+
+    public function selectTypeAll()
+    {
+        $this->selectedTypeOptions = $this->typeOptions;
+    }
+
+    public function deselectTypeAll()
+    {
+        $this->selectedTypeOptions = [];
     }
 
 //    public $newMessage = '';
