@@ -15,6 +15,10 @@ class MedisearchController extends Controller
     {
         return view('medisearch.index');
     }
+    public function streamChat()
+    {
+        return view('medisearch.stream');
+    }
     public function conversation(Request $request, $chatId)
     {
         if($request->headers->get('key') === null)

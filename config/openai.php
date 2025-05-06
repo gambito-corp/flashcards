@@ -25,4 +25,9 @@ return [
     */
 
     'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
+    'http' => [
+        'headers' => [
+            'OpenAI-Beta' => 'assistants=v2'
+        ]
+    ]
 ];

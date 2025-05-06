@@ -1,7 +1,6 @@
 <div class="max-w-[67rem] mx-auto p-4 pt-[40px] md:pt-[70px] h-full main-chat-bot-mbs">
-<div class="overlay"></div>
     <!-- Sección de Historial de Chats -->
-    <div class="sidebar-chat bg-white z-0   p-9 m-0 fixed    rounded-[0px] md:rounded-[20px] z-10 left-5 transform md:-translate-x-[0%] -translate-x-[109%]">
+    <div class="sidebar-chat bg-white z-0 p-9 m-0 fixed    rounded-[0px] md:rounded-[20px] z-10 left-5 transform md:-translate-x-[0%] -translate-x-[109%]">
 
         <h3 class="text-lg font-bold mb-4 text-[#195b81]">Historial</h3>
         <hr>
@@ -19,7 +18,7 @@
     <!-- Boton historial movil -->
     <div class="history-chat-button fixed left-[20px] bottom-[15px] bg-white z-[999] px-[25px] py-[10px] rounded-full text-[14px] shadow-md md:hidden block"><i class="mr-1 fa-regular fa-message"></i>Historial</div>
     <!-- Área del Chat -->
-    <div class="flex flex-col mt-4  rounded-2xl content-chat__mbs">
+    <div class="flex flex-col mt-4 rounded-2xl content-chat__mbs">
         <!-- Chat Header -->
         <div class="p-4 md-4  md:mt-[0px]">
         <h2 class="text-[24px] md:text-[30px] font-extrabold text-[#195b81]" >¿En qué puedo ayudarte?</h2>

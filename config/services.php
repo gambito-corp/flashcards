@@ -47,6 +47,7 @@ return [
     ],
     'openAI' => [
         'base_url' => env('OPENAI_BASE_URL', 'https://api.medisearch.com'),
+        'base_url_v2' => env('AI_API_BASE_URL_V2', 'https://api.medisearch.com'),
         'token' => env('OPENAI_TOKEN'),
     ],
     'elsevier' => [

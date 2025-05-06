@@ -264,8 +264,15 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago'])->name('webhooks.mercadopago');
 
 
+
 if (config('app.env') === 'local'){
+    // routes/web.php
+    Route::get('chatv2', [MedisearchController::class, 'streamChat']);
+
     Route::get('prueba', function (){
+        //Instancia del servicio
+        $service = new App\Services\Usuarios\MBIAService();
+        $service->newFunction();
 
     });
 }

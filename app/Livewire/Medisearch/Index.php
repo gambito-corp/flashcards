@@ -227,7 +227,6 @@ class Index extends Component
         $this->messages[] = [
             'from' => 'user',
             'text' => $query,
-            'loading' => false,
         ];
 
         // Limpiar el input
@@ -269,13 +268,11 @@ class Index extends Component
                         'from' => 'bot',
                         'text' => $item['respuesta'],
                         'references' => $references,
-                        'loading' => true,
                     ];
                 } elseif ($item['tipo'] === 'articles' && !empty($item['articulos'])) {
                     $this->messages[] = [
                         'from' => 'articles',
                         'data' => $item['articulos'],
-                        'loading' => true,
                     ];
                 }
             }
