@@ -1,7 +1,7 @@
 <x-main-layout title="Bienvenido {{auth()->user()->name}}">
 
     @if(Auth::user()->status === 0)
-        <div class=" bg-white border-b border-gray-200  container-ask box-dashboard relative overflow-hidden max-sm:m-5 shadow-md nopadding-dashboard">
+        <div class="  box-dashboard relative overflow-hidden max-sm:m-5  tw-container_mbs m-auto">
             <div class="mb-4 bg-[radial-gradient(circle, rgb(2,85,91), rgb(1,25,27))]">
                 <div class="grid grid-cols-2 relative">
                     <div class="span-2">
@@ -20,17 +20,17 @@
             </div>
         </div>
     @else 
-    <div class=" bg-white border-b border-gray-200  container-ask box-dashboard relative overflow-hidden max-sm:m-5 shadow-md nopadding-dashboard">
+    <div class=" box-dashbbg-transparent bg-gradient-to-r from-[var(--primary-color)] to-[#1280B4] relative overflow-hidden max-sm:m-5 tw-container_mbs m-auto">
             <div class="mb-4 bg-[radial-gradient(circle, rgb(2,85,91), rgb(1,25,27))]">
                 <div class="grid grid-cols-2 relative">
                     <div class="span-2">
-                        <h2 class="mb-3 text-yellow-500 primary-color title-ask-container color-white">¿Tienes dudas médicas? ¡Pregúntale a MediSearch!</h2>
-                        <hr>
-                        <p class="pb-3">Con nuestro chatbot inteligente, obtén respuestas rápidas, confiables y claras sobre temas de salud, medicamentos, síntomas y mucho más.</p>
-                        <a href="{{route('medisearch.index')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
-                            Ir a MediSearch<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
+                        <h2 class="mb-3 font-black text-[20px] text-white">¿Tienes dudas médicas? ¡Pregúntale a MediSearch!</h2>
+                        <hr class="opacity-10">
+                        <p class="pb-5 text-white">Con nuestro chatbot inteligente, obtén respuestas rápidas, confiables y claras sobre temas de salud, medicamentos, síntomas y mucho más.</p>
+                        <a href="{{route('medisearch.index')}}" class="bg-white text-[var(--primary-color)] inline-flex items-center gap-[10px] px-[30px] py-[15px] text-[16px] rounded-[5px] font-semibold hover:bg-[rgb(255_255_255_/_90%)]">
+                            Ir a MediSearch<img class="w-[21px] " src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
                         </a>
-                        <img class="img-dashboard__regret block w-[410px]" src="/chat-bot-medisearch.webp"  alt="mas info"/>
+                        <img class="absolute top-0 right-0 mix-blend-luminosity block w-[410px]" src="/chat-bot-medisearch.webp"  alt="mas info"/>
                     </div>
                     <div class="col-span-3 flex items-center justify-center">
                         <i class="fal fa-graduation-cap fa-3x opacity-30"></i>
@@ -42,9 +42,9 @@
     <div class="">
 
         <!-- Card 2: Tabla de últimos exámenes realizados -->
-        <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 container-ask nopadding-dashboard">
+        <div class="mt-6 mb-6 bg-white tw-container_mbs m-auto">
             <div class="">
-                <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container ">Últimos Exámenes Realizados</h2>
+                <h2 class="font-bold mb-4 primary-color text-[17px] md:text-[20px] ">Últimos Exámenes Realizados</h2>
                 <hr>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -81,9 +81,9 @@
         </div>
 
         <!-- Card 3: Gráfico de evolución -->
-        <div class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 container-ask">
+        <div class="mb-6 bg-white tw-container_mbs m-auto">
             <div class="">
-                <h2 class="text-2xl font-bold mb-4 primary-color title-ask-container ">Evolución del Usuario</h2>
+                <h2 class="font-bold mb-4 primary-color text-[17px] md:text-[20px] ">Evolución del Usuario</h2>
                 <hr>
                 <!-- Selector para elegir el rango de tiempo -->
                 <select id="timeframe" class="mb-4 p-2 border rounded">

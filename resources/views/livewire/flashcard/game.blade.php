@@ -28,7 +28,7 @@
      }"
      x-on:touchstart="touchStart($event)"
      x-on:touchend="touchEnd($event)">
-
+    
      <h1 class="text-3xl font-bold mb-6 text-indigo-700 primary-color title-ask-container ">Juego de Flashcards</h1>
      <hr>
 
@@ -36,7 +36,6 @@
     @if($cards->isNotEmpty())
         @php
             $currentCard = $cards[$currentIndex] ?? null;
-            $last = count($cards)-1 == $currentIndex;
         @endphp
 
         @if($currentCard)
@@ -47,15 +46,15 @@
                          'slide-left': slideDirection === 'left',
                          'slide-right': slideDirection === 'right'
                      }">
-
+                    
                     <!-- Contenedor interno rotatorio con grid -->
                     <div class="card-inner w-full transition-transform duration-500 transform-style-3d"
                          :class="{ 'rotate-y-180': showAnswer }">
-
+                        
                         <!-- Cara frontal (pregunta) -->
                         <div class="card-face card-front bg-[#195b81] text-white p-10 rounded-[20px]">
                             <div class="box-content-answer">
-
+                                
                             <div class="flex justify-end">
                                 @if ($currentCard->imagen)
                                     <img class="img-answer cursor-pointer" src="{{ Storage::disk('s3')->temporaryUrl($currentCard->imagen, now()->addMinutes(10)) }}" alt="Imagen de la pregunta" onclick="openModal(this)">
@@ -83,7 +82,7 @@
 
                             <div class="flex justify-end">
                                 <!-- Aseguramos que la imagen de respuesta siempre se vea -->
-
+                    
                                 @if ($currentCard->imagen_respuesta)
                                     <img class="img-answer img-answer-response " src="{{ Storage::disk('s3')->temporaryUrl($currentCard->imagen_respuesta, now()->addMinutes(10)) }}" alt="Imagen de la respuesta" onclick="openModal(this)">
                                 @elseif($currentCard->url)
@@ -96,28 +95,28 @@
                             </div>
                             <div x-show="showAnswer" class="mt-6 flex flex-col md:flex-row gap-4">
                                 <button @click="
-
+                            
                                     setTimeout(() => {
                                         $wire.markCorrect();
                                         showAnswer = false;
                                     }, 400);
-                                " class="w-full py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700 transition duration-200 boton-success-m py-[15px] rounded-[10px] button-overlay" data-last="{{$last}}">
+                                " class="w-full py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700 transition duration-200 boton-success-m py-[15px] rounded-[10px] button-overlay">
                                     ✓ Correcto
                                 </button>
                                 <button @click="
-
+                                 
                                     setTimeout(() => {
                                         $wire.markIncorrect();
                                         showAnswer = false;
                                     }, 400);
-                                " class="w-full py-2 px-4 bg-red-600 text-white rounded hover:bg-red-700 transition duration-200 button-incorrect py-[15px] rounded-[10px] button-overlay"  data-last="{{$last}}">
+                                " class="w-full py-2 px-4 bg-red-600 text-white rounded hover:bg-red-700 transition duration-200 button-incorrect py-[15px] rounded-[10px] button-overlay">
                                     ✗ Incorrecto
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-
+          
             </div>
         @else
             <p class="text-center text-gray-700">No se encontró la flashcard actual.</p>
@@ -262,24 +261,25 @@ function closeModal() {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".button-overlay").forEach(button => {
-      const valorDataLast = button.getAttribute("data-last");
-      if(valorDataLast == 1) {
-          button.addEventListener("click", function () {
-              // Crear el overlay
-              const overlay = document.createElement("div");
-              overlay.className = "custom-overlay";
-              overlay.innerHTML = `
+    button.addEventListener("click", function () {
+      // Crear el overlay
+      const overlay = document.createElement("div");
+      overlay.className = "custom-overlay";
+      overlay.innerHTML = `
         <div class="overlay-content">
           <div class="overlay-icon spinner"></div>
           <div class="overlay-text">Calculando...</div>
         </div>
       `;
-              document.body.appendChild(overlay);
 
-          });
-      }
+      document.body.appendChild(overlay);
+    });
   });
 });
+
+</script>
+
+@endpush
 
 </script>
 

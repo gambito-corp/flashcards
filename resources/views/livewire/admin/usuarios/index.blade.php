@@ -1,10 +1,10 @@
 <div>
-    <div class="max-w-7xl mx-auto bg-white p-6 rounded shadow container-ask">
+    <div class=" mx-auto bg-white mb-10 mt-5 tw-container_w tw-container_mbs">
         <!-- Contenedor del enlace -->
         <div class="flex items-center justify-end mb-4 mt gap-2">
             <!-- Enlace en lugar de botón -->
             <a href="{{route('admin.usuarios.create')}}"
-               class="px-4 py-2 rounded text-white bg-green-500 hover:bg-green-600 flex items-center gap-2 button-add"
+               class="bg-[var(--secondary-color)] p-0 h-[40px] w-[40px] flex justify-center items-center rounded text-white mb-4 hover:bg-[#125b5f] transition duration-300"
                title="Crear usuario"
             >
                 <i class="fa-solid fa-plus"></i>
@@ -12,8 +12,8 @@
         </div>
 
         <!-- Select de paginación e Input de búsqueda (50% cada uno) -->
-        <div class="flex w-full mb-4 gap-2 form-container-ask form-table">
-            <select class="w-1/2 border rounded px-2 py-1 focus:outline-none">
+        <div class="flex flex-wrap lg:flex-nowrap w-full mb-4 mb-5 gap-5">
+            <select class="w-1/2 border-none rounded bg-[var(--background-color)] indent-2 text-[#7a7a7a] !important text-[15px] h-[50px] outline-none rounded-[5px] ">
                 <option value="10">10 por página</option>
                 <option value="20">20 por página</option>
                 <option value="50">50 por página</option>
@@ -23,7 +23,7 @@
             <input
                 type="text"
                 placeholder="Buscar..."
-                class="w-1/2 border rounded px-2 py-1 focus:outline-none search-input"
+                class="w-1/2 border-none bg-[var(--background-color)] indent-2 text-[#7a7a7a] !important text-[15px] h-[50px] outline-none rounded-[5px] search-input"
             />
         </div>
 
@@ -46,7 +46,7 @@
                 </thead>
                 <tbody class="text-gray-700">
                 @foreach($data as $item)
-                    <tr class="border-b last:border-0">
+                    <tr class="last:border-0">
                         <!-- Nº: número de orden usando $loop->iteration -->
                         <td class="px-4 py-2">{{ $loop->iteration }}</td>
                         <!-- Nombre -->
@@ -63,17 +63,17 @@
                         <!-- Verificación de Email -->
                         <td class="px-4 py-2 text-center">
                             @if($item->email_verified_at)
-                                <i class="fa-solid fa-check text-green-500"></i>
+                                <i class="fa-solid fa-check text-green-500 bg-[#dcffe9] rounded-full w-[25px] aspect-[1/1] flex justify-center items-center m-auto"></i>
                             @else
-                                <i class="fa-solid fa-xmark text-red-500"></i>
+                                <i class="fa-solid fa-xmark text-red-500 bg-[#ffebeb] rounded-full w-[25px] aspect-[1/1] flex justify-center items-center m-auto"></i>
                             @endif
                         </td>
                         <!-- Foto de Perfil -->
                         <td class="px-4 py-2">
                             @if ($item->profile_photo_path)
-                                <img src="{{ Storage::disk('s3')->temporaryUrl($item->profile_photo_path, now()->addMinutes(10)) }}" alt="Foto de Perfil" class="w-10 h-10 rounded-full">
+                                <img src="{{ Storage::disk('s3')->temporaryUrl($item->profile_photo_path, now()->addMinutes(10)) }}" alt="Foto de Perfil" class="m-auto w-10 h-10 rounded-full">
                             @else
-                                <img src="{{ $item->profile_photo_url }}" alt="Foto de Perfil" class="w-10 h-10 rounded-full">
+                                <img src="{{ $item->profile_photo_url }}" alt="Foto de Perfil" class="w-10 h-10 rounded-full m-auto">
                             @endif
                         </td>
                         <!-- Carreras Registradas -->

@@ -2,14 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Colores principales */
+  --primary-color: #195b81;
+  --secondary-color: #157b80;
+  --accent-color: #5b8080;
+  --background-color: #f7f7f7;
+  --text-color: #333333;
+}
+
+/* Alpine.js cloak support */
 [x-cloak] {
-    display: none;
+  display: none;
 }
 
 @layer components {
-    .title-mbs{ 
-        @apply bg-white ;
-    }
-    
+   strong{ @apply text-[#7a7a7a] font-semibold}
+  .title-mbs {
+    @apply bg-white;
+  }
 
+  .tw-container_mbs {
+    @apply p-10 rounded-[20px] max-w-[92rem];
+  }
+  .tw-container_w{
+    @apply max-w-[92rem];
+  }
+
+  table thead tr {
+    @apply  text-[#333333] text-[12px] uppercase border-b border-b-[var(--background-color)] h-[80px] ;
+  }
+
+  table thead tr th  {
+    @apply font-bold ;
+  }
+  table tbody tr{
+    @apply hover:bg-[rgb(247_247_247_/_50%)] transition duration-300 ease-in-out;
+}
+  table tbody td {
+    @apply h-[80px] text-[15px] text-[var(--text-color)] border-b border-b-[var(--background-color)] ;
+  }
+
+  @media (max-width: 620px) {
+    .tw-container_mbs {
+      @apply p-8;
+    }
+  }
 }

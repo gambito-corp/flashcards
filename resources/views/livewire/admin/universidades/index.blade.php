@@ -1,9 +1,10 @@
-<div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-lg border border-gray-200 container-ask">
+<div class="tw-container_w tw-container_mbs mx-auto bg-white  mb-10 mt-5">
     <!-- Encabezado con título y botón de crear -->
     <div class="flex justify-between items-center mb-4 m-25">
-        <h1 class="text-2xl font-bold primary-color title-ask-container">Universidades</h1>
+        <h1 class=" font-bold primary-color text-[17px] md:text-[20px]">Universidades</h1>
+    
         <a href="{{ route('admin.universidades.create') }}"
-           class="px-4 py-2 rounded text-white bg-green-500 hover:bg-green-600 flex items-center gap-2 button-add"
+           class="bg-[var(--secondary-color)] p-0 h-[40px] w-[40px] flex justify-center items-center rounded text-white mb-4 hover:bg-[#125b5f] transition duration-300"
            title="Crear Universidad"
         >
             <i class="fa-solid fa-plus"></i>
@@ -12,7 +13,7 @@
 
     <!-- Tabla de universidades -->
     <table class="min-w-full bg-white border">
-        <thead class="bg-gray-200">
+        <thead>
         <tr>
             <th class="px-4 py-2 text-left">Nº</th>
             <th class="px-4 py-2 text-left">Id</th>
