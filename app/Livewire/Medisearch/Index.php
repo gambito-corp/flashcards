@@ -21,10 +21,10 @@ class Index extends Component
     protected MBIAService $MBIAService;
     protected chatService $chatService;
     public Collection $chatHistory, $messages;
-    public bool $showEditModal, $openModalFilter, $deepResearch;
-    public int|null $activeChatId, $editChatId;
-    public string $editChatName, $activeChatTitle, $newMessage;
-    public array $groupedChats, $chatGroupsOpen, $suggestedQuestions;
+    public bool $showEditModal, $showDeleteModal, $openModalFilter, $deepResearch;
+    public int|null $activeChatId, $editChatId, $deleteChatId, $current, $currentAdvance;
+    public string $editChatName, $deleteChatName, $activeChatTitle, $newMessage, $question;
+    public array $groupedChats, $chatGroupsOpen, $suggestedQuestions, $questionsBasic, $questionsAdvanced;
     public $from_date;
     public $to_date;
     public $fromTypeDate;
@@ -63,8 +63,6 @@ class Index extends Component
     {
         return view('livewire.medisearch.index');
     }
-
-
     private function loadChatHistory()
     {
         $this->chatHistory = $this->chatService->loadChats(Auth::id());
@@ -106,8 +104,6 @@ class Index extends Component
                 $groups['El resto'][] = $chat;
             }
         }
-
-        // Filtrar grupos vacíos y mantener el orden
         $this->groupedChats = array_filter($groups, function($items) {
             return !empty($items);
         });
@@ -176,6 +172,13 @@ class Index extends Component
         $this->editChatName = $chat->title ?? '';
         $this->showEditModal = true;
     }
+    public function openDeleteModal($chatId)
+    {
+        $chat = $this->chatHistory->where('id', $chatId)->first();
+        $this->deleteChatId = $chatId;
+        $this->deleteChatName = $chat->title ?? '';
+        $this->showDeleteModal = true;
+    }
     public function openFilters()
     {
         $this->openModalFilter = true;
@@ -186,6 +189,16 @@ class Index extends Component
         $this->showEditModal = false;
         $this->editChatId = null;
         $this->editChatName = '';
+        $this->loadChatHistory();
+
+    }
+    public function closeDeleteModal()
+    {
+        $this->showDeleteModal = false;
+        $this->deleteChatId = null;
+        $this->deleteChatName = '';
+        $this->loadChatHistory();
+
     }
     public function closeFilters()
     {
@@ -197,6 +210,12 @@ class Index extends Component
         $this->chatService->updateTitle($this->editChatId, $this->editChatName, Auth::id());
         $this->loadChatHistory();
         $this->closeEditModal();
+    }
+    public function deleteChat()
+    {
+        $this->chatService->deleteChat($this->deleteChatId, Auth::id());
+        $this->loadChatHistory();
+        $this->closeDeleteModal();
     }
     public function createNewChat()
     {
@@ -268,7 +287,7 @@ class Index extends Component
                 'years' => [2015, 2025],
                 'types' => ["Meta Analysis",
                     "Clinical Trials"],
-                'lang' => 'es',
+                'lang' => 'es', // Por default en todos los Idiomas
             ]
         ];
         // Aquí deberías llamar a tu servicio de IA, por ejemplo:
@@ -309,9 +328,12 @@ class Index extends Component
     {
         $this->chatHistory = collect();
         $this->showEditModal = false;
+        $this->showDeleteModal = false;
         $this->activeChatId = null;
         $this->editChatId = null;
+        $this->deleteChatId = null;
         $this->editChatName = '';
+        $this->deleteChatName = '';
         $this->groupedChats = [];
         $this->chatGroupsOpen = [];
         $this->activeChatTitle = '';
@@ -324,6 +346,17 @@ class Index extends Component
         $this->messages = collect();
         $this->openModalFilter = false;
         $this->deepResearch = false;
+        $this->current = 0;
+        $this->currentAdvance = 0;
+        $this->question = '';
+        $this->questionsBasic = [
+            '¿El deporte aumenta la esperanza de vida?',
+            '¿Cuáles son las probabilidades de contraer cáncer?'
+        ];
+        $this->questionsAdvanced = [
+            '¿La vacuna contra el COVID empeora la artritis?',
+            '¿El control de la natalidad hormonal puede afectar la demografía?'
+        ];
     }
 
     public function selectAll()
@@ -344,6 +377,32 @@ class Index extends Component
     public function deselectTypeAll()
     {
         $this->selectedTypeOptions = [];
+    }
+    public function nextQuestion()
+    {
+        $this->current = ($this->current < count($this->questionsBasic) - 1)
+            ? $this->current + 1
+            : 0;
+    }
+
+    public function previousQuestion()
+    {
+        $this->current = ($this->current > 0)
+            ? $this->current - 1
+            : count($this->questionsBasic) - 1;
+    }
+    public function nextQuestionAdvance()
+    {
+        $this->currentAdvance = ($this->current < count($this->questionsAdvance) - 1)
+            ? $this->currentAdvance + 1
+            : 0;
+    }
+
+    public function previousQuestionAdvance()
+    {
+        $this->currentAdvance = ($this->current > 0)
+            ? $this->currentAdvance - 1
+            : count($this->questionsAdvance) - 1;
     }
 
 //    public $newMessage = '';

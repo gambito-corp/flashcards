@@ -69,6 +69,17 @@ class chatService
             ->orderBy('created_at', 'asc')
             ->get();
     }
+    public function deleteChat($chatId, $userId)
+    {
+        $chat = $this->findChat($chatId);
+        if ($chat->user_id !== $userId) {
+            throw new \Exception("No autorizado para eliminar este chat");
+        }
+        $chat->questions()->delete();
+        $chat->delete();
+
+        return true;
+    }
 
     public function askToOpenAI(array $messages, string $prompt)
     {

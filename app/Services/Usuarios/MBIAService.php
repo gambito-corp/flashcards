@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Client\RequestException;
 use OpenAI\Laravel\Facades\OpenAI;
 
-set_time_limit(120);
+set_time_limit(360);
 
 class MBIAService
 {

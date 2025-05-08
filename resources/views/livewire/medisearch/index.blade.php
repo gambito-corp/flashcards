@@ -42,6 +42,12 @@
                                                 title="Editar nombre">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
+                                        <!-- Botón eliminar -->
+                                        <button wire:click="openDeleteModal({{ $chat->id }})"
+                                                class="ml-2 text-red-500 transition opacity-70 hover:opacity-100"
+                                                title="Eliminar chat">
+                                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                        </button>
                                     </div>
                                 @endforeach
                             </div>
@@ -65,8 +71,14 @@
 
         <!-- Área principal del chat -->
         <div class="flex flex-col flex-1 h-full mx-4">
-            <div class="bg-black">
-                <p class="text-white" wire:loading='sendMessage'>HOLA MUNDO</p>
+            <div wire:loading="sendMessage" class="flex justify-start ml-40">
+                <div class="flex justify-start w-4/5">
+                    <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
+                        <div class="text-[#195b81] animate-pulse">
+                            <i class="mr-2 fa-solid fa-spinner fa-spin"></i> cargando...
+                        </div>
+                    </div>
+                </div>
             </div>
             @if($messages->isEmpty())
                 <!-- Estado 1: Pantalla de bienvenida -->
@@ -76,7 +88,8 @@
                     <div class="text-lg md:text-xl text-[#195b81] font-semibold mb-1">Respuestas <span class="text-[#3b82f6]">científicas</span> a preguntas médicas</div>
 
                     <div class="w-full max-w-2xl mt-8 mb-8">
-                        <div class="flex absolute items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-6 py-4 shadow-lg">
+                        <div class="flex absolute inset-x-0 mx-auto max-w-full items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-6 py-4 shadow-lg
+            md:flex-nowrap md:inset-auto md:mx-0 md:max-w-none">
                             <input type="text"
                                    wire:model.defer="newMessage"
                                    wire:keydown.enter="sendMessage"
@@ -87,7 +100,7 @@
                                 <span class="ml-1">Filtros</span>
                             </button>
                             <label class="relative flex items-center ml-4 cursor-pointer select-none">
-                                <span class="text-sm text-[#b0b8c1] font-bold mr-1">Investigacion Profunda </span>
+                                <span class="text-sm text-[#b0b8c1] font-bold mr-1">Medisearch </span>
                                 <input wire:model.live='deepResearch' type="checkbox" class="accent-[#195b81] scale-125">
                             </label>
                             <button wire:click='sendMessage' class="relative ml-4 bg-[#3b82f6] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition">
@@ -100,87 +113,93 @@
                     <div class="w-full max-w-2xl mt-20 space-y-8">
 
                         {{-- Carrusel 1: Preguntas comunes --}}
-                        <div x-data="{
-                            questions: [
-                                '¿El deporte aumenta la esperanza de vida?',
-                                '¿Cuáles son las probabilidades de contraer cáncer?'
-                            ],
-                            current: 0
-                        }" class="space-y-2">
+                        <div class="space-y-2">
                             <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
                                 <i class="fa-regular fa-lightbulb"></i>
                                 Comienza con preguntas comunes
                             </div>
-                    
-                            <div class="relative w-full max-w-md mx-auto overflow-hidden">
-                                <template x-for="(question, index) in questions" :key="index">
-                                    <div x-show="current === index" class="transition-all duration-300">
-                                        <button
-                                            @click="$wire.set('question', question)"
-                                            class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
-                                            <span x-text="question"></span>
-                                        </button>
-                                    </div>
-                                </template>
-                    
-                                <div class="absolute left-0 -translate-y-1/2 top-1/2">
-                                    <button @click="current = (current > 0) ? current - 1 : questions.length - 1"
+
+                            <div class="relative w-full max-w-md mx-auto overflow-visible">
+                                @foreach($questionsBasic as $index => $question)
+                                    @if($current === $index)
+                                        <div class="transition-all duration-300">
+                                            <button
+                                                wire:click="$set('question', '{{ $question }}')"
+                                                class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
+                                                {{ $question }}
+                                            </button>
+                                        </div>
+                                    @endif
+                                @endforeach
+
+                                <div class="absolute z-10 -translate-y-1/2 -left-4 top-1/2 md:-left-6">
+                                    <button wire:click="previousQuestion"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-                                        ‹
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M15 19l-7-7 7-7"/>
+                                        </svg>
                                     </button>
                                 </div>
-                                <div class="absolute right-0 -translate-y-1/2 top-1/2">
-                                    <button @click="current = (current < questions.length - 1) ? current + 1 : 0"
+
+                                <div class="absolute z-10 -translate-y-1/2 -right-4 top-1/2 md:-right-6">
+                                    <button wire:click="nextQuestion"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-                                        ›
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M9 5l7 7-7 7"/>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    
+
+
                         {{-- Carrusel 2: Preguntas complejas --}}
-                        <div x-data="{
-                            questions: [
-                                '¿La vacuna contra el COVID empeora la artritis?',
-                                '¿El control de la natalidad hormonal puede afectar la demografía?'
-                            ],
-                            current: 0
-                        }" class="space-y-2">
+                        <div class="space-y-2">
                             <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
                                 <i class="fa-solid fa-flask"></i>
                                 Profundiza en preguntas complejas
                             </div>
-                    
-                            <div class="relative w-full max-w-md mx-auto overflow-hidden">
-                                <template x-for="(question, index) in questions" :key="index">
-                                    <div x-show="current === index" class="transition-all duration-300">
-                                        <button
-                                            @click="$wire.set('question', question)"
-                                            class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
-                                            <span x-text="question"></span>
-                                        </button>
-                                    </div>
-                                </template>
-                    
-                                <div class="absolute left-0 -translate-y-1/2 top-1/2">
-                                    <button @click="current = (current > 0) ? current - 1 : questions.length - 1"
+
+                            <div class="relative w-full max-w-md mx-auto overflow-visible">
+                                @foreach($questionsAdvanced as $index => $question)
+                                    @if($currentAdvance === $index)
+                                        <div class="transition-all duration-300">
+                                            <button
+                                                wire:click="$set('question', '{{ $question }}')"
+                                                class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
+                                                {{ $question }}
+                                            </button>
+                                        </div>
+                                    @endif
+                                @endforeach
+
+                                <div class="absolute z-10 -translate-y-1/2 -left-4 top-1/2 md:-left-6">
+                                    <button wire:click="nextQuestionAdvance"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-                                        ‹
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M15 19l-7-7 7-7"/>
+                                        </svg>
                                     </button>
                                 </div>
-                                <div class="absolute right-0 -translate-y-1/2 top-1/2">
-                                    <button @click="current = (current < questions.length - 1) ? current + 1 : 0"
+
+                                <div class="absolute z-10 -translate-y-1/2 -right-4 top-1/2 md:-right-6">
+                                    <button wire:click="previousQuestionAdvance"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-                                        ›
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M9 5l7 7-7 7"/>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Enlace informativo -->
-                    <div class="mt-10">
-                        <a href="#" class="text-[#3b82f6] text-sm underline hover:text-[#195b81] transition">¿Qué es MediSearch?</a>
                     </div>
                 </div>
 
@@ -219,7 +238,7 @@
                                             <div id="answer-div"
                                                 class="text-[#195b81] answer-div"
                                                 x-data="typingEffectWithHtml()"
-                                                x-bind:data-content='@json($content)' 
+                                                x-bind:data-content='@json($content)'
                                                 x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
                                             >
                                                 <span x-html="displayedHtml"></span>
@@ -272,15 +291,6 @@
 
                             @endif
                         @endforeach
-                        <div wire:loading="sendMessage" class="flex justify-start ml-10">
-                            <div class="flex justify-start w-4/5">
-                                <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
-                                    <div class="text-[#195b81] animate-pulse">
-                                        <i class="mr-2 fa-solid fa-spinner fa-spin"></i> cargando...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <!-- Input de seguimiento -->
                     <div class="p-4 bg-white border-t border-[#d9e6f7]">
@@ -335,6 +345,26 @@
             </div>
         </div>
     @endif
+    @if($showDeleteModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="relative w-full max-w-sm p-6 bg-white shadow-lg rounded-xl">
+                <button class="absolute text-gray-400 top-3 right-3 hover:text-gray-600"
+                        wire:click="closeDeleteModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <h2 class="text-lg font-bold text-[#195b81] mb-4">Editar nombre del chat</h2>
+                <form wire:submit.prevent="deleteChat">
+                    <h1>Eliminar Este Chat</h1>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" wire:click="closeDeleteModal"
+                                class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancelar</button>
+                        <button type="submit"
+                                class="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-800">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
     @if($openModalFilter)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
             <div class="bg-white w-[90vw] max-w-md rounded-2xl p-6 shadow-lg animate-in fade-in zoom-in-95 overflow-y-auto max-h-[90vh]">
@@ -343,7 +373,7 @@
                     <h2 class="text-xl font-bold">Filtrar artículos</h2>
                     <button wire:click="closeFilters" class="text-2xl text-gray-600 hover:text-gray-800">&times;</button>
                 </div>
-        
+
                 {{-- Filtro de fechas --}}
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Desde</label>
@@ -353,13 +383,13 @@
                     <label class="block text-sm font-medium text-gray-700">Hasta</label>
                     <input type="date" wire:model="to_date" class="w-full p-2 mt-1 border rounded-md">
                 </div>
-        
+
                 {{-- Seleccionar/Deseleccionar todos --}}
                 <div class="flex justify-between mb-2">
                     <button wire:click="selectAll" class="text-sm text-blue-600 hover:underline">Seleccionar todos</button>
                     <button wire:click="deselectAll" class="text-sm text-red-600 hover:underline">Deseleccionar todos</button>
                 </div>
-        
+
                 {{-- Opciones de checkboxes --}}
                 <div class="space-y-2">
                     <label class="block mb-1 font-medium">Fuentes</label>
@@ -370,13 +400,13 @@
                         </label>
                     @endforeach
                 </div>
-                
+
                 {{-- Seleccionar/Deseleccionar todos --}}
                 <div class="flex justify-between mb-2">
                     <button wire:click="selectTypeAll" class="text-sm text-blue-600 hover:underline">Seleccionar todos</button>
                     <button wire:click="deselectTypeAll" class="text-sm text-red-600 hover:underline">Deseleccionar todos</button>
                 </div>
-        
+
                 {{-- Opciones de checkboxes --}}
                 <div class="space-y-2">
                     <label class="block mb-1 font-medium">Tipo de artículos científicos</label>
@@ -387,7 +417,7 @@
                         </label>
                     @endforeach
                 </div>
-        
+
                 {{-- Botón aplicar (opcional) --}}
                 <div class="flex justify-end mt-6">
                     <button wire:click="closeFilters" class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
@@ -460,8 +490,8 @@
     // Observar el contenedor general
     const container = document.getElementById("answer-content");
     if (container) {
-        observera.observe(container, { 
-            childList: true, 
+        observera.observe(container, {
+            childList: true,
             subtree: true,
             characterData: true // Escuchar también cambios de texto
         });
@@ -614,14 +644,14 @@
             adjustContentMargin();
 
             const answerDivs = document.querySelectorAll('#answer-div');
-    
+
             answerDivs.forEach(div => {
                 const text = div.innerHTML;
                 div.innerHTML = '';
-                
+
                 let i = 0;
                 const speed = 20; // Velocidad en milisegundos
-                
+
                 function typeWriter() {
                     if (i < text.length) {
                         div.innerHTML += text.charAt(i);
@@ -629,7 +659,7 @@
                         setTimeout(typeWriter, speed);
                     }
                 }
-                
+
                 typeWriter();
             });
         });
@@ -778,25 +808,25 @@
         }
         /* estilos del contenido de las respuestas*/
         h1 {
-            color: #2a5d84; 
+            color: #2a5d84;
         }
         h2 {
-            color: #3a7ca5; 
+            color: #3a7ca5;
         }
         p {
-            font-size: 1.1em; 
+            font-size: 1.1em;
         }
         ul {
-            margin-left: 20px; 
+            margin-left: 20px;
         }
-        .referencias { 
-            margin-top: 30px; background: #eaf1f8; padding: 15px; border-radius: 8px; 
+        .referencias {
+            margin-top: 30px; background: #eaf1f8; padding: 15px; border-radius: 8px;
         }
-        .referencias h3 { 
-            color: #2a5d84; 
+        .referencias h3 {
+            color: #2a5d84;
         }
-        .referencias li { 
-            font-size: 0.98em; 
+        .referencias li {
+            font-size: 0.98em;
         }
         /*lettering */
         .typewriter {
