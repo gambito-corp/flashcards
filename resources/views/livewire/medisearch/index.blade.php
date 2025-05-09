@@ -612,66 +612,43 @@
                 overlay.classList.add('hidden');
             }
 
+            function updateContentMargins(isMobile, sidebar, elements) {
+                // elements = [mainContent, chatContent, dateContent, answerContent]
+
+                // Define los posibles márgenes según el contexto
+                let removeClasses, addClass;
+
+                if (isMobile) {
+                    removeClasses = ['ml-20', 'ml-48'];
+                    addClass = 'ml-0';
+                } else if (sidebar.classList.contains('collapsed')) {
+                    removeClasses = ['ml-48', 'ml-0'];
+                    addClass = 'ml-20';
+                } else {
+                    removeClasses = ['ml-20', 'ml-0'];
+                    addClass = 'ml-48';
+                }
+
+                // Aplica los cambios a todos los elementos de la lista
+                elements.forEach(el => {
+                    if (el) {
+                        el.classList.remove(...removeClasses);
+                        el.classList.add(addClass);
+                    }
+                });
+            }
+
             function adjustContentMargin() {
                 const dateContent = document.getElementById('date-content');
                 const answerContent = document.getElementById('answer-content');
 
                 const isMobile = window.innerWidth <= 768;
 
-                if (isMobile) {
-                    if (mainContent) {
-                        mainContent.classList.remove('ml-20', 'ml-48');
-                        mainContent.classList.add('ml-0');
-                    }
-                    if (chatContent) {
-                        chatContent.classList.remove('ml-20', 'ml-48');
-                        chatContent.classList.add('ml-0');
-                    }
-                    if (dateContent) {
-                        dateContent.classList.remove('ml-20', 'ml-48');
-                        dateContent.classList.add('ml-0');
-                    }
-                    if (answerContent) {
-                        answerContent.classList.remove('ml-20', 'ml-48');
-                        answerContent.classList.add('ml-0');
-                    }
-                } else {
-                    if (sidebar.classList.contains('collapsed')) {
-                        if (mainContent) {
-                            mainContent.classList.remove('ml-48', 'ml-0');
-                            mainContent.classList.add('ml-20');
-                        }
-                        if (chatContent) {
-                            chatContent.classList.remove('ml-48', 'ml-0');
-                            chatContent.classList.add('ml-20');
-                        }
-                        if (dateContent) {
-                            dateContent.classList.remove('ml-48', 'ml-0');
-                            dateContent.classList.add('ml-20');
-                        }
-                        if (answerContent) {
-                            answerContent.classList.remove('ml-48', 'ml-0');
-                            answerContent.classList.add('ml-20');
-                        }
-                    } else {
-                        if (mainContent) {
-                            mainContent.classList.remove('ml-20', 'ml-0');
-                            mainContent.classList.add('ml-48');
-                        }
-                        if (chatContent) {
-                            chatContent.classList.remove('ml-20', 'ml-0');
-                            chatContent.classList.add('ml-48');
-                        }
-                        if (dateContent) {
-                            dateContent.classList.remove('ml-20', 'ml-0');
-                            dateContent.classList.add('ml-48');
-                        }
-                        if (answerContent) {
-                            answerContent.classList.remove('ml-20', 'ml-0');
-                            answerContent.classList.add('ml-48');
-                        }
-                    }
-                }
+                updateContentMargins(
+                    isMobile,
+                    sidebar,
+                    [mainContent, chatContent, dateContent, answerContent]
+                );
             }
 
             if (toggle) {
