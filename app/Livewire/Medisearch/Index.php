@@ -26,11 +26,8 @@ class Index extends Component
     public string $editChatName, $deleteChatName, $activeChatTitle, $newMessage, $question;
     public array $groupedChats, $chatGroupsOpen, $suggestedQuestions, $questionsBasic, $questionsAdvanced, $fontOptions,
         $typeOptions, $selectedOptions, $selectedTypeOptions;
-    public $from_date;
-    public $to_date;
-    public $fromTypeDate;
-    public $toTypeDate;
-
+    public $from_date = 1890;
+    public $to_date = 2025;
 
     private function setingProps()
     {
@@ -63,6 +60,9 @@ class Index extends Component
             'otros',
         ];
         $this->selectedOptions = ["PubMed"];
+
+        $this->selectAll();
+        $this->selectTypeAll();
 
 //
 //        $this->questionsBasic = $this->chatService->getMostInterestingQuestions()['preguntas'] ?? [];
@@ -343,8 +343,10 @@ class Index extends Component
         }
 
         dd(
-            $this->fromTypeDate,
-            $this->toTypeDate
+            $this->selectedOptions,
+            $this->selectedTypeOptions,
+            $this->from_date,
+            $this->to_date
         );
 
         $client = $this->deepResearch ? 'medisearch' : 'MBIA';
