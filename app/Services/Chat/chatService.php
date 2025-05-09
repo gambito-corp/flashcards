@@ -4,6 +4,7 @@ namespace App\Services\Chat;
 
 use App\Models\MedisearchChat;
 use App\Models\MedisearchQuestion;
+use Carbon\Carbon;
 use OpenAI\Laravel\Facades\OpenAI;
 
 class chatService
@@ -160,7 +161,6 @@ class chatService
         );
     }
 
-
     private function createOrGetThread(): string
     {
         if (!$this->threadId) {
@@ -170,7 +170,89 @@ class chatService
         return $this->threadId;
     }
 
+    private function getQuestions(): array
+    {
+        $preguntas = MedisearchQuestion::orderBy('id', 'desc')
+            ->pluck('query')
+            ->toArray();
 
+        $preguntasUnicas = [];
+        $vistos = [];
+
+        foreach ($preguntas as $pregunta) {
+            if (!in_array($pregunta, $vistos, true)) {
+                $preguntasUnicas[] = $pregunta;
+                $vistos[] = $pregunta;
+            }
+        }
+        return array_slice($preguntasUnicas, 0, 100);
+    }
+
+    public function getMostInterestingQuestions(): array
+    {
+        $questions = $this->getQuestions();
+
+        if (empty($questions)) return [];
+
+        $prompt = <<<EOT
+            Eres un experto en educación médica. Analiza la siguiente lista de preguntas y selecciona
+            únicamente aquellas que sean de contenido médico, ignorando cualquier pregunta que no esté
+            relacionada con medicina. De entre las preguntas médicas, elige las 5 más interesantes y útiles
+            para un estudiante de medicina. Devuelve exclusivamente un array JSON plano con las preguntas
+            Devuelve exclusivamente un objeto JSON con la clave "preguntas" que contenga un array plano con las preguntas
+            seleccionadas, por ejemplo: {"preguntas": ["Pregunta 1", ...]}
+            EOT;
+
+        return $this->selectQuestionsWithOpenAI($questions, $prompt);
+    }
+
+    public function getMostDifficultQuestions(array $exclude = []): array
+    {
+        $questions = $this->getQuestions();
+
+        // Excluye las preguntas ya seleccionadas como "más interesantes"
+        $questions = array_values(array_diff($questions, $exclude));
+
+        if (empty($questions)) return [];
+
+        // Incluye la lista de exclusión en el prompt para mayor robustez
+        $excludeList = json_encode($exclude, JSON_UNESCAPED_UNICODE);
+
+        $prompt = <<<EOT
+            Eres un experto en educación médica. Analiza la siguiente lista de preguntas y selecciona
+            únicamente aquellas que sean de contenido médico, ignorando cualquier pregunta que no esté
+            relacionada con medicina. De entre las preguntas médicas, elige las 5 más difíciles de responder.
+            No incluyas ninguna de las siguientes preguntas ya seleccionadas: $excludeList.
+            Devuelve exclusivamente un objeto JSON con la clave "preguntas" que contenga un array plano con las preguntas
+            seleccionadas, por ejemplo: {"preguntas": ["Pregunta 1", ...]}
+            No incluyas explicaciones ni texto adicional.
+            EOT;
+
+        return $this->selectQuestionsWithOpenAI($questions, $prompt);
+    }
+
+    private function selectQuestionsWithOpenAI(array $questions, string $prompt): array
+    {
+        $content = $prompt . "\n\nLista de preguntas:\n" . json_encode($questions, JSON_UNESCAPED_UNICODE);
+
+        $response = OpenAI::chat()->create([
+            'model' => 'gpt-4.1-nano-2025-04-14',
+            'messages' => [
+                ['role' => 'system', 'content' => $this->systemPrompt],
+                ['role' => 'user', 'content' => $content],
+            ],
+            'temperature' => 0.3,
+            'max_tokens' => 512,
+            'response_format' => ['type' => 'json_object'],
+        ]);
+
+        // Extrae el array JSON de la respuesta
+        $output = $response->choices[0]->message->content ?? '';
+        $selected = json_decode($output, true);
+
+        // Si OpenAI responde con un array, devuélvelo; si no, devuelve vacío
+        return is_array($selected) ? $selected : [];
+    }
 
 
 }

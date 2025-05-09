@@ -24,45 +24,85 @@ class Index extends Component
     public bool $showEditModal, $showDeleteModal, $openModalFilter, $deepResearch;
     public int|null $activeChatId, $editChatId, $deleteChatId, $current, $currentAdvance;
     public string $editChatName, $deleteChatName, $activeChatTitle, $newMessage, $question;
-    public array $groupedChats, $chatGroupsOpen, $suggestedQuestions, $questionsBasic, $questionsAdvanced;
+    public array $groupedChats, $chatGroupsOpen, $suggestedQuestions, $questionsBasic, $questionsAdvanced, $fontOptions,
+        $typeOptions, $selectedOptions, $selectedTypeOptions;
     public $from_date;
     public $to_date;
     public $fromTypeDate;
     public $toTypeDate;
-    public array $fontOptions = [
-        'Articulos cientificos',
-        'Libros',
-        'Directrices internacionales de salud',
-        'Guías de medicina',
-        'healthline',
-    ];
-    public array $typeOptions = [
-        'Metalanasis',
-        'Articulos de revisión',
-        'Ensayos clínicos',
-        'Otros',
-    ];
-    public array $selectedOptions = [];
-    public array $selectedTypeOptions = [];
 
 
-    public function boot(
-        MBIAService $MBIAService,
-        chatService $chatService
-    ){
+    private function setingProps()
+    {
+        $this->chatHistory = collect();
+        $this->showEditModal = false;
+        $this->showDeleteModal = false;
+        $this->activeChatId = null;
+        $this->editChatId = null;
+        $this->deleteChatId = null;
+        $this->editChatName = '';
+        $this->deleteChatName = '';
+        $this->groupedChats = [];
+        $this->chatGroupsOpen = [];
+        $this->activeChatTitle = '';
+        $this->suggestedQuestions = [];
+        $this->messages = collect();
+        $this->openModalFilter = false;
+        $this->deepResearch = false;
+        $this->current = 0;
+        $this->currentAdvance = 0;
+        $this->question = '';
+        $this->fontOptions = [
+            'PubMed',
+        ];
+        $this->typeOptions = [
+            'Meta Analyses',
+            'Reviews',
+            'Clinical Trials',
+            'Observational Studies',
+            'otros',
+        ];
+        $this->selectedOptions = ["PubMed"];
+
+//
+//        $this->questionsBasic = $this->chatService->getMostInterestingQuestions()['preguntas'] ?? [];
+//        $this->questionsAdvanced = $this->chatService->getMostDifficultQuestions($this->questionsBasic)['preguntas'] ?? [];
+//        if (count($this->questionsAdvanced) > 0)
+//        {
+        $this->questionsAdvanced = [
+            '¿La vacuna contra el COVID empeora la artritis?',
+            '¿El control de la natalidad hormonal puede afectar la demografía?'
+        ];
+//        }
+//        if (count($this->questionsBasic) > 0)
+//        {
+        $this->questionsBasic = [
+            '¿El deporte aumenta la esperanza de vida?',
+            '¿Cuáles son las probabilidades de contraer cáncer?'
+        ];
+//        }
+    }
+
+
+
+    public function boot(MBIAService $MBIAService, chatService $chatService)
+    {
         $this->MBIAService = $MBIAService;
         $this->chatService = $chatService;
     }
+
     public function mount()
     {
         $this->setingProps();
         $this->loadChatHistory();
         $this->groupChatsByAge();
     }
+
     public function render()
     {
         return view('livewire.medisearch.index');
     }
+
     private function loadChatHistory()
     {
         $this->chatHistory = $this->chatService->loadChats(Auth::id());
@@ -70,14 +110,16 @@ class Index extends Component
             ? $this->chatHistory->first()->id
             : $this->createFirstChat();
     }
+
     private function createFirstChat()
     {
         $firstChat = $this->chatService->createNewChat(
-                userId: Auth::id(),
-                title: 'Nuevo Chat ' . now()->format('d/m H:i')
-            );
+            userId: Auth::id(),
+            title: 'Nuevo Chat ' . now()->format('d/m H:i')
+        );
         return $firstChat->id;
     }
+
     private function groupChatsByAge()
     {
         $now = now();
@@ -104,21 +146,23 @@ class Index extends Component
                 $groups['El resto'][] = $chat;
             }
         }
-        $this->groupedChats = array_filter($groups, function($items) {
+        $this->groupedChats = array_filter($groups, function ($items) {
             return !empty($items);
         });
 
         // Inicializar el estado de apertura de cada grupo (abierto por defecto)
-        foreach(array_keys($this->groupedChats) as $group) {
+        foreach (array_keys($this->groupedChats) as $group) {
             if (!isset($this->chatGroupsOpen[$group])) {
                 $this->chatGroupsOpen[$group] = true;
             }
         }
     }
+
     public function toggleChatGroup($group)
     {
         $this->chatGroupsOpen[$group] = !($this->chatGroupsOpen[$group] ?? false);
     }
+
     public function selectChat($chatId)
     {
         $this->loadChatMessages($chatId);
@@ -165,6 +209,7 @@ class Index extends Component
                 return $messages;
             });
     }
+
     public function openEditModal($chatId)
     {
         $chat = $this->chatHistory->where('id', $chatId)->first();
@@ -172,6 +217,7 @@ class Index extends Component
         $this->editChatName = $chat->title ?? '';
         $this->showEditModal = true;
     }
+
     public function openDeleteModal($chatId)
     {
         $chat = $this->chatHistory->where('id', $chatId)->first();
@@ -179,11 +225,13 @@ class Index extends Component
         $this->deleteChatName = $chat->title ?? '';
         $this->showDeleteModal = true;
     }
+
     public function openFilters()
     {
         $this->openModalFilter = true;
         //dd($this->openModalFilter);
     }
+
     public function closeEditModal()
     {
         $this->showEditModal = false;
@@ -192,6 +240,7 @@ class Index extends Component
         $this->loadChatHistory();
 
     }
+
     public function closeDeleteModal()
     {
         $this->showDeleteModal = false;
@@ -200,23 +249,27 @@ class Index extends Component
         $this->loadChatHistory();
 
     }
+
     public function closeFilters()
     {
         $this->openModalFilter = false;
         //dd($this->openModalFilter);
     }
+
     public function saveChatName()
     {
         $this->chatService->updateTitle($this->editChatId, $this->editChatName, Auth::id());
         $this->loadChatHistory();
         $this->closeEditModal();
     }
+
     public function deleteChat()
     {
         $this->chatService->deleteChat($this->deleteChatId, Auth::id());
         $this->loadChatHistory();
         $this->closeDeleteModal();
     }
+
     public function createNewChat()
     {
         try {
@@ -234,11 +287,52 @@ class Index extends Component
             $this->dispatch('error', message: 'Error al crear nuevo chat: ' . $e->getMessage());
         }
     }
+
     public function setQuestion($question)
     {
         $this->newMessage = $question;
         $this->sendMessage();
     }
+
+    public function updatedDeepResearch($value)
+    {
+        // Aquí pones la lógica que quieras ejecutar cada vez que cambie deepResearch
+        $this->deselectAll();
+        $this->deselectTypeAll();
+        $this->setActiveFilters($value);
+    }
+    private function setActiveFilters($deep)
+    {
+        if ($deep) {
+            $this->fontOptions = [
+                'Articulos cientificos',
+                'Libros',
+                'Directrices internacionales de salud',
+                'Guías de medicina',
+                'healthline',
+            ];
+            $this->typeOptions = [
+                'Metalanasis',
+                'Articulos de revisión',
+                'Ensayos clínicos',
+                'Otros',
+            ];
+        } else {
+            $this->selectedOptions = ["PubMed"];
+            $this->fontOptions = [
+                'PubMed',
+            ];
+            $this->typeOptions = [
+                'Meta Analyses',
+                'Reviews',
+                'Clinical Trials',
+                'Observational Studies',
+                'Otros',
+            ];
+        }
+    }
+
+
     public function sendMessage()
     {
         // Validar que haya texto y un chat activo
@@ -247,6 +341,33 @@ class Index extends Component
         if (!$query || !$this->activeChatId) {
             return;
         }
+
+        dd(
+            $this->fromTypeDate,
+            $this->toTypeDate
+        );
+
+        $client = $this->deepResearch ? 'medisearch' : 'MBIA';
+        $config = [];
+        if ($client === 'medisearch') {
+            $config = [
+                'fuentes' => ["PubMed"],
+                'years' => [2015, 2025],
+                'types' => ["Meta Analysis",
+                    "Clinical Trials"],
+                'lang' => 'es', // Por default en todos los Idiomas
+            ];
+        }else {
+            $config = [
+                'fuentes' => ["PubMed"],
+                'years' => [2015, 2025],
+                'types' => ["Meta Analysis",
+                    "Clinical Trials"],
+                'lang' => 'es', // Por default en todos los Idiomas
+            ];
+        }
+        dd($config);
+
 
         // Opcional: puedes limitar longitud o limpiar caracteres no permitidos
         if (mb_strlen($query) > 800) {
@@ -257,9 +378,9 @@ class Index extends Component
 
         // Crear la pregunta en la base de datos
         $question = \App\Models\MedisearchQuestion::create([
-            'user_id'  => \Auth::id(),
-            'chat_id'  => $this->activeChatId,
-            'query'    => $query,
+            'user_id' => \Auth::id(),
+            'chat_id' => $this->activeChatId,
+            'query' => $query,
             'response' => null, // Se puede actualizar luego con la respuesta del bot
         ]);
 
@@ -272,23 +393,37 @@ class Index extends Component
         // Limpiar el input
         $this->newMessage = '';
 
-        // Lógica para obtener la respuesta del bot:
-        $payload = [
-            'client' => 'MBIA',
-            'query' => $query,
-            'image' =>'',
-            'chat_id' => $this->activeChatId,
-            'audio' =>'',
-            'model' => '',
-            'include_articles' =>  true,
-            'conversation_id' => '',
-            'config' => [
+        $client = $this->deepResearch ? 'medisearch' : 'MBIA';
+        $config = [];
+        if ($client === 'medisearch') {
+            $config = [
                 'fuentes' => ["PubMed"],
                 'years' => [2015, 2025],
                 'types' => ["Meta Analysis",
                     "Clinical Trials"],
                 'lang' => 'es', // Por default en todos los Idiomas
-            ]
+            ];
+        }else {
+            $config = [
+                'fuentes' => ["PubMed"],
+                'years' => [2015, 2025],
+                'types' => ["Meta Analysis",
+                    "Clinical Trials"],
+                'lang' => 'es', // Por default en todos los Idiomas
+            ];
+        }
+
+        // Lógica para obtener la respuesta del bot:
+        $payload = [
+            'client' => $client,
+            'query' => $query,
+            'image' => '',
+            'chat_id' => $this->activeChatId,
+            'audio' => '',
+            'model' => '',
+            'include_articles' => true,
+            'conversation_id' => '',
+            'config' => $config,
         ];
         // Aquí deberías llamar a tu servicio de IA, por ejemplo:
         $responseData = $this->MBIAService->search($payload);
@@ -324,41 +459,6 @@ class Index extends Component
         $question->save();
     }
 
-    private function setingProps()
-    {
-        $this->chatHistory = collect();
-        $this->showEditModal = false;
-        $this->showDeleteModal = false;
-        $this->activeChatId = null;
-        $this->editChatId = null;
-        $this->deleteChatId = null;
-        $this->editChatName = '';
-        $this->deleteChatName = '';
-        $this->groupedChats = [];
-        $this->chatGroupsOpen = [];
-        $this->activeChatTitle = '';
-        $this->suggestedQuestions= [
-            '¿El deporte aumenta la esperanza de vida?',
-            '¿Cuáles son las probabilidades de contraer cáncer?',
-            '¿La vacuna contra el COVID empeora la artritis?',
-            '¿El control de la natalidad hormonal puede afectar la demografía?'
-        ];
-        $this->messages = collect();
-        $this->openModalFilter = false;
-        $this->deepResearch = false;
-        $this->current = 0;
-        $this->currentAdvance = 0;
-        $this->question = '';
-        $this->questionsBasic = [
-            '¿El deporte aumenta la esperanza de vida?',
-            '¿Cuáles son las probabilidades de contraer cáncer?'
-        ];
-        $this->questionsAdvanced = [
-            '¿La vacuna contra el COVID empeora la artritis?',
-            '¿El control de la natalidad hormonal puede afectar la demografía?'
-        ];
-    }
-
     public function selectAll()
     {
         $this->selectedOptions = $this->fontOptions;
@@ -378,6 +478,7 @@ class Index extends Component
     {
         $this->selectedTypeOptions = [];
     }
+
     public function nextQuestion()
     {
         $this->current = ($this->current < count($this->questionsBasic) - 1)
@@ -391,247 +492,19 @@ class Index extends Component
             ? $this->current - 1
             : count($this->questionsBasic) - 1;
     }
+
     public function nextQuestionAdvance()
     {
-        $this->currentAdvance = ($this->current < count($this->questionsAdvance) - 1)
+        $this->currentAdvance = ($this->currentAdvance < count($this->questionsAdvanced) - 1)
             ? $this->currentAdvance + 1
             : 0;
     }
 
     public function previousQuestionAdvance()
     {
-        $this->currentAdvance = ($this->current > 0)
+        $this->currentAdvance = ($this->currentAdvance > 0)
             ? $this->currentAdvance - 1
-            : count($this->questionsAdvance) - 1;
+            : count($this->questionsAdvanced) - 1;
     }
 
-//    public $newMessage = '';
-//    public $messages = [];
-//    public $activeChatId = null;
-//    public $chatHistory = [];
-//    public $queryCount = 0;
-//    public $modelosIA = ['medisearch' => 'Medisearch', 'MBIA' => 'MBIA'];
-//    public $modeloIA = 'MBIA'; // Valor por defecto, puedes cambiarlo
-//    public $investigacionProfunda = false;
-//    public $config = true;
-//    public $suggestedQuestions = [
-//        '¿El deporte aumenta la esperanza de vida?',
-//        '¿Cuáles son las probabilidades de recuperación tras un ictus?',
-//        '¿La vacuna contra el COVID empeora la artritis?',
-//        '¿El control de la natalinad afecta a la demografía?'
-//    ];
-//    public $showFilters = false;
-//    public $filters = [
-//        'year' => 2025,
-//        'sources' => [],
-//        'types' => []
-//    ];
-//    public function mount()
-//    {
-//        $this->updateQueryCount();
-//        $this->loadChatHistory();
-//        $this->checkMBIAStatus();
-//        $this->chargeChatsSessions();
-//        if ($this->modeloIA == 'medisearch') {
-//            $this->investigacionProfunda = true;
-//        } else {
-//            $this->investigacionProfunda = false;
-//        }
-//    }
-
-
-//    public function setQuestion($question)
-//    {
-//        $this->newMessage = $question;
-//    }
-//    public $availableSources = [
-//        ['value' => 'articles', 'label' => 'Artículos científicos'],
-//        ['value' => 'books', 'label' => 'Libros'],
-//        ['value' => 'guidelines', 'label' => 'Directrices internacionales de salud'],
-//        ['value' => 'guides', 'label' => 'Guías de práctica'],
-//        ['value' => 'healthlines', 'label' => 'Healthlines']
-//    ];
-//
-//    public $availableTypes = [
-//        ['value' => 'metanalysis', 'label' => 'Metanálisis'],
-//        ['value' => 'review', 'label' => 'Artículos de revisión'],
-//        ['value' => 'trials', 'label' => 'Ensayos clínicos'],
-//        ['value' => 'others', 'label' => 'Otros']
-//    ];
-//
-//
-//    // Actualiza el contador de preguntas mensuales
-//    private function updateQueryCount()
-//    {
-//        $user = Auth::user();
-//        if (!$user->hasAnyRole('root', 'admin', 'colab', 'Rector')) {
-//            $this->queryCount = MedisearchQuestion::where('user_id', $user->id)
-//                ->where('created_at', '>=', Carbon::now()->startOfMonth())
-//                ->count();
-//        } else {
-//            $this->queryCount = 0;
-//        }
-//    }
-//
-//    // Carga el historial de chats del usuario
-//    private function loadChatHistory()
-//    {
-//        $user = Auth::user();
-//        $this->chatHistory = MedisearchChat::where('user_id', $user->id)
-//            ->orderBy('created_at', 'desc')
-//            ->get();
-//    }
-//
-//    // Carga los mensajes de un chat seleccionado
-//    private function loadChatMessages($chatId)
-//    {
-//        // Se recuperan todas las preguntas/respuestas de ese chat, ordenadas cronológicamente
-//        $questions = MedisearchQuestion::where('chat_id', $chatId)
-//            ->orderBy('created_at', 'asc')
-//            ->get();
-//
-//        $this->messages = [];
-//        foreach ($questions as $question) {
-//            // Agregamos el mensaje del usuario
-//            $this->messages[] = [
-//                'from' => 'user',
-//                'text' => $question->query,
-//            ];
-//            // Procesamos la respuesta almacenada (asumiendo que viene con artículos y respuesta llm)
-//            $data = $question->response;
-//            if (isset($data['data']['resultados'])) {
-//                foreach ($data['data']['resultados'] as $item) {
-//                    if ($item['tipo'] === 'articles') {
-//                        $this->messages[] = [
-//                            'from' => 'articles',
-//                            'data' => $item['articulos'],
-//                        ];
-//                    }elseif ($item['tipo'] === 'llm_response') {
-//                        $this->messages[] = [
-//                            'from' => 'bot',
-//                            'text' => $item['respuesta'],
-//                        ];
-//                    }
-//                }
-//            }
-//        }
-//        $this->activeChatId = $chatId;
-//        session(['activeChatId' => $chatId]);
-//    }
-//
-//    // Selecciona un chat del historial y carga sus mensajes
-//    public function selectChat($chatId)
-//    {
-//        $this->loadChatMessages($chatId);
-//    }
-//
-//    public function sendMessage()
-//    {
-//        $user = Auth::user();
-//
-//        if (!$user->hasAnyRole('root', 'admin', 'colab', 'Rector')) {
-//            $limite = $user->status == 0 ? 20 : 100;
-//            if ($this->queryCount >= $limite) {
-//                $this->messages[] = [
-//                    'from' => 'bot',
-//                    'text' => 'Has alcanzado el límite de '.$limite.' preguntas por mes. Por favor, revisa nuestros planes de suscripción.',
-//                ];
-//                $this->newMessage = '';
-//                return;
-//            }
-//        }
-//
-//        $query = $this->newMessage;
-//
-//        // Si no hay chat activo, se crea uno
-//        if (!$this->activeChatId) {
-//            $chat = MedisearchChat::create([
-//                'user_id' => $user->id,
-//                'title'   => 'Chat ' . now()->toDateTimeString(),
-//            ]);
-//            $this->activeChatId = $chat->id;
-//            session(['activeChatId' => $chat->id]);
-//            $this->loadChatHistory(); // Actualiza el historial
-//        }
-//
-//        // Agrega el mensaje del usuario a la conversación (interfaz)
-//
-//        $this->messages[] = [
-//            'from' => 'user',
-//            'text' => $query,
-//        ];
-//
-//        $conversationId = $this->getConversationId($this->activeChatId);
-//
-//        // Prepara el payload para el backend Python
-//        $payload = [
-//            'client' => $this->modeloIA,
-//            'query' => $query,
-//            'image' =>'',
-//            'chat_id' => $this->activeChatId,
-//            'audio' =>'',
-//            'model' => '',
-//            'include_articles' =>  $this->investigacionProfunda,
-//            'conversation_id' => $conversationId,
-//        ];
-//
-//        $data = $this->MBIAService->search($payload);
-//        if (isset($data['data']['resultados'])) {
-//            foreach ($data['data']['resultados'] as $item) {
-//                if ($item['tipo'] === 'articles') {
-//                    $this->messages[] = [
-//                        'from' => 'articles',
-//                        'data' => $item['articulos'],
-//                    ];
-//                }elseif ($item['tipo'] === 'llm_response') {
-//                    $this->messages[] = [
-//                        'from' => 'bot',
-//                        'text' => $item['respuesta'],
-//                    ];
-//                }
-//            }
-//            $data['data']['query'] = $query;
-//        }
-//        // Guardar en la base de datos
-//        MedisearchQuestion::create([
-//            'user_id'  => $user->id,
-//            'chat_id'  => $this->activeChatId,
-//            'model'    => $this->modeloIA,
-//            'query'    => $query,
-//            'response' => $data,
-//        ]);
-//
-//        $this->newMessage = '';
-//        $this->updateQueryCount();
-//    }
-
-
-
-//    private function getConversationId(mixed $activeChatId)
-//    {
-//        $message = MedisearchQuestion::query()->where('chat_id', $this->activeChatId)->get()->last();
-//        if (!empty($message) && !empty($message->response['data']) && !empty($message->response['data']['conversation_id'])) {
-//            return $message->response['data'] != null ?   : '' ;
-//        }
-//    }
-//
-//    private function checkMBIAStatus(): void
-//    {
-//        $config = Config::query()->where('tipo', 'services.MBAI.openai_quota_exceeded')->first();
-//        if (isset($config) && $config->value === 'true') {
-//            $this->modelosIA = ['medisearch' => 'Medisearch'];
-//            $this->modeloIA = 'medisearch';
-//            $this->investigacionProfunda = true;
-//            $this->config = false;
-//        }
-//    }
-//
-//    private function chargeChatsSessions(): void
-//    {
-//        // Si existe un chat activo en sesión, se carga
-//        $this->activeChatId = session('activeChatId', null);
-//        if ($this->activeChatId) {
-//            $this->loadChatMessages($this->activeChatId);
-//        }
-//    }
 }

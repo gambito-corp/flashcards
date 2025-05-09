@@ -79,13 +79,13 @@
             </div>
             @if($messages->isEmpty())
                 <!-- Estado 1: Pantalla de bienvenida -->
-   
+
                 <div class="flex  mt-8 flex-col items-center justify-center h-full w-full bg-[#f3f8fd] ">
                     <!-- Logo y título -->
                     <h1 class="text-4xl md:text-5xl font-extrabold text-[#195b81]  mb-2">DoctorMBS</h1>
                     <div class="text-lg md:text-xl text-[#195b81] font-semibold mb-1  mx-5 md:mx-0 text-center">Respuestas <span class="text-[#3b82f6]">científicas</span> a preguntas médicas</div>
 
-    
+
                     <div class="w-full max-w-2xl mt-8 mb-8 ">
                         <div class="flex inset-x-0 mx-auto max-w-full items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-4 md:px-6  shadow-lg
            flex-wrap md:inset-auto md:mx-0 md:max-w-none h-[140px] mx-5 md:mx-0">
@@ -94,35 +94,35 @@
                                    wire:keydown.enter="sendMessage"
                                    class="relative flex-1 text-lg bg-transparent border-0 focus:ring-0 focus:outline-none text-[#195b81] placeholder-[#b0b8c1]"
                                    placeholder="Haz una pregunta de salud o biociencia...">
-                       
-                         
+
+
                             <button wire:click='sendMessage' class="relative ml-4 bg-[#66acff] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition h-[40px] w-[40px] hidden md:block">
                                 <i class="text-lg fa-solid fa-magnifying-glass"></i>
                             </button>
                             <div class="flex w-full">
-                        
+
                                 <button wire:click='openFilters' class="relative ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold mr-3 md:mr-5">
                                 <i class="fa-solid fa-sliders"></i>
                                 <span class="ml-1 font-[14pz]">Filtros</span>
                             </button>
-                                
+
                           <label class="inline-flex items-center cursor-pointer">
   <!-- Checkbox Livewire -->
   <input wire:model.live="deepResearch" type="checkbox" class="sr-only peer">
 
   <!-- Toggle background -->
-  <div class="relative w-14 h-7 bg-gray-200 rounded-full peer-focus:outline-none 
-              dark:peer-focus:ring-blue-800 dark:bg-gray-300 
-              peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600 
-              peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
-              peer-checked:after:border-white 
-              after:content-[''] after:absolute after:top-[2px] after:start-[2px] 
-              after:bg-white after:border-gray-300 after:border 
-              after:rounded-full after:h-6 after:w-6 after:transition-all 
+  <div class="relative w-14 h-7 bg-gray-200 rounded-full peer-focus:outline-none
+              dark:peer-focus:ring-blue-800 dark:bg-gray-300
+              peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600
+              peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+              peer-checked:after:border-white
+              after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+              after:bg-white after:border-gray-300 after:border
+              after:rounded-full after:h-6 after:w-6 after:transition-all
               dark:border-gray-600">
-    
+
     <!-- ON/OFF text -->
- 
+
   </div>
 
   <!-- Label text -->
@@ -132,12 +132,12 @@
                                 <i class="text-lg fa-solid fa-magnifying-glass"></i>
                             </button>
 
-             
-                          
+
+
                         </div>
 </div>
-                        
-                        
+
+
                     </div>
 
                     <!-- Sugerencias -->
@@ -344,17 +344,17 @@
                        <label class="inline-flex items-center cursor-pointer ml-4 select-none md:order-none order-1">
   <!-- Hidden checkbox with Livewire binding -->
   <input wire:model="deepResearch" type="checkbox" class="sr-only peer">
-  
+
   <!-- Toggle switch styling -->
-  <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 
-              dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 
-              peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
-              peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-              after:start-[2px] after:bg-white after:border-gray-300 after:border 
-              after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+  <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300
+              dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700
+              peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+              peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px]
+              after:start-[2px] after:bg-white after:border-gray-300 after:border
+              after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600
               peer-checked:bg-[#195b81] dark:peer-checked:bg-[#195b81]">
   </div>
-  
+
   <!-- Label text -->
   <span class="ms-3 text-[13px] md:text-sm font-bold text-[#b0b8c1]">Investigacion Profunda</span>
 </label>
