@@ -1,5 +1,5 @@
 <div class="fixed inset-0 top-[80px] left-0 right-0 bottom-0 z-10 bg-[#f3f8fd] flex">
-    <div id="main-content" class="w-full h-auto flex flex-col bg-[#f3f8fd] ml-48 overflow-x-hidden transition-all duration-300">
+    <div id="main-content" class="w-full  flex flex-col bg-[#f3f8fd] md:ml:48 ml-0 overflow-x-hidden transition-all duration-300">
         <!-- Overlay para sidebar en móvil -->
         <div id="sidebarOverlay" class="fixed inset-0 z-20 hidden bg-black overlay bg-opacity-30" onclick="closeSidebar()"></div>
 
@@ -64,13 +64,10 @@
 
 
         <!-- Botón para abrir sidebar en móvil -->
-        <button class="history-chat-button fixed left-4 bottom-4 bg-white z-40 px-5 py-2 rounded-full text-[14px] shadow-md md:hidden flex items-center gap-2"
-                onclick="openSidebar()">
-            <i class="fa-regular fa-message"></i> Historial
-        </button>
+
 
         <!-- Área principal del chat -->
-        <div class="flex flex-col flex-1 h-full mx-4">
+        <div class="flex flex-col flex-1 h-full">
             <div wire:loading="sendMessage" class="flex justify-start ml-40">
                 <div class="flex justify-start w-4/5">
                     <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
@@ -82,39 +79,73 @@
             </div>
             @if($messages->isEmpty())
                 <!-- Estado 1: Pantalla de bienvenida -->
-                <div class="flex  mt-8 flex-col items-center justify-center h-full w-full bg-[#f3f8fd]">
+   
+                <div class="flex  mt-8 flex-col items-center justify-center h-full w-full bg-[#f3f8fd] ">
                     <!-- Logo y título -->
                     <h1 class="text-4xl md:text-5xl font-extrabold text-[#195b81]  mb-2">DoctorMBS</h1>
-                    <div class="text-lg md:text-xl text-[#195b81] font-semibold mb-1">Respuestas <span class="text-[#3b82f6]">científicas</span> a preguntas médicas</div>
+                    <div class="text-lg md:text-xl text-[#195b81] font-semibold mb-1  mx-5 md:mx-0 text-center">Respuestas <span class="text-[#3b82f6]">científicas</span> a preguntas médicas</div>
 
-                    <div class="w-full max-w-2xl mt-8 mb-8">
-                        <div class="flex absolute inset-x-0 mx-auto max-w-full items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-6 py-4 shadow-lg
-            md:flex-nowrap md:inset-auto md:mx-0 md:max-w-none">
+    
+                    <div class="w-full max-w-2xl mt-8 mb-8 ">
+                        <div class="flex inset-x-0 mx-auto max-w-full items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-4 md:px-6  shadow-lg
+           flex-wrap md:inset-auto md:mx-0 md:max-w-none h-[140px] mx-5 md:mx-0">
                             <input type="text"
                                    wire:model.defer="newMessage"
                                    wire:keydown.enter="sendMessage"
                                    class="relative flex-1 text-lg bg-transparent border-0 focus:ring-0 focus:outline-none text-[#195b81] placeholder-[#b0b8c1]"
                                    placeholder="Haz una pregunta de salud o biociencia...">
-                            <button wire:click='openFilters' class="relative ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold">
-                                <i class="fa-solid fa-sliders"></i>
-                                <span class="ml-1">Filtros</span>
-                            </button>
-                            <label class="relative flex items-center ml-4 cursor-pointer select-none">
-                                <span class="text-sm text-[#b0b8c1] font-bold mr-1">Medisearch </span>
-                                <input wire:model.live='deepResearch' type="checkbox" class="accent-[#195b81] scale-125">
-                            </label>
-                            <button wire:click='sendMessage' class="relative ml-4 bg-[#3b82f6] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition">
+                       
+                         
+                            <button wire:click='sendMessage' class="relative ml-4 bg-[#66acff] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition h-[40px] w-[40px] hidden md:block">
                                 <i class="text-lg fa-solid fa-magnifying-glass"></i>
                             </button>
+                            <div class="flex w-full">
+                        
+                                <button wire:click='openFilters' class="relative ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold mr-3 md:mr-5">
+                                <i class="fa-solid fa-sliders"></i>
+                                <span class="ml-1 font-[14pz]">Filtros</span>
+                            </button>
+                                
+                          <label class="inline-flex items-center cursor-pointer">
+  <!-- Checkbox Livewire -->
+  <input wire:model.live="deepResearch" type="checkbox" class="sr-only peer">
+
+  <!-- Toggle background -->
+  <div class="relative w-14 h-7 bg-gray-200 rounded-full peer-focus:outline-none 
+              dark:peer-focus:ring-blue-800 dark:bg-gray-300 
+              peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600 
+              peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+              peer-checked:after:border-white 
+              after:content-[''] after:absolute after:top-[2px] after:start-[2px] 
+              after:bg-white after:border-gray-300 after:border 
+              after:rounded-full after:h-6 after:w-6 after:transition-all 
+              dark:border-gray-600">
+    
+    <!-- ON/OFF text -->
+ 
+  </div>
+
+  <!-- Label text -->
+  <span class="ms-1 text-sm font-medium text-[#195b81] md:ms-3">Medisearch</span>
+</label>
+   <button wire:click='sendMessage' class="relative ml-4 bg-[#66acff] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition md:h-[40px] h-[35px] md:w-[40px] w-[35px] md:hidden">
+                                <i class="text-lg fa-solid fa-magnifying-glass"></i>
+                            </button>
+
+             
+                          
                         </div>
+</div>
+                        
+                        
                     </div>
 
                     <!-- Sugerencias -->
-                    <div class="w-full max-w-2xl mt-20 space-y-8">
+                    <div class="w-full max-w-2xl space-y-8 px-8 md:px-0">
 
                         {{-- Carrusel 1: Preguntas comunes --}}
                         <div class="space-y-2">
-                            <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
+                            <div class="text-center gap-2 text-sm font-semibold text-gray-600">
                                 <i class="fa-regular fa-lightbulb"></i>
                                 Comienza con preguntas comunes
                             </div>
@@ -132,7 +163,7 @@
                                     @endif
                                 @endforeach
 
-                                <div class="absolute z-10 -translate-y-1/2 -left-4 top-1/2 md:-left-6">
+                                <div class="absolute z-10 -translate-y-1/2 -left-4 top-1/2 md:-left-10">
                                     <button wire:click="previousQuestion"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
@@ -143,7 +174,7 @@
                                     </button>
                                 </div>
 
-                                <div class="absolute z-10 -translate-y-1/2 -right-4 top-1/2 md:-right-6">
+                                <div class="absolute z-10 -translate-y-1/2 -right-4 top-1/2 md:-right-10">
                                     <button wire:click="nextQuestion"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
@@ -159,7 +190,7 @@
 
                         {{-- Carrusel 2: Preguntas complejas --}}
                         <div class="space-y-2">
-                            <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
+                            <div class="text-center gap-2 text-sm font-semibold text-gray-600">
                                 <i class="fa-solid fa-flask"></i>
                                 Profundiza en preguntas complejas
                             </div>
@@ -177,7 +208,7 @@
                                     @endif
                                 @endforeach
 
-                                <div class="absolute z-10 -translate-y-1/2 -left-4 top-1/2 md:-left-6">
+                                <div class="absolute z-10 -translate-y-1/2 -left-4 top-1/2 md:-left-10">
                                     <button wire:click="nextQuestionAdvance"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
@@ -188,7 +219,7 @@
                                     </button>
                                 </div>
 
-                                <div class="absolute z-10 -translate-y-1/2 -right-4 top-1/2 md:-right-6">
+                                <div class="absolute z-10 -translate-y-1/2 -right-4 top-1/2 md:-right-10">
                                     <button wire:click="previousQuestionAdvance"
                                             class="p-2 bg-white rounded-full shadow hover:bg-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700" fill="none"
@@ -204,13 +235,20 @@
                 </div>
 
             @else
+
+
+
                 <!-- Estado 2: Chat activo -->
                 <div class="flex flex-col h-full bg-[#f3f8fd]">
                     <!-- Encabezado del chat -->
-                    <div id="date-content" class="flex items-center justify-between p-4 ml-48 bg-white shadow">
-                        <h2 class="text-xl ml-12 font-bold text-[#195b81]">
+                    <div id="date-content" class="flex items-center justify-between p-4 ml-0 md:ml-48 bg-white shadow flex-wrap">
+                        <h2 class="text-sm md:text-xl  font-bold text-[#195b81]">
                             {{ $activeChatTitle }}
                         </h2>
+                                <button class="history-chat-button  bg-white z-40 px-5 py-2 rounded-full text-[14px] shadow-md md:hidden flex items-center gap-2"
+                onclick="openSidebar()">
+            <i class="fa-regular fa-message"></i> Historial
+        </button>
                         <button class="bg-gradient-to-r from-[#6a5af9] to-[#38bdf8] text-white px-6 py-2 rounded-full font-bold shadow hover:scale-105 transition">
                             <i class="mr-1 fa-solid fa-star"></i> Actualizar a Pro
                         </button>
@@ -228,7 +266,7 @@
                                     </div>
                                 </div>
                             @elseif($message['from'] === 'bot')
-                                <div id="answer-content" class="flex justify-start ml-48">
+                                <div id="answer-content" class="flex justify-start ml-20 md:ml-48">
                                     <div class="flex justify-start w-4/5">
                                         <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
                                             @php
@@ -236,7 +274,7 @@
                                             @endphp
 
                                             <div id="answer-div"
-                                                class="text-[#195b81] answer-div"
+                                                class="text-[#195b81] answer-div text-[15px] "
                                                 x-data="typingEffectWithHtml()"
                                                 x-bind:data-content='@json($content)'
                                                 x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
@@ -256,15 +294,15 @@
                                     </div>
                                 </div>
                             @elseif($message['from'] === 'articles' && !empty($message['data']))
-                                <div class="flex justify-center w-full">
-                                    <div class="w-4/5 max-w-2xl">
-                                        <div class="bg-[#eaf4fb] p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
+                                <div class=" ml-0 md:ml-48">
+                                    <div class="w-4/5 max-w-6xl">
+                                        <div class="text-left">
                                             <div class="font-semibold text-[#195b81] mb-2">
                                                 Artículos relacionados:
                                             </div>
-                                            <div class="grid gap-3">
+                                            <div class="flex gap-3 flex-wrap">
                                                 @foreach($message['data'] as $article)
-                                                    <div class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition">
+                                                    <div class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-auto w-full">
                                                         <a href="{{ $article['url'] ?? '#' }}" target="_blank" class="block">
                                                             <h4 class="font-bold text-[#195b81] text-sm">Titulo de Prueba</h4>
                                                             <div class="mt-1 text-xs text-gray-500">
@@ -294,21 +332,35 @@
                     </div>
                     <!-- Input de seguimiento -->
                     <div class="p-4 bg-white border-t border-[#d9e6f7]">
-                        <div id="chat-content" class="flex items-center px-6 ml-48 shadow py-4bg-white rounded-2xl">
+                        <div id="chat-content" class="flex flex-wrap items-center px-4 py-4 md:px-6 ml-0 md:ml-48 shadow py-4bg-white rounded-2xl">
                             <input type="text"
                                    wire:model.live="newMessage"
                                    class="flex-1 text-lg bg-transparent border-0 focus:ring-0 focus:outline-none text-[#195b81]"
                                    placeholder="Haz una pregunta de seguimiento...">
-                                <button wire:click='openFilters' class="ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold">
+                                <button wire:click='openFilters' class="ml-3 text-[#195b81] hover:text-[#1a6ca6] flex items-center gap-1 font-semibold md:order-none order-1">
                                     <i class="fa-solid fa-sliders"></i>
                                     <span class="ml-1">Filtros</span>
                                 </button>
-                                <label class="flex items-center ml-4 cursor-pointer select-none">
-                                    <span class="text-sm text-[#b0b8c1] font-bold mr-1">Investigacion Profunda </span>
-                                    <input wire:model='deepResearch' type="checkbox" class="accent-[#195b81] scale-125">
-                                </label>
+                       <label class="inline-flex items-center cursor-pointer ml-4 select-none md:order-none order-1">
+  <!-- Hidden checkbox with Livewire binding -->
+  <input wire:model="deepResearch" type="checkbox" class="sr-only peer">
+  
+  <!-- Toggle switch styling -->
+  <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 
+              dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 
+              peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+              peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+              after:start-[2px] after:bg-white after:border-gray-300 after:border 
+              after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+              peer-checked:bg-[#195b81] dark:peer-checked:bg-[#195b81]">
+  </div>
+  
+  <!-- Label text -->
+  <span class="ms-3 text-[13px] md:text-sm font-bold text-[#b0b8c1]">Investigacion Profunda</span>
+</label>
+
                             <button wire:click="sendMessage"
-                                    class="ml-3 bg-[#195b81] text-white px-4 py-2 rounded-full font-bold shadow hover:bg-[#1a6ca6] transition">
+                                    class="order-0 relative ml-4 bg-[#66acff] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition md:h-[40px] h-[35px] md:w-[40px] w-[35px] md:order-none order-0">
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </div>
@@ -743,6 +795,7 @@
             background-color: #fff;
             transition: width 0.2s, transform 0.3s ease;
             border-right: 1px solid #e0e7ef;
+            z-index: 999;
         }
 
         .sidebar-resizer {
