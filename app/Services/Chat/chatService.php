@@ -253,6 +253,4 @@ class chatService
         // Si OpenAI responde con un array, devuélvelo; si no, devuelve vacío
         return is_array($selected) ? $selected : [];
     }
-
-
 }

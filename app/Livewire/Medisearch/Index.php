@@ -55,7 +55,7 @@ class Index extends Component
             'Reviews',
             'Clinical Trials',
             'Observational Studies',
-            'otros',
+            'Otros',
         ];
         $this->selectedOptions = ["PubMed"];
 
@@ -82,8 +82,6 @@ class Index extends Component
         ];
 //        }
     }
-
-
 
     public function boot(MBIAService $MBIAService, chatService $chatService)
     {
@@ -229,7 +227,6 @@ class Index extends Component
     public function openFilters()
     {
         $this->openModalFilter = true;
-        //dd($this->openModalFilter);
     }
 
     public function closeEditModal()
@@ -253,7 +250,6 @@ class Index extends Component
     public function closeFilters()
     {
         $this->openModalFilter = false;
-        //dd($this->openModalFilter);
     }
 
     public function saveChatName()
@@ -302,17 +298,18 @@ class Index extends Component
     {
         if ($deep) {
             $this->fontOptions = [
-                'Articulos cientificos',
-                'Libros',
-                'Directrices internacionales de salud',
-                'Guías de medicina',
-                'healthline',
+                'internationalHealthGuidelines',
+                'medicineGuidelines',
+                'scientificArticles',
+                'books',
+                'healthBlogs'
             ];
             $this->typeOptions = [
-                'Metalanasis',
-                'Articulos de revisión',
-                'Ensayos clínicos',
-                'Otros',
+                'metaAnalysis',
+                'reviews',
+                'clinicalTrials',
+                'observationalStudies',
+                'other'
             ];
             $this->selectAll();
             $this->selectTypeAll();
@@ -338,39 +335,15 @@ class Index extends Component
     {
         // Validar que haya texto y un chat activo
         $query = trim($this->newMessage ?? '');
-        //dd($this->activeChatId);
         if (!$query || !$this->activeChatId) {
             return;
         }
-
-//        dd(
-//            $this->selectedOptions,
-//            $this->selectedTypeOptions,
-//            $this->from_date,
-//            $this->to_date
-//        );
-
-        $client = $this->deepResearch ? 'medisearch' : 'MBIA';
-        $config = [];
-        if ($client === 'medisearch') {
-            $config = [
-                'fuentes' => ["PubMed"],
-                'years' => [2015, 2025],
-                'types' => ["Meta Analysis",
-                    "Clinical Trials"],
-                'lang' => 'es', // Por default en todos los Idiomas
-            ];
-        }else {
-            $config = [
-                'fuentes' => ["PubMed"],
-                'years' => [2015, 2025],
-                'types' => ["Meta Analysis",
-                    "Clinical Trials"],
-                'lang' => 'es', // Por default en todos los Idiomas
-            ];
-        }
-//        dd($config);
-
+        $config = [
+            'fuentes' => $this->selectedOptions,
+            'years' => [$this->from_date,  $this->to_date],
+            'types' => $this->selectedTypeOptions,
+            'lang' => 'es', // Por default en todos los Idiomas
+        ];
 
         // Opcional: puedes limitar longitud o limpiar caracteres no permitidos
         if (mb_strlen($query) > 800) {
@@ -397,24 +370,6 @@ class Index extends Component
         $this->newMessage = '';
 
         $client = $this->deepResearch ? 'medisearch' : 'MBIA';
-        $config = [];
-        if ($client === 'medisearch') {
-            $config = [
-                'fuentes' => ["PubMed"],
-                'years' => [2015, 2025],
-                'types' => ["Meta Analysis",
-                    "Clinical Trials"],
-                'lang' => 'es', // Por default en todos los Idiomas
-            ];
-        }else {
-            $config = [
-                'fuentes' => ["PubMed"],
-                'years' => [2015, 2025],
-                'types' => ["Meta Analysis",
-                    "Clinical Trials"],
-                'lang' => 'es', // Por default en todos los Idiomas
-            ];
-        }
 
         // Lógica para obtener la respuesta del bot:
         $payload = [
@@ -426,7 +381,7 @@ class Index extends Component
             'model' => '',
             'include_articles' => true,
             'conversation_id' => '',
-            'config' => $config,
+            'config' => json_encode($config),
         ];
         // Aquí deberías llamar a tu servicio de IA, por ejemplo:
         $responseData = $this->MBIAService->search($payload);

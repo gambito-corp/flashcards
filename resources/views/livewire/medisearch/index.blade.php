@@ -248,85 +248,59 @@
                     </div>
 
                     <!-- Área de mensajes -->
-                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f3f8fd]">
+                    <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chat-messages">
                         @foreach($messages as $message)
+
                             @if($message['from'] === 'user')
-                                <div class="flex justify-end mr-10">
-                                    <div class="flex justify-end w-4/5">
-                                        <div class="bg-[#195b81] text-white p-4 rounded-2xl shadow text-right">
-                                            {{ $message['text'] }}
-                                        </div>
+                                <div class="pt-3 flex">
+                                    <div class=" text-[17px]   py-2  my-2 w-fit text-[#195b81] font-semibold "><i class="fa-regular fa-comment mr-1"></i>
+                                        {{ $message['text'] }}
                                     </div>
                                 </div>
+                            @elseif($message['from'] === 'articles')
+                                <div class="flex flex-wrap gap-4 relative article-section">
+                                    @foreach($message['data'] as $index => $article)
+                                    @php
+                                        $url = $article['url'];
+                                        $fecha = isset($article['fecha']) ? $article['fecha'] : $article['year'];
+                                        $fuente = isset($article['fuente']) ? $article['fuente'] : $article['source'];
+                                        $titulo = isset($article['titulo']) ? $article['titulo'] : $article['title'];
+                                        $autores = isset($article['autores']) ? $article['autores'] : $article['authors'];
+                                        $resumen = isset($article['resumen']) ? $article['resumen'] : $article['summary'];
+                                        $tipoEstudio = isset($article['tipo_estudio']) ? $article['tipo_estudio'] : $article['journal'];
+                                    @endphp
+
+                                        <div class="md:w-[15rem] w-full md-1 md:mb-4 bg-white p-3 h-[85px] rounded-[15px] article-card {{ $index > 3 ? 'hidden' : '' }}">
+                                            <a href="{{ $url }}" class="text-sm" target="_blank">
+                                                <h3 class="font-bold text-[13px] leading-[18px] text-[#195b81] line-clamp-2">
+                                                    {{$titulo}}
+                                                </h3>
+                                                <p class="text-xs text-gray-500 line-clamp-1">
+                                                    {{ $tipoEstudio }} - {{ $fecha }}
+                                                </p>
+                                            </a>
+                                        </div>
+                                        @if ($index === 3)
+                                            <button class="verMas absolute bottom-[12px] right-[-7px] w-[23px] h-[23px] bg-[#195b81] rounded-full">
+                                                <i class="fa-solid fa-plus text-white"></i>
+                                            </button>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <hr class="w-full ">
                             @elseif($message['from'] === 'bot')
-                                <div id="answer-content" class="flex justify-start ml-20 md:ml-48">
-                                    <div class="flex justify-start w-4/5">
-                                        <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
-                                            @php
-                                                $content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $message['text']);
-                                            @endphp
-
-                                            <div id="answer-div"
-                                                 class="text-[#195b81] answer-div text-[15px] "
-                                                 x-data="typingEffectWithHtml()"
-                                                 x-bind:data-content='@json($content)'
-                                                 x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
-                                            >
-                                                <span x-html="displayedHtml"></span>
-                                            </div>
-                                            @if(!empty($message['references']))
-                                                <div class="flex flex-wrap gap-2 mt-2">
-                                                    @foreach($message['references'] as $ref)
-                                                        <span
-                                                            class="bg-[#d9e6f7] text-[#195b81] px-3 py-1 rounded-full text-xs">
-                                                            {{ $ref }}
-                                                        </span>
-                                                    @endforeach
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
+                                <div class="flex justify-start ">
+                                    <span  class="bot-text text-[15px] md:text-[16px] text-[#333333] leading-[32px] mb-5 font-medium">"{!! $message['text']  !!} "</span>
                                 </div>
-                            @elseif($message['from'] === 'articles' && !empty($message['data']))
-                                <div class=" ml-0 md:ml-48">
-                                    <div class="w-4/5 max-w-6xl">
-                                        <div class="text-left">
-                                            <div class="font-semibold text-[#195b81] mb-2">
-                                                Artículos relacionados:
-                                            </div>
-                                            <div class="flex gap-3 flex-wrap">
-                                                @foreach($message['data'] as $article)
-                                                    <div
-                                                        class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-auto w-full">
-                                                        <a href="{{ $article['url'] ?? '#' }}" target="_blank"
-                                                           class="block">
-                                                            <h4 class="font-bold text-[#195b81] text-sm">Titulo de
-                                                                Prueba</h4>
-                                                            <div class="mt-1 text-xs text-gray-500">
-                                                                Autor de Prueba
-                                                                @if(!empty($article['journal'] ?? ''))
-                                                                    · journal de Prueba
-                                                                @endif
-                                                                @if(!empty($article['fecha'] ?? ''))
-                                                                    · fecha de Prueba
-                                                                @endif
-                                                            </div>
-                                                            @if(!empty($article['tipo_estudio']))
-                                                                <span
-                                                                    class="inline-block bg-[#d9e6f7] text-[#195b81] px-2 py-0.5 rounded-full text-xs mt-2">
-                                                                    estudio de Prueb
-                                                                </span>
-                                                            @endif
-                                                        </a>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             @endif
                         @endforeach
+                        <!-- Mensaje de "Razonando..." mientras se procesa el envío -->
+                        <div wire:loading.delay wire:target="sendMessage" class="flex justify-start">
+                            <div class="flex items-center bg-[#dfe9ef] text-gray-800 px-4 py-2 rounded-lg my-2">
+                                <i class="fa-regular fa-hourglass animate-spin-360 text-xl  mr-4"></i>
+                                <span class="mr-2">Respondiendo<span class="dots"></span></span>
+                            </div>
+                        </div>
                     </div>
                     <!-- Input de seguimiento -->
                     <div class="p-4 bg-white border-t border-[#d9e6f7]">
@@ -507,74 +481,74 @@
     @endif
     <script>
         // ===================Lettering===================
-        document.addEventListener("DOMContentLoaded", function () {
-            let observer = new MutationObserver(() => {
-                const botMessages = document.querySelectorAll(".bot-text");
-                if (botMessages.length === 0) return;
-                const lastMessage = botMessages[botMessages.length - 1];
-                if (!lastMessage.classList.contains("animated")) {
-                    // Seleccionar la última sección antes de la animación y agregar "card-ati"
-                    const articleSections = document.querySelectorAll(".article-section");
-                    const lastSection = articleSections[articleSections.length - 1];
-                    if (lastSection) {
-                        lastSection.classList.add("card-ati");
-                    }
-                    // Animar el texto y luego cambiar las clases
-                    animateText(lastMessage, () => {
-                        // Remover "active-card" de todas las secciones
-                        articleSections.forEach(section => section.classList.remove("active-card"));
-                        if (lastSection) {
-                            // Eliminar "card-ati" y agregar "active-card" después de la animación
-                            lastSection.classList.remove("card-ati");
-                            lastSection.classList.add("active-card");
-                        }
-                    });
-                    lastMessage.classList.add("animated");
-                }
-            });
-
-            function typeEffect(element, speed) {
-                const text = element.innerHTML;
-                element.innerHTML = "";
-                let i = 0;
-
-                function typing() {
-                    if (i < text.length) {
-                        element.innerHTML += text.charAt(i);
-                        i++;
-                        setTimeout(typing, speed);
-                    }
-                }
-
-                typing();
-            }
-
-            const observera = new MutationObserver(function (mutationsList) {
-                for (const mutation of mutationsList) {
-                    console.log(mutation);
-                    // Detectar cambios en texto o nodos
-                    if (mutation.type === 'childList' || mutation.type === 'characterData') {
-                        const answerDiv = document.getElementById("answer-div");
-                        if (answerDiv && !answerDiv.dataset.animated) {
-                            console.log("Nuevo contenido detectado, aplicando efecto");
-                            answerDiv.dataset.animated = "true";
-                            typeEffect(answerDiv, 30);
-                        }
-                    }
-                }
-            });
-
-            // Observar el contenedor general
-            const container = document.getElementById("answer-content");
-            if (container) {
-                observera.observe(container, {
-                    childList: true,
-                    subtree: true,
-                    characterData: true // Escuchar también cambios de texto
-                });
-            }
-
-        });
+        // document.addEventListener("DOMContentLoaded", function () {
+        //     let observer = new MutationObserver(() => {
+        //         const botMessages = document.querySelectorAll(".bot-text");
+        //         if (botMessages.length === 0) return;
+        //         const lastMessage = botMessages[botMessages.length - 1];
+        //         if (!lastMessage.classList.contains("animated")) {
+        //             // Seleccionar la última sección antes de la animación y agregar "card-ati"
+        //             const articleSections = document.querySelectorAll(".article-section");
+        //             const lastSection = articleSections[articleSections.length - 1];
+        //             if (lastSection) {
+        //                 lastSection.classList.add("card-ati");
+        //             }
+        //             // Animar el texto y luego cambiar las clases
+        //             animateText(lastMessage, () => {
+        //                 // Remover "active-card" de todas las secciones
+        //                 articleSections.forEach(section => section.classList.remove("active-card"));
+        //                 if (lastSection) {
+        //                     // Eliminar "card-ati" y agregar "active-card" después de la animación
+        //                     lastSection.classList.remove("card-ati");
+        //                     lastSection.classList.add("active-card");
+        //                 }
+        //             });
+        //             lastMessage.classList.add("animated");
+        //         }
+        //     });
+        //
+        //     function typeEffect(element, speed) {
+        //         const text = element.innerHTML;
+        //         element.innerHTML = "";
+        //         let i = 0;
+        //
+        //         function typing() {
+        //             if (i < text.length) {
+        //                 element.innerHTML += text.charAt(i);
+        //                 i++;
+        //                 setTimeout(typing, speed);
+        //             }
+        //         }
+        //
+        //         typing();
+        //     }
+        //
+        //     const observera = new MutationObserver(function (mutationsList) {
+        //         for (const mutation of mutationsList) {
+        //             console.log(mutation);
+        //             // Detectar cambios en texto o nodos
+        //             if (mutation.type === 'childList' || mutation.type === 'characterData') {
+        //                 const answerDiv = document.getElementById("answer-div");
+        //                 if (answerDiv && !answerDiv.dataset.animated) {
+        //                     console.log("Nuevo contenido detectado, aplicando efecto");
+        //                     answerDiv.dataset.animated = "true";
+        //                     typeEffect(answerDiv, 30);
+        //                 }
+        //             }
+        //         }
+        //     });
+        //
+        //     // Observar el contenedor general
+        //     const container = document.getElementById("answer-content");
+        //     if (container) {
+        //         observera.observe(container, {
+        //             childList: true,
+        //             subtree: true,
+        //             characterData: true // Escuchar también cambios de texto
+        //         });
+        //     }
+        //
+        // });
         // ======================== Fin del Lettering ?==============================
 
 
