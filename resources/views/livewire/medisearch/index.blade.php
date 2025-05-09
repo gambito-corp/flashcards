@@ -441,8 +441,7 @@
                     <label class="block text-sm font-medium text-gray-700">Hasta</label>
                     <input type="number" min="1890" max="{{now()->year}}" wire:model="to_date" class="w-full p-2 mt-1 border rounded-md">
                 </div>
-                @if(count($fontOptions) === 0)
-
+                @if($fontOptions[0] !== "PubMed")
                     {{-- Seleccionar/Deseleccionar todos --}}
                     <div class="flex justify-between mb-2">
                         <button wire:click="selectAll" class="text-sm text-blue-600 hover:underline">Seleccionar todos

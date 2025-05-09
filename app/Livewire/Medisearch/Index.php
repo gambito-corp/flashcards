@@ -22,12 +22,10 @@ class Index extends Component
     protected chatService $chatService;
     public Collection $chatHistory, $messages;
     public bool $showEditModal, $showDeleteModal, $openModalFilter, $deepResearch;
-    public int|null $activeChatId, $editChatId, $deleteChatId, $current, $currentAdvance;
+    public int|null $activeChatId, $editChatId, $deleteChatId, $current, $currentAdvance, $from_date, $to_date;
     public string $editChatName, $deleteChatName, $activeChatTitle, $newMessage, $question;
     public array $groupedChats, $chatGroupsOpen, $suggestedQuestions, $questionsBasic, $questionsAdvanced, $fontOptions,
         $typeOptions, $selectedOptions, $selectedTypeOptions;
-    public $from_date = 1890;
-    public $to_date = 2025;
 
     private function setingProps()
     {
@@ -63,6 +61,8 @@ class Index extends Component
 
         $this->selectAll();
         $this->selectTypeAll();
+        $this->from_date = 1890;
+        $this->to_date = 2025;
 
 //
 //        $this->questionsBasic = $this->chatService->getMostInterestingQuestions()['preguntas'] ?? [];
@@ -296,9 +296,6 @@ class Index extends Component
 
     public function updatedDeepResearch($value)
     {
-        // Aquí pones la lógica que quieras ejecutar cada vez que cambie deepResearch
-        $this->deselectAll();
-        $this->deselectTypeAll();
         $this->setActiveFilters($value);
     }
     private function setActiveFilters($deep)
@@ -317,6 +314,8 @@ class Index extends Component
                 'Ensayos clínicos',
                 'Otros',
             ];
+            $this->selectAll();
+            $this->selectTypeAll();
         } else {
             $this->selectedOptions = ["PubMed"];
             $this->fontOptions = [
@@ -329,6 +328,8 @@ class Index extends Component
                 'Observational Studies',
                 'Otros',
             ];
+            $this->selectAll();
+            $this->selectTypeAll();
         }
     }
 
@@ -342,12 +343,12 @@ class Index extends Component
             return;
         }
 
-        dd(
-            $this->selectedOptions,
-            $this->selectedTypeOptions,
-            $this->from_date,
-            $this->to_date
-        );
+//        dd(
+//            $this->selectedOptions,
+//            $this->selectedTypeOptions,
+//            $this->from_date,
+//            $this->to_date
+//        );
 
         $client = $this->deepResearch ? 'medisearch' : 'MBIA';
         $config = [];
@@ -368,7 +369,7 @@ class Index extends Component
                 'lang' => 'es', // Por default en todos los Idiomas
             ];
         }
-        dd($config);
+//        dd($config);
 
 
         // Opcional: puedes limitar longitud o limpiar caracteres no permitidos
