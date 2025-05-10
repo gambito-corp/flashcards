@@ -280,15 +280,22 @@
                                             @php
                                                 $content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $message['text']);
                                             @endphp
-
-                                            <div id="answer-div"
-                                                 class="text-[#195b81] answer-div text-[15px] "
-                                                 x-data="typingEffectWithHtml()"
-                                                 x-bind:data-content='@json($content)'
-                                                 x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
-                                            >
-                                                <span x-html="displayedHtml"></span>
-                                            </div>
+                                            @if(!empty($message['is_new']))
+                                                <div id="answer-div"
+                                                     class="text-[#195b81] answer-div text-[15px]"
+                                                     x-data="typingEffectWithHtml()"
+                                                     x-bind:data-content='@json($content)'
+                                                     x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
+                                                >
+                                                    <span x-html="displayedHtml"></span>
+                                                </div>
+                                            @else
+                                                <div id="answer-div"
+                                                     class="text-[#195b81] answer-div text-[15px]"
+                                                >
+                                                    {!! $content !!}
+                                                </div>
+                                            @endif
                                             @if(!empty($message['references']))
                                                 <div class="flex flex-wrap gap-2 mt-2">
                                                     @foreach($message['references'] as $ref)

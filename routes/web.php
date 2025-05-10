@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
 
+
+Route::get('gettigPay/{productId}', [MercadoPagoController::class, 'gettigPay'])->name('gettigPay');
 Route::redirect('/home', '/dashboard');
 if(config('app.env') === 'production') {
     Route::get('/robots.txt', function () {
