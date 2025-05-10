@@ -330,7 +330,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                                                            class="block">
                                                             <h4 class="font-bold text-[#195b81] text-sm">{{$titulo}}</h4>
                                                             <div class="mt-1 text-xs text-gray-500">
-                                                                {{$autores}}
+                                                                {!! $autores !!}
 
                                                                 @if(!empty($article['fecha'] ?? ''))
                                                                     ·     {{$fecha}}
