@@ -21,7 +21,7 @@ class Index extends Component
     protected MBIAService $MBIAService;
     protected chatService $chatService;
     public Collection $chatHistory, $messages;
-    public bool $showEditModal, $showDeleteModal, $openModalFilter, $deepResearch;
+    public bool $showEditModal, $showDeleteModal, $openModalFilter, $deepResearch, $openSidebar;
     public int|null $activeChatId, $editChatId, $deleteChatId, $current, $currentAdvance, $from_date, $to_date;
     public string $editChatName, $deleteChatName, $activeChatTitle, $newMessage, $question;
     public array $groupedChats, $chatGroupsOpen, $suggestedQuestions, $questionsBasic, $questionsAdvanced, $fontOptions,
@@ -63,6 +63,7 @@ class Index extends Component
         $this->selectTypeAll();
         $this->from_date = 1890;
         $this->to_date = 2025;
+        $this->openSidebar = false;
 
 //
 //        $this->questionsBasic = $this->chatService->getMostInterestingQuestions()['preguntas'] ?? [];
@@ -91,6 +92,7 @@ class Index extends Component
 
     public function mount()
     {
+        $this->openSidebar = session('sidebarAbierto', true);
         $this->setingProps();
         $this->loadChatHistory();
         $this->groupChatsByAge();
@@ -99,6 +101,14 @@ class Index extends Component
     public function render()
     {
         return view('livewire.medisearch.index');
+    }
+
+    public function toggleSidebar()
+    {
+        $this->openSidebar = !$this->openSidebar;
+
+        // Guardar estado en la sesión
+        session()->put('openSidebar', $this->openSidebar);
     }
 
     private function loadChatHistory()

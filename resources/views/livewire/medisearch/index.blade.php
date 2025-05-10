@@ -2,11 +2,11 @@
     <div id="main-content"
          class="w-full  flex flex-col bg-[#f3f8fd] md:ml:48 ml-0 overflow-x-hidden transition-all duration-300">
         <!-- Overlay para sidebar en móvil -->
-     
+
 <div class="flex justify-end">
         <!-- Sidebar con resizer -->
         <aside id="sidebar"
-               class="fixed left-0 z-30 flex flex-col transition-transform duration-300 transform translate-x-0 bg-white shadow-lg sidebar-chat w-1/5 h-[calc(100vh_-_75px)]">
+               class="fixed left-0 z-30 flex flex-col transition-transform duration-300 transform transition-transform duration-300 @if(!$openSidebar) -translate-x-full @endif bg-white shadow-lg sidebar-chat w-1/5 h-[calc(100vh_-_75px)]">
             <!-- Botón "+" para nuevo chat -->
             <div class="flex items-center justify-between px-3 pt-3 pb-2">
                 <span class="font-bold text-[#195b81] text-base">Chats</span>
@@ -15,11 +15,12 @@
                         title="Nuevo chat">
                        <span> Nuevo Chat</span>                   <i class="fa-solid fa-plus"></i>
                 </button>
-                       <!-- Botón hamburguesa para mostrar/ocultar sidebar -->
-        <button id="sidebarToggle" class="open-sidebar bg-white absolute -right-[34px]  h-[35px] w-[35px] rounded-[0px_50px_50px_0px]">
-            <i class="fa-solid fa-bars text-[#195b81]"></i>
-        </button>
-
+                <!-- Botón hamburguesa -->
+                <button wire:click="toggleSidebar" class="absolute right-[-35px] h-[35px] w-[35px] bg-[#195b81] rounded-r-full rounded-l-none" id="toggle-sidebar">
+                    <svg class="w-6 h-6" fill="white" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
             <hr class="mb-2 bg-white">
             <!-- Lista de chats -->
@@ -71,7 +72,7 @@
             <!-- Barra para redimensionar -->
             <div id="sidebarResizer" class="sidebar-resizer"></div>
         </aside>
- 
+
         <!-- Área principal del chat -->
        <div class="flex flex-col flex-1 h-full w-4/5 container-bot transition-all duration-300 max-w-[80%]">
           <!--  <div wire:loading="sendMessage" class="flex justify-start ml-40">
@@ -83,7 +84,7 @@
                     </div>
                 </div>
             </div>-->
-            
+
 
             @if($messages->isEmpty())
                 <div class="flex  mt-8 flex-col items-center justify-center h-full w-full bg-[#f3f8fd] ">

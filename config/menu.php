@@ -21,7 +21,7 @@ return [
     // ELEMENTOS EXCLUSIVOS VISTA USUARIOS
     [
         'group'  => 'user',
-        'name'   => 'Examenes',
+        'name'   => 'MedBanks',
         'route'  => 'examenes.index',
         'active' => 'examenes.index',
         'roles'  => ['admin', 'root', 'colab', 'Rector', 'user'],
@@ -29,7 +29,7 @@ return [
     ],
     [
         'group'  => 'user',
-        'name'   => 'Flashcard',
+        'name'   => 'MedFlash',
         'route'  => 'flashcard.index',
         'active' => 'flashcard.index',
         'roles'  => ['admin', 'root', 'colab', 'Rector', 'user'],
