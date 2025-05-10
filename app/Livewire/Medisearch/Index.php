@@ -219,7 +219,6 @@ class Index extends Component
                 return $messages;
             });
     }
-
     public function openEditModal($chatId)
     {
         $chat = $this->chatHistory->where('id', $chatId)->first();
