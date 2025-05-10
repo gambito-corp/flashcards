@@ -22,10 +22,10 @@ input:focus {
     background-color: var(--primary-color);
 }
 
-.h-screen {
+/*.h-screen {
     min-height: initial;
     height: initial;
-}
+}*/
 .text-color {
     color: var(--text-color);
 }

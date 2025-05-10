@@ -6,7 +6,7 @@
 <div class="flex justify-end">
         <!-- Sidebar con resizer -->
         <aside id="sidebar"
-               class="fixed left-0 z-30 flex flex-col transition-transform duration-300 transform transition-transform duration-300 @if(!$openSidebar) -translate-x-full @endif bg-white shadow-lg sidebar-chat w-1/5 h-[calc(100vh_-_75px)]">
+               class=" fixed left-0 z-30 flex flex-col transition-transform duration-300 transform @if(!$openSidebar) -translate-x-full @endif bg-white shadow-lg w-1/5 h-[calc(100vh_-_75px)]">
             <!-- Botón "+" para nuevo chat -->
             <div class="flex items-center justify-between px-3 pt-3 pb-2">
                 <span class="font-bold text-[#195b81] text-base">Chats</span>
@@ -16,8 +16,8 @@
                        <span> Nuevo Chat</span>                   <i class="fa-solid fa-plus"></i>
                 </button>
                 <!-- Botón hamburguesa -->
-                <button wire:click="toggleSidebar" class="absolute right-[-35px] h-[35px] w-[35px] bg-[#195b81] rounded-r-full rounded-l-none" id="toggle-sidebar">
-                    <svg class="w-6 h-6" fill="white" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                <button wire:click="toggleSidebar" class="absolute right-[-35px] h-[35px] w-[35px] bg-white rounded-r-full rounded-l-none shadow-lg" id="toggle-sidebar">
+                    <svg class="w-6 h-6" fill="white" stroke="#195b81" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
@@ -74,7 +74,7 @@
         </aside>
 
         <!-- Área principal del chat -->
-       <div class="flex flex-col flex-1 h-full w-4/5 container-bot transition-all duration-300 max-w-[80%]">
+       <div class="flex flex-col flex-1 h-full container-bot transition-all duration-300  ">
           <!--  <div wire:loading="sendMessage" class="flex justify-start ml-40">
                 <div class="flex justify-start w-4/5">
                     <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
@@ -87,7 +87,7 @@
 
 
             @if($messages->isEmpty())
-                <div class="flex  mt-8 flex-col items-center justify-center h-full w-full bg-[#f3f8fd] ">
+                <div class="transition-all duration-300 ml-auto mt-8 flex flex-col items-center justify-center h-full bg-[#f3f8fd]  @if($openSidebar) w-4/5 @else w-full @endif">
                     <!-- Logo y título -->
                     <h1 class="text-4xl md:text-5xl font-extrabold text-[#195b81]  mb-2">DoctorMBS</h1>
                     <div class="text-lg md:text-xl text-[#195b81] font-semibold mb-1  mx-5 md:mx-0 text-center">
@@ -234,11 +234,12 @@
             @else
 
                 <!-- Estado 2: Chat activo -->
-                <div class="flex flex-col h-full bg-[#f3f8fd]">
+                <div class="flex flex-col h-full bg-[#f3f8fd] transition-all duration-300
+    @if($openSidebar) w-4/5 ml-[20%] @else w-full ml-0 @endif">
                     <!-- Encabezado del chat -->
                     <div id="date-content"
                          class="flex items-center justify-between p-4  bg-white shadow flex-wrap">
-                        <h2 class="text-sm md:text-xl  font-bold text-[#195b81]">
+                        <h2 class="text-sm md:text-xl  font-bold text-[#195b81] pl-8">
                             {{ $activeChatTitle }}
                         </h2>
                         <button
@@ -262,7 +263,7 @@
                     </div>
 
                     <!-- Área de mensajes -->
-                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f3f8fd]">
+                    <div id="chat-messages" class="h-screen flex-1 overflow-y-auto p-4 space-y-4 bg-[#f3f8fd]">
                         @foreach($messages as $message)
                             @if($message['from'] === 'user')
                                 <div class="flex justify-end mr-10">
@@ -547,28 +548,6 @@
     }
 
 
-// Seleccionar los elementos necesarios
-const openSidebarBtn = document.querySelector('.open-sidebar');
-const sidebar = document.getElementById('sidebar');  // Usamos el ID para el sidebar
-const containerBot = document.querySelector('.container-bot');
-
-// Función para alternar el estado del sidebar
-openSidebarBtn.addEventListener('click', function() {
-  // Verificamos si la propiedad transform está configurada en translateX(-100%)
-  if (sidebar.style.transform === 'translateX(-100%)') {
-    // Si la clase está presente, la quitamos (lo volvemos a mostrar)
-    sidebar.style.transform = 'translateX(0)';
-  } else {
-    // Si no está presente, la agregamos (lo ocultamos)
-    sidebar.style.transform = 'translateX(-100%)';
-  }
-});
-
-// Agregar evento de clic para el contenedor 'container-bot'
-containerBot.addEventListener('click', function() {
-  // Cambiar la clase para que el max-width sea 80%
-  containerBot.classList.toggle('max-w-[100%]');
-});
 
 
 </script>
