@@ -322,7 +322,6 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                                         $fecha = isset($article['fecha']) ? $article['fecha'] : $article['year'];
                                         $titulo = isset($article['titulo']) ? $article['titulo'] : $article['title'];
                                         $autores = isset($article['autores']) ? $article['autores'] : $article['authors'];
-                                        $resumen = isset($article['resumen']) ? $article['resumen'] : $article['summary'];
                                         $tipoEstudio = isset($article['tipo_estudio']) ? $article['tipo_estudio'] : $article['journal'];
                                     @endphp
                                                     <div
