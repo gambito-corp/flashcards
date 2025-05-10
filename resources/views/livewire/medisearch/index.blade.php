@@ -2,13 +2,21 @@
     <div id="main-content"
          class="w-full  flex flex-col bg-[#f3f8fd] md:ml:48 ml-0 overflow-x-hidden transition-all duration-300">
         <!-- Overlay para sidebar en móvil -->
+<!-- Overlay -->
+@if($openSidebar)
+    <div
+        class="fixed inset-0 bg-black bg-opacity-50 z-20 sm:hidden top-[65px] "
+        wire:click="$set('openSidebar', false)">
+    </div>
+@endif
 
 <div class="flex justify-end">
+
         <!-- Sidebar con resizer -->
         <aside id="sidebar"
                class=" fixed left-0 z-30 flex flex-col transition-transform duration-300 transform
 @if(!$openSidebar) -translate-x-full @endif
-bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
+bg-white shadow-lg w-[85%] sm:w-1/5 h-[calc(100vh_-_75px)]">
             <!-- Botón "+" para nuevo chat -->
             <div class="flex items-center justify-between px-3 pt-3 pb-2">
                 <span class="font-bold text-[#195b81] text-base">Chats</span>
@@ -76,7 +84,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
         </aside>
 
         <!-- Área principal del chat -->
-       <div class="flex flex-col flex-1 h-full container-bot transition-all duration-300  ">
+       <div class="flex flex-col flex-1 h-full container-bot transition-all duration-300 w-full ">
           <!--  <div wire:loading="sendMessage" class="flex justify-start ml-40">
                 <div class="flex justify-start w-4/5">
                     <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
@@ -263,7 +271,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                     <div id="chat-messages" class="h-screen flex-1 overflow-y-auto p-4 space-y-4 bg-[#f3f8fd]">
                         @foreach($messages as $message)
                             @if($message['from'] === 'user')
-                                <div class="flex justify-end mr-10">
+                                <div class="flex justify-end md:mr-10 mr-0">
                                     <div class="flex justify-end w-4/5">
                                         <div class="bg-[#195b81] text-white p-4 rounded-2xl shadow text-right">
                                             {{ $message['text'] }}
@@ -271,16 +279,16 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                                     </div>
                                 </div>
                             @elseif($message['from'] === 'bot')
-                                <div id="answer-content" class="flex justify-start ml-0 md:ml-20 md:ml-48">
+                                <div id="answer-content" class="flex justify-start ml-0 md:ml-20  md:mr-10 mr-0">
                                     <div class="flex justify-start ">
-                                        <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
+                                        <div class="bg-white p-4 rounded-2xl  border border-[#d9e6f7] text-left">
                                             @php
                                                 $content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $message['text']);
                                             @endphp
 
                                      @if(isset($message["is_new"]) && $message["is_new"] !== 'false')
     <div id="answer-div"
-         class="text-[#195b81] answer-div text-[15px]"
+         class="text-[#444] answer-div text-[15px]"
          x-data="typingEffectWithHtml()"
          x-bind:data-content='@json($content)'
          x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
@@ -289,7 +297,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
     </div>
 @else
     <div id="answer-div"
-         class="text-[#195b81] answer-div text-[15px]"
+         class="text-[#444] answer-div text-[15px]"
     >
         {!! $content !!}
     </div>
@@ -309,7 +317,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                                     </div>
                                 </div>
                             @elseif($message['from'] === 'articles' && !empty($message['data']))
-                                <div class="">
+                                <div class="ml-0 md:ml-20">
                                     <div class="">
                                         <div class="text-left">
                                             <div class="font-semibold text-[#195b81] mb-2">
@@ -325,7 +333,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                                         $tipoEstudio = isset($article['tipo_estudio']) ? $article['tipo_estudio'] : $article['journal'];
                                     @endphp
                                                     <div
-                                                        class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-auto w-full">
+                                                        class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-1/5 w-full">
                                                         <a href="{{ $article['url'] ?? '#' }}" target="_blank"
                                                            class="block">
                                                             <h4 class="font-bold text-[#195b81] text-sm">{{$titulo}}</h4>
@@ -387,7 +395,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
     <!-- Botón -->
     <button wire:click="sendMessage"
             class="order-0 relative ml-4 bg-[#66acff] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition md:h-[40px] h-[35px] md:w-[40px] w-[35px] md:order-none order-0"
-            @click="overlay = true; setTimeout(() => overlay = false, 5000)">
+            @click="overlay = true; setTimeout(() => overlay = false, 6000)">
         <i class="fa-solid fa-arrow-right"></i>
     </button>
 
