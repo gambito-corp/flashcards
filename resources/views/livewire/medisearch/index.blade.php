@@ -1,26 +1,35 @@
-<div class="fixed inset-0 top-[80px] left-0 right-0 bottom-0 z-10 bg-[#f3f8fd] flex">
-    <!-- Botón hamburguesa -->
-    <button class="absolute z-30 p-2 text-black transition-colors bg-white rounded-lg shadow-lg top-4 left-4 hover:bg-gray-100" id="toggle-sidebar">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<div class="fixed inset-0 top-[75px] left-0 right-0 bottom-0 z-10 bg-[#f3f8fd] ">
+ 
+<div class="flex">
+     <!-- Sidebar -->
+        <div class="relative flex flex-col bg-white w-[20%] transform transition-transform duration-300" id="sidebar">
+            <!-- Handle de arrastre -->
+
+           <div class="flex items-center justify-between px-3 pt-3 pb-2">
+               <span class="font-bold text-[#195b81] text-lg">Chats</span>
+               <button {{--wire:click="createNewChat"--}}
+                       class="bg-[#195b81] py-2 px-5 rounded-full text-sm flex gap-2 justify-center items-center text-white"
+                       title="Nuevo chat"><span>Nuevo Chat</span>
+                   <i class="fa-solid fa-plus"></i>
+               </button>
+                  <!-- Botón hamburguesa -->
+    <button class="absolute right-[-35px] h-[35px] w-[35px] bg-[#195b81] rounded-r-full rounded-l-none" id="toggle-sidebar">
+        <svg class="w-6 h-6" fill="white" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
     </button>
 
-    <div class="grid w-full h-full transition-all duration-300 ease-in-out" id="resizable-grid">
-        <!-- Sidebar -->
-        <div class="relative flex flex-col overflow-hidden bg-white" id="sidebar">
-            <!-- Handle de arrastre -->
-            <div class="absolute top-0 bottom-0 right-0 z-20 w-2 bg-gray-400 hover:bg-blue-500 cursor-col-resize" id="drag-handle"></div>
-           <div class="flex items-center justify-between px-3 pt-3 pb-2">--}}
-               <span class="font-bold text-[#195b81] text-lg">Chats</span>
-               <button {{--wire:click="createNewChat"--}}
-                       class="bg-[#195b81] text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-[#1a6ca6] transition"
-                       title="Nuevo chat">
-                   <i class="fa-solid fa-plus"></i>
-               </button>
             </div>
+            <hr>
             <!-- Contenido del sidebar -->
-            <div class="p-4 mt-16 text-white">
+            <div class="p-4 text-white max-h-100 overflow-y-auto
+  [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:rounded-full
+  [&::-webkit-scrollbar-track]:bg-[#f3f4f6]
+  [&::-webkit-scrollbar-thumb]:rounded-full
+  [&::-webkit-scrollbar-thumb]:bg-[#f3f4f6]
+  dark:[&::-webkit-scrollbar-track]:bg-[#f3f4f6]
+  dark:[&::-webkit-scrollbar-thumb]:bg-[#d1d5dc]">
                 @foreach($groupedChats as $group => $chats)
                     <div class="mt-4">
                         <button type="button"
@@ -34,7 +43,7 @@
                             @foreach($chats as $chat)
                                 <div class="flex items-center group">
                                     <button {{--wire:click="selectChat({{ $chat->id }})"--}}
-                                            class="flex-1 w-full text-left flex items-center gap-2 px-2 py-2 mb-1 rounded-lg
+                                            class="flex-1 text-base w-full text-left flex items-center gap-2 px-2 py-2 mb-1 rounded-lg
                                             transition hover:bg-[#f3f6fb]
                                             {{ $activeChatId == $chat->id ? 'bg-[#f3f6fb] text-[#195b81] font-bold' : 'text-gray-800' }}">
                                         <i class="fa-regular fa-message"></i>
@@ -60,6 +69,9 @@
             </div>
         </div>
 
+
+    <div class="w-[80%] h-full transition-all duration-300 ease-in-out chat">
+       
         <!-- Columna principal -->
         <div class="">
             @if ($messages->isEmpty())
@@ -202,7 +214,7 @@
                 </div>
             </div>
             @else
-                 <!-- Estado 2: Chat activo -->--}}
+                 <!-- Estado 2: Chat activo -->
                 <div class="flex flex-col h-full bg-[#f3f8fd]">
                     <!-- Encabezado del chat -->
                     <div id="date-content"
@@ -320,64 +332,26 @@
         </div>
     </div>
 </div>
-
+</div>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const grid = document.getElementById('resizable-grid');
-    const sidebar = document.getElementById('sidebar');
-    const dragHandle = document.getElementById('drag-handle');
-    const toggleButton = document.getElementById('toggle-sidebar');
 
-    let isDragging = false;
-    let startX = 0;
-    let startWidth = 0;
-    let isOpen = true;
-    let lastWidth = 25; // Porcentaje inicial
+// Seleccionar los elementos
+const toggleSidebarBtn = document.getElementById('toggle-sidebar');
+const sidebar = document.getElementById('sidebar');
 
-    // Función para actualizar el grid
-    function updateGrid(width) {
-        grid.style.gridTemplateColumns = `${width}% ${100 - width}%`;
-    }
-
-    // Eventos para el drag handle
-    dragHandle.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        startWidth = grid.offsetWidth * (lastWidth / 100);
-        document.body.style.userSelect = 'none';
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging || !isOpen) return;
-
-        const containerWidth = grid.offsetWidth;
-        const deltaX = e.clientX - startX;
-        const newWidth = ((startWidth + deltaX) / containerWidth) * 100;
-
-        // Limitar entre 10% y 25%
-        const clampedWidth = Math.max(10, Math.min(25, newWidth));
-        lastWidth = clampedWidth;
-        updateGrid(clampedWidth);
-    });
-
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-        document.body.style.userSelect = '';
-    });
-
-    // Evento para el botón de hamburguesa
-    toggleButton.addEventListener('click', () => {
-        isOpen = !isOpen;
-        if (isOpen) {
-            updateGrid(lastWidth);
-        } else {
-            grid.style.gridTemplateColumns = '0% 100%';
-        }
-    });
-
-    // Inicializar con el ancho por defecto
-    updateGrid(lastWidth);
+// Añadir un evento de clic al botón de la clase 'toggle-sidebar'
+toggleSidebarBtn.addEventListener('click', function() {
+  // Verificar si el estilo 'transform' tiene la propiedad translateX(-100%)
+  if (sidebar.classList.contains('translate-x-[-100%]')) {
+    // Si ya tiene el translateX(-100%), quitar la clase
+    sidebar.classList.remove('translate-x-[-100%]');
+  } else {
+    // Si no tiene la clase, agregar translateX(-100%)
+    sidebar.classList.add('translate-x-[-100%]');
+  }
 });
+
+
 </script>
 
 
@@ -396,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 {{--        <!-- Sidebar con resizer -->--}}
 {{--        <aside id="sidebar"--}}
-{{--               class="fixed left-0 z-30 flex flex-col transition-all duration-300 bg-white shadow-lg sidebar-chat">--}}
+{{--               class="fixed left-0 z-30 flex flex-col transition-all duration-300 bg-white shadow-lg sidebar-chat ">--}}
 {{--            <!-- Botón "+" para nuevo chat -->--}}
 {{--            <div class="flex items-center justify-between px-3 pt-3 pb-2">--}}
 {{--                <span class="font-bold text-[#195b81] text-lg">Chats</span>--}}
