@@ -70,6 +70,9 @@ class WebhookController extends Controller
 
         $purchase->status = 'authorized';
         $purchase->save();
+        $purchase->load('user');
+        $purchase->user->status = 1;
+        $purchase->user->save();
 
         Log::info('Purchase actualizado a authorized.', ['purchase_id' => $purchase->id]);
     }

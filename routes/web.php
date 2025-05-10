@@ -215,8 +215,7 @@ Route::middleware([
 Route::middleware(['auth'])->group(function () {
     Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
     Route::post('/subscription/create/{product}', [MercadoPagoController::class, 'createSubscription'])->name('subscription.create');
-    Route::get('/pago-exitoso', function (\Illuminate\Http\Request $request){
-        // URL de la API de Mercado Pago
+    Route::get('/pago-exitoso/{preapproval_id}', function (\Illuminate\Http\Request $request){
         // URL de la API de Mercado Pago
         $url = 'https://api.mercadopago.com/preapproval_plan/search';
 
