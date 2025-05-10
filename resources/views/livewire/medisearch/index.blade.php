@@ -245,7 +245,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                             {{ $activeChatTitle }}
                         </h2>
 
-
+                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
                             <a
                                 href="{{ route('planes') }}"
                                 class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base"
@@ -256,7 +256,7 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                                 </svg>
                             </a>
-
+                        @endif
                     </div>
 
                     <!-- Área de mensajes -->
@@ -538,21 +538,21 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                 </div>
             </div>
         </div>
-
-            <div class="absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center rounded-2xl">
-                  <button wire:click="closeFilters" class="text-2xl  text-white absolute top-0 right-0 bg-[#195b81] w-10 h-10 rounded-xl">&times;
-                    </button>
-                <a
-                    href="{{ route('planes') }}"
-                    class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg text-lg hover:scale-105 transition flex items-center justify-center"
-                >
-                    Actualizar a Pro
-                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                </a>
-            </div>
-
+            @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                <div class="absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center rounded-2xl">
+                      <button wire:click="closeFilters" class="text-2xl  text-white absolute top-0 right-0 bg-[#195b81] w-10 h-10 rounded-xl">&times;
+                        </button>
+                    <a
+                        href="{{ route('planes') }}"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg text-lg hover:scale-105 transition flex items-center justify-center"
+                    >
+                        Actualizar a Pro
+                        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </a>
+                </div>
+            @endif
     @endif
    <script>
     function typingEffectWithHtml() {
