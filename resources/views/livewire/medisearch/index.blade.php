@@ -1,4 +1,4 @@
-<div class="fixed inset-0 top-[75px] left-0 right-0 bottom-0 z-10 bg-[#f3f8fd] flex">
+<div class="fixed inset-0 top-[65px] md:top-[75px] left-0 right-0 bottom-0 z-10 bg-[#f3f8fd] flex">
     <div id="main-content"
          class="w-full  flex flex-col bg-[#f3f8fd] md:ml:48 ml-0 overflow-x-hidden transition-all duration-300">
         <!-- Overlay para sidebar en móvil -->
@@ -6,7 +6,9 @@
 <div class="flex justify-end">
         <!-- Sidebar con resizer -->
         <aside id="sidebar"
-               class=" fixed left-0 z-30 flex flex-col transition-transform duration-300 transform @if(!$openSidebar) -translate-x-full @endif bg-white shadow-lg w-1/5 h-[calc(100vh_-_75px)]">
+               class=" fixed left-0 z-30 flex flex-col transition-transform duration-300 transform
+@if(!$openSidebar) -translate-x-full @endif
+bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
             <!-- Botón "+" para nuevo chat -->
             <div class="flex items-center justify-between px-3 pt-3 pb-2">
                 <span class="font-bold text-[#195b81] text-base">Chats</span>
@@ -43,7 +45,7 @@
                         <div class="transition-all duration-200"
                              style="{{ $chatGroupsOpen[$group] ? '' : 'display:none;' }}">
                             @foreach($chats as $chat)
-                                <div class="flex items-center group">
+                                <div class="flex items-center group ">
                                     <button wire:click="selectChat({{ $chat->id }})"
                                             class="flex-1 w-full text-left flex items-center gap-2 px-2 py-2 mb-1 rounded-lg
                                             transition hover:bg-[#f3f6fb]
@@ -87,7 +89,7 @@
 
 
             @if($messages->isEmpty())
-                <div class="transition-all duration-300 ml-auto mt-8 flex flex-col items-center justify-center h-full bg-[#f3f8fd]  @if($openSidebar) w-4/5 @else w-full @endif">
+                <div class="transition-all duration-300 ml-auto mt-8 flex flex-col items-center justify-center h-full bg-[#f3f8fd] w-full {{ $openSidebar ? 'sm:w-4/5' : 'sm:w-full' }}">
                     <!-- Logo y título -->
                     <h1 class="text-4xl md:text-5xl font-extrabold text-[#195b81]  mb-2">DoctorMBS</h1>
                     <div class="text-lg md:text-xl text-[#195b81] font-semibold mb-1  mx-5 md:mx-0 text-center">
@@ -242,15 +244,11 @@
                         <h2 class="text-sm md:text-xl  font-bold text-[#195b81] pl-8">
                             {{ $activeChatTitle }}
                         </h2>
-                        <button
-                            class="history-chat-button  bg-white z-40 px-5 py-2 rounded-full text-[14px] shadow-md md:hidden flex items-center gap-2"
-                            onclick="openSidebar()">
-                            <i class="fa-regular fa-message"></i> Historial
-                        </button>
-                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+
+
                             <a
                                 href="{{ route('planes') }}"
-                                class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg text-lg hover:scale-105 transition flex items-center justify-center"
+                                class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base"
                             >
                                 Actualizar a Pro
                                 <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
@@ -259,7 +257,6 @@
                                 </svg>
                             </a>
 
-                        @endif
                     </div>
 
                     <!-- Área de mensajes -->
@@ -274,28 +271,30 @@
                                     </div>
                                 </div>
                             @elseif($message['from'] === 'bot')
-                                <div id="answer-content" class="flex justify-start ml-20 md:ml-48">
-                                    <div class="flex justify-start w-4/5">
+                                <div id="answer-content" class="flex justify-start ml-0 md:ml-20 md:ml-48">
+                                    <div class="flex justify-start ">
                                         <div class="bg-white p-4 rounded-2xl shadow border border-[#d9e6f7] text-left">
                                             @php
                                                 $content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $message['text']);
                                             @endphp
-                                            @if(!empty($message['is_new']))
-                                                <div id="answer-div"
-                                                     class="text-[#195b81] answer-div text-[15px]"
-                                                     x-data="typingEffectWithHtml()"
-                                                     x-bind:data-content='@json($content)'
-                                                     x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
-                                                >
-                                                    <span x-html="displayedHtml"></span>
-                                                </div>
-                                            @else
-                                                <div id="answer-div"
-                                                     class="text-[#195b81] answer-div text-[15px]"
-                                                >
-                                                    {!! $content !!}
-                                                </div>
-                                            @endif
+
+                                     @if(isset($message["is_new"]) && $message["is_new"] !== 'false')
+    <div id="answer-div"
+         class="text-[#195b81] answer-div text-[15px]"
+         x-data="typingEffectWithHtml()"
+         x-bind:data-content='@json($content)'
+         x-init="startTyping(decodeHTMLEntities($el.dataset.content))"
+    >
+        <span x-html="displayedHtml"></span>
+    </div>
+@else
+    <div id="answer-div"
+         class="text-[#195b81] answer-div text-[15px]"
+    >
+        {!! $content !!}
+    </div>
+@endif
+
                                             @if(!empty($message['references']))
                                                 <div class="flex flex-wrap gap-2 mt-2">
                                                     @foreach($message['references'] as $ref)
@@ -310,33 +309,41 @@
                                     </div>
                                 </div>
                             @elseif($message['from'] === 'articles' && !empty($message['data']))
-                                <div class=" ml-0 md:ml-48">
-                                    <div class="w-4/5 max-w-6xl">
+                                <div class="">
+                                    <div class="">
                                         <div class="text-left">
                                             <div class="font-semibold text-[#195b81] mb-2">
                                                 Artículos relacionados:
                                             </div>
                                             <div class="flex gap-3 flex-wrap">
                                                 @foreach($message['data'] as $article)
+                                                @php
+                                        $url = $article['url'];
+                                        $fecha = isset($article['fecha']) ? $article['fecha'] : $article['year'];
+                                        $fuente = isset($article['fuente']) ? $article['fuente'] : $article['source'];
+                                        $titulo = isset($article['titulo']) ? $article['titulo'] : $article['title'];
+                                        $autores = isset($article['autores']) ? $article['autores'] : $article['authors'];
+                                        $resumen = isset($article['resumen']) ? $article['resumen'] : $article['summary'];
+                                        $tipoEstudio = isset($article['tipo_estudio']) ? $article['tipo_estudio'] : $article['journal'];
+                                    @endphp
                                                     <div
                                                         class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-auto w-full">
                                                         <a href="{{ $article['url'] ?? '#' }}" target="_blank"
                                                            class="block">
-                                                            <h4 class="font-bold text-[#195b81] text-sm">Titulo de
-                                                                Prueba</h4>
+                                                            <h4 class="font-bold text-[#195b81] text-sm">{{$titulo}}</h4>
                                                             <div class="mt-1 text-xs text-gray-500">
-                                                                Autor de Prueba
+                                                                {{$autores}}
                                                                 @if(!empty($article['journal'] ?? ''))
-                                                                    · journal de Prueba
+                                                                    ·     {{$fuente}}
                                                                 @endif
                                                                 @if(!empty($article['fecha'] ?? ''))
-                                                                    · fecha de Prueba
+                                                                    ·     {{$fecha}}
                                                                 @endif
                                                             </div>
                                                             @if(!empty($article['tipo_estudio']))
                                                                 <span
                                                                     class="inline-block bg-[#d9e6f7] text-[#195b81] px-2 py-0.5 rounded-full text-xs mt-2">
-                                                                    estudio de Prueb
+                                                                       {{$tipoEstudio}}
                                                                 </span>
                                                             @endif
                                                         </a>
@@ -381,12 +388,29 @@
                                 <!-- Label text -->
                                 <span class="ms-3 text-[13px] md:text-sm font-bold text-[#b0b8c1]">Investigacion Profunda</span>
                             </label>
+<!-- Asegúrate de que Alpine.js esté cargado en tu plantilla -->
+<div x-data="{ overlay: false }">
+    <!-- Botón -->
+    <button wire:click="sendMessage"
+            class="order-0 relative ml-4 bg-[#66acff] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition md:h-[40px] h-[35px] md:w-[40px] w-[35px] md:order-none order-0"
+            @click="overlay = true; setTimeout(() => overlay = false, 5000)">
+        <i class="fa-solid fa-arrow-right"></i>
+    </button>
 
-                            <button wire:click="sendMessage"
-                                    class="order-0 relative ml-4 bg-[#66acff] hover:bg-[#195b81] text-white p-2 rounded-full flex items-center justify-center shadow transition md:h-[40px] h-[35px] md:w-[40px] w-[35px] md:order-none order-0">
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </button>
+    <!-- Overlay con texto "Cargando..." -->
+    <div
+      x-show="overlay"
+      x-transition.opacity
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    >
+      <div class="bg-white rounded-lg px-6 py-4 shadow-lg">
+        <p class="text-lg font-semibold">Cargando...</p>
+      </div>
+    </div>
+</div>
+
                         </div>
+
                     </div>
                 </div>
             @endif
@@ -514,8 +538,10 @@
                 </div>
             </div>
         </div>
-        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+
             <div class="absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center rounded-2xl">
+                  <button wire:click="closeFilters" class="text-2xl  text-white absolute top-0 right-0 bg-[#195b81] w-10 h-10 rounded-xl">&times;
+                    </button>
                 <a
                     href="{{ route('planes') }}"
                     class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg text-lg hover:scale-105 transition flex items-center justify-center"
@@ -526,7 +552,7 @@
                     </svg>
                 </a>
             </div>
-        @endif
+
     @endif
    <script>
     function typingEffectWithHtml() {

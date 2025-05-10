@@ -408,13 +408,15 @@ class Index extends Component
                         $references = array_map('strip_tags', $refMatches[1] ?? []);
                     }
 
-                    $this->messages[] = [
+                    $this->messages[] = [  
+                        'is_new' => true,
                         'from' => 'bot',
                         'text' => $item['respuesta'],
                         'references' => $references,
                     ];
                 } elseif ($item['tipo'] === 'articles' && !empty($item['articulos'])) {
                     $this->messages[] = [
+                         'is_new' => true,
                         'from' => 'articles',
                         'data' => $item['articulos'],
                     ];
