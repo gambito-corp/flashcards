@@ -187,6 +187,7 @@ class Index extends Component
 
                 // Mensaje del usuario
                 $messages[] = [
+                    'is_new' => 'false',
                     'from' => 'user',
                     'text' => $question->query,
                     'timestamp' => $question->created_at
@@ -198,6 +199,7 @@ class Index extends Component
                         if ($resultado['tipo'] === 'llm_response') {
                             // Mensaje del bot
                             $messages[] = [
+                                'is_new' => 'false',
                                 'from' => 'bot',
                                 'text' => $resultado['respuesta'],
                                 'references' => [],
@@ -206,6 +208,7 @@ class Index extends Component
                         } elseif ($resultado['tipo'] === 'articles' && !empty($resultado['articulos'])) {
                             // Artículos relacionados
                             $messages[] = [
+                                'is_new' => 'false',
                                 'from' => 'articles',
                                 'data' => $resultado['articulos'],
                                 'timestamp' => $question->created_at
@@ -213,11 +216,9 @@ class Index extends Component
                         }
                     }
                 }
-
                 return $messages;
             });
     }
-
     public function openEditModal($chatId)
     {
         $chat = $this->chatHistory->where('id', $chatId)->first();
