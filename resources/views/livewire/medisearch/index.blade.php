@@ -320,7 +320,6 @@ bg-white shadow-lg w-[90%] sm:w-1/5 h-[calc(100vh_-_75px)]">
                                                 @php
                                         $url = $article['url'];
                                         $fecha = isset($article['fecha']) ? $article['fecha'] : $article['year'];
-                                        $fuente = isset($article['fuente']) ? $article['fuente'] : $article['source'];
                                         $titulo = isset($article['titulo']) ? $article['titulo'] : $article['title'];
                                         $autores = isset($article['autores']) ? $article['autores'] : $article['authors'];
                                         $resumen = isset($article['resumen']) ? $article['resumen'] : $article['summary'];
