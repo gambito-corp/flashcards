@@ -20,11 +20,14 @@
                 <!-- Botón "+" para nuevo chat -->
                 <div class="flex items-center justify-between px-3 pt-3 pb-2">
                     <span class="font-bold text-[#195b81] text-base">Chats</span>
-                    <button wire:click="createNewChat"
-                            class="bg-[#195b81] px-[20px] py-[8px] text-[12px] rounded-[50px] gap-2 flex justify-center items-center text-white hover:bg-[#1a6ca6] transition"
-                            title="Nuevo chat">
+                    <button
+                        wire:click="createNewChat"
+                        @if($messages->isEmpty()) disabled @endif
+                        class="bg-[#195b81] px-[20px] py-[8px] text-[12px] rounded-[50px] gap-2 flex justify-center items-center text-white hover:bg-[#1a6ca6] transition"
+                        title="Nuevo chat">
                         <span> Nuevo Chat</span> <i class="fa-solid fa-plus"></i>
                     </button>
+
                     <!-- Botón hamburguesa -->
                     <button wire:click="toggleSidebar"
                             class="absolute right-[-35px] h-[35px] w-[35px] bg-white rounded-r-full rounded-l-none shadow-lg"
@@ -99,12 +102,13 @@
 
                         <div class="w-full max-w-2xl mt-8 mb-8 ">
 
-                            <div wire:loading wire:target="sendMessage"
+                            <div wire:loading.flex wire:target="sendMessage,setQuestion"
                                  class="flex flex-col items-center justify-center mt-4 space-y-2">
                                 <div
                                     class="animate-spin h-8 w-8 border-4 border-blue-400 border-t-transparent rounded-full"></div>
                                 <span class="text-blue-600 font-semibold text-lg">Cargando...</span>
                             </div>
+
                             <div class="flex inset-x-0 mx-auto max-w-full items-center bg-white border-2 border-[#3b82f6] rounded-2xl px-4 md:px-6  shadow-lg
                             flex-wrap md:inset-auto md:max-w-none h-[140px] mx-5 md:mx-0">
                                 <input type="text"
@@ -154,8 +158,11 @@
                                         @if($current === $index)
                                             <div class="transition-all duration-300">
                                                 <button
-                                                    wire:click="$set('question', '{{ $question }}')"
-                                                    class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
+                                                    wire:click="setQuestion('{{ $question }}')"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="setQuestion,sendMessage"
+                                                    class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl
+                                                px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
                                                     {{ $question }}
                                                 </button>
                                             </div>
@@ -200,7 +207,9 @@
                                         @if($currentAdvance === $index)
                                             <div class="transition-all duration-300">
                                                 <button
-                                                    wire:click="$set('question', '{{ $question }}')"
+                                                    wire:click="setQuestion('{{ $question }}')"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="setQuestion,sendMessage"
                                                     class="w-full bg-white border border-[#b0b8c1] text-[#195b81] rounded-xl px-4 py-3 text-sm shadow hover:bg-[#f3f6fb] transition text-left">
                                                     {{ $question }}
                                                 </button>
@@ -360,6 +369,7 @@
                                  class="flex flex-wrap items-center px-4 py-4 md:px-6 shadow py-4bg-white rounded-2xl">
                                 <input type="text"
                                        wire:model.live="newMessage"
+                                       wire:keydown.enter.prevent="sendMessage"
                                        class="flex-1 text-lg bg-transparent border-0 focus:ring-0 focus:outline-none text-[#195b81]"
                                        placeholder="Haz una pregunta de seguimiento...">
                                 <button wire:click='openFilters'
@@ -383,7 +393,7 @@
                                     </div>
 
                                     <!-- Label text -->
-                                    <span class="ms-3 text-[13px] md:text-sm font-bold text-[#b0b8c1]">Investigacion Profunda</span>
+                                    <span class="ms-3 text-[13px] md:text-sm font-bold text-[#b0b8c1]">Medisearch</span>
                                 </label>
                                 <!-- Asegúrate de que Alpine.js esté cargado en tu plantilla -->
                                 <div x-data="{ overlay: false }">
@@ -413,8 +423,8 @@
                 @endif
             </div>
         </div>
-        <div>
 
+        <div>
             @if($showEditModal)
                 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
                     <div class="relative w-full max-w-sm p-6 bg-white shadow-lg rounded-xl">
@@ -591,9 +601,18 @@
 
             </script>
         </div>
-
         @push('styles')
             <style>
 
             </style>
-@endpush
+        @endpush
+    </div>
+    @script
+    <script>
+        // Forzar recarga al cerrar la pestaña/navegador
+        window.addEventListener('beforeunload', function (e) {
+            Livewire.dispatch('preserve-state');
+        });
+    </script>
+    @endscript
+</div>

@@ -4,7 +4,7 @@
             <!-- Logo con margen y padding a la izquierda -->
             <div class="shrink-0 flex mr-24 pr-24 site-logo">
                 <a href="{{ route('dashboard') }}">
-                    <x-application-mark class="block h-9" />
+                    <x-application-mark class="block h-9"/>
                 </a>
             </div>
 
@@ -13,14 +13,14 @@
                 <!-- Enlaces de navegación para escritorio -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     @foreach ($menu as $item)
-                            <x-nav-link href="{{ route($item['route']) }}" :active="request()->routeIs($item['route'])">
-                                {{ __($item['name']) }}
-{{--                                @if(!auth()->user()->hasAnyRole('admin', 'root', 'colab', 'Rector'))--}}
-{{--                                    @if(($item['need_premium'] === true && Auth::user()->status == 0))--}}
-{{--                                        <span class="ml-1 inline-block bg-yellow-400 text-xs text-white px-1 rounded">PRO</span>--}}
-{{--                                    @endif--}}
-{{--                                @endif--}}
-                            </x-nav-link>
+                        <x-nav-link href="{{ route($item['route']) }}" :active="request()->routeIs($item['route'])">
+                            {{ __($item['name']) }}
+                            {{--                                @if(!auth()->user()->hasAnyRole('admin', 'root', 'colab', 'Rector'))--}}
+                            {{--                                    @if(($item['need_premium'] === true && Auth::user()->status == 0))--}}
+                            {{--                                        <span class="ml-1 inline-block bg-yellow-400 text-xs text-white px-1 rounded">PRO</span>--}}
+                            {{--                                    @endif--}}
+                            {{--                                @endif--}}
+                        </x-nav-link>
                     @endforeach
                 </div>
 
@@ -39,7 +39,7 @@
                                         <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                                              viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
                                         </svg>
                                     </button>
                                 </span>
@@ -53,7 +53,9 @@
                                                      onclick="event.preventDefault(); document.getElementById('team-switch-form-{{ $team->id }}').submit();">
                                         {{ $team->name }}
                                     </x-dropdown-link>
-                                    <form id="team-switch-form-{{ $team->id }}" action="{{ route('current-team.updates', $team) }}" method="POST" class="hidden">
+                                    <form id="team-switch-form-{{ $team->id }}"
+                                          action="{{ route('current-team.updates', $team) }}" method="POST"
+                                          class="hidden">
                                         @csrf
                                         @method('PUT')
                                     </form>
@@ -71,14 +73,16 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-                                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
+                                <button
+                                    class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
                                     @if(Auth::user()->profile_photo_path)
                                         <img class="h-8 w-8 rounded-full object-cover"
                                              src="{{ Storage::disk('s3')->temporaryUrl(Auth::user()->profile_photo_path, now()->addMinutes(10)) }}"
                                              alt="{{ Auth::user()->name }}">
                                     @else
-                                        <img class="h-8 w-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}"
-                                             alt="{{ Auth::user()->name }}" />
+                                        <img class="h-8 w-8 rounded-full object-cover"
+                                             src="{{ Auth::user()->profile_photo_url }}"
+                                             alt="{{ Auth::user()->name }}"/>
                                     @endif
                                 </button>
                             @else
@@ -89,7 +93,7 @@
                                         <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                                              viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
                                         </svg>
                                     </button>
                                 </span>
@@ -121,9 +125,10 @@
                         class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex"
-                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16"/>
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden"
-                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
@@ -141,22 +146,26 @@
         </div>
 
         @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
-            <div x-data="{ teamOpen: false }" class="pt-2 pb-3 space-y-1">
-                <button @click="teamOpen = !teamOpen" class="w-full flex justify-between items-center px-4 py-2 text-xs text-gray-400 focus:outline-none">
+            <div x-data="{ teamOpen: false }" class="pt-2 pb-3 space-y-1 z-50 ">
+                <button @click="teamOpen = !teamOpen"
+                        class="z-50 w-full flex justify-between items-center px-4 py-2 text-xs text-gray-400 focus:outline-none">
                     <span>
                         {{ Auth::user()->currentTeam ? Auth::user()->currentTeam->name : __('Selecciona Materia') }}
                     </span>
-                    <svg class="ml-2 h-4 w-4 transform" :class="{'rotate-180': teamOpen}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    <svg class="ml-2 h-4 w-4 transform" :class="{'rotate-180': teamOpen}"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
                     </svg>
                 </button>
-                <div x-show="teamOpen" class="mt-2 space-y-1">
+                <div x-show="teamOpen" class="z-50 mt-2 space-y-1">
                     @forelse (Auth::user()->teams as $team)
                         <x-responsive-nav-link href="{{ route('current-team.updates', $team) }}"
                                                onclick="event.preventDefault(); document.getElementById('team-switch-form-mobile-{{ $team->id }}').submit();">
                             {{ $team->name }}
                         </x-responsive-nav-link>
-                        <form id="team-switch-form-mobile-{{ $team->id }}" action="{{ route('current-team.updates', $team) }}" method="POST" class="hidden">
+                        <form id="team-switch-form-mobile-{{ $team->id }}"
+                              action="{{ route('current-team.updates', $team) }}" method="POST" class="hidden">
                             @csrf
                             @method('PUT')
                         </form>
@@ -173,7 +182,8 @@
             <div class="flex items-center px-4">
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="shrink-0">
-                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}"
+                             alt="{{ Auth::user()->name }}"/>
                     </div>
                 @endif
                 <div class="ml-3">
