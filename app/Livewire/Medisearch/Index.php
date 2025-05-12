@@ -171,6 +171,12 @@ class Index extends Component
         ];
 
         foreach ($this->chatHistory as $chat) {
+            // Truncar el título si es necesario
+            $originalTitle = $chat->title;
+            if (strlen($originalTitle) > 20) {
+                $chat->title = substr($originalTitle, 0, 17) . '...';
+                $chat->save();
+            }
             $diffDays = $now->diffInDays($chat->created_at);
 
             if ($diffDays == 0) {
