@@ -2,19 +2,13 @@
 
 namespace App\Livewire\Medisearch;
 
-use App\Models\Config;
+use App\Models\MedisearchQuestion;
 use App\Services\Chat\chatService;
-use App\Services\DeepseekService;
-use App\Services\MedisearchService;
-use App\Services\OpenAiService;
-use App\Services\PerplexityService;
 use App\Services\Usuarios\MBIAService;
 use Illuminate\Support\Collection;
-use Livewire\Component;
-use App\Models\MedisearchChat;
-use App\Models\MedisearchQuestion;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Livewire\Component;
 
 class Index extends Component
 {
@@ -58,30 +52,47 @@ class Index extends Component
             'Otros',
         ];
         $this->selectedOptions = ["PubMed"];
-
         $this->selectAll();
         $this->selectTypeAll();
         $this->from_date = 1890;
         $this->to_date = 2025;
         $this->openSidebar = false;
+        $this->setQuestionPrompt();
 
-//
-//        $this->questionsBasic = $this->chatService->getMostInterestingQuestions()['preguntas'] ?? [];
-//        $this->questionsAdvanced = $this->chatService->getMostDifficultQuestions($this->questionsBasic)['preguntas'] ?? [];
-//        if (count($this->questionsAdvanced) > 0)
-//        {
-        $this->questionsAdvanced = [
-            '¿La vacuna contra el COVID empeora la artritis?',
-            '¿El control de la natalidad hormonal puede afectar la demografía?'
+
+    }
+
+    public function setQuestionPrompt()
+    {
+        // Usar cache con una duración de 24 horas (86400 segundos)
+        $questions = Cache::remember('mbia_questions', 86400, function () {
+            return $this->MBIAService->generateEasyQuestions() ?? [];
+        });
+
+        // Si el caché está vacío o ha expirado, usamos un array de respaldo
+        $fallbackQuestions = [
+            'basic' => [
+                '¿El deporte aumenta la esperanza de vida?',
+                '¿Cuáles son las probabilidades de contraer cáncer?'
+            ],
+            'advanced' => [
+                '¿La vacuna contra el COVID empeora la artritis?',
+                '¿El control de la natalidad hormonal puede afectar la demografía?'
+            ]
         ];
-//        }
-//        if (count($this->questionsBasic) > 0)
-//        {
-        $this->questionsBasic = [
-            '¿El deporte aumenta la esperanza de vida?',
-            '¿Cuáles son las probabilidades de contraer cáncer?'
-        ];
-//        }
+
+        // Dividir las preguntas cacheadas
+        $this->questionsBasic = array_slice($questions, 0, 5);
+        $this->questionsAdvanced = array_slice($questions, 5, 5);
+
+        // Usar preguntas de respaldo si no hay suficientes en caché
+        if (count($this->questionsAdvanced) <= 0) {
+            $this->questionsAdvanced = $fallbackQuestions['advanced'];
+        }
+
+        if (count($this->questionsBasic) <= 0) {
+            $this->questionsBasic = $fallbackQuestions['basic'];
+        }
     }
 
     public function boot(MBIAService $MBIAService, chatService $chatService)
@@ -94,8 +105,28 @@ class Index extends Component
     {
         $this->openSidebar = session('sidebarAbierto', true);
         $this->setingProps();
-        $this->loadChatHistory();
-        $this->groupChatsByAge();
+        $this->activeChatId = session('activeChatId');
+
+        if ($this->activeChatId) {
+            // Verificar que el chat aún existe
+            $existingChat = $this->chatService->findChat($this->activeChatId);
+
+            if (!$existingChat) {
+                // Si el chat fue eliminado, crear uno nuevo
+                $this->activeChatId = $this->createFirstChat();
+                session()->put('activeChatId', $this->activeChatId);
+            }
+
+            $this->loadChatHistory();
+            $this->groupChatsByAge();
+            $this->loadChatMessages($this->activeChatId);
+        } else {
+            // 2. Si no hay chat en sesión, crear uno nuevo
+            $this->activeChatId = $this->createFirstChat();
+            session()->put('activeChatId', $this->activeChatId);
+            $this->loadChatHistory();
+            $this->groupChatsByAge();
+        }
     }
 
     public function render()
@@ -140,6 +171,12 @@ class Index extends Component
         ];
 
         foreach ($this->chatHistory as $chat) {
+            // Truncar el título si es necesario
+            $originalTitle = $chat->title;
+            if (strlen($originalTitle) > 20) {
+                $chat->title = substr($originalTitle, 0, 17) . '...';
+                $chat->save();
+            }
             $diffDays = $now->diffInDays($chat->created_at);
 
             if ($diffDays == 0) {
@@ -177,6 +214,9 @@ class Index extends Component
         $this->activeChatId = $chatId;
         $chat = $this->chatService->findChat($chatId);
         $this->activeChatTitle = $chat->title ?? "Chat #{$chatId}";
+
+        // Actualizar la sesión con el nuevo chat activo
+        session()->put('activeChatId', $chatId);
     }
 
     private function loadChatMessages($chatId)
@@ -219,6 +259,7 @@ class Index extends Component
                 return $messages;
             });
     }
+
     public function openEditModal($chatId)
     {
         $chat = $this->chatHistory->where('id', $chatId)->first();
@@ -274,11 +315,19 @@ class Index extends Component
     {
         $this->chatService->deleteChat($this->deleteChatId, Auth::id());
         $this->loadChatHistory();
+        $this->groupChatsByAge(); // <-- ¡Añade esta línea!
         $this->closeDeleteModal();
     }
 
     public function createNewChat()
     {
+        // Si el chat actual está vacío (sin mensajes), no permitas crear uno nuevo
+        if ($this->messages->isEmpty()) {
+            // Opcional: puedes mostrar un mensaje de error o feedback
+            $this->dispatch('error', message: 'Debes escribir al menos un mensaje antes de crear un nuevo chat.');
+            return;
+        }
+
         try {
             $newChat = $this->chatService->createNewChat(
                 userId: Auth::id(),
@@ -288,7 +337,10 @@ class Index extends Component
             $this->loadChatHistory();
             $this->groupChatsByAge();
             $this->activeChatId = $newChat->id;
-            $this->dispatch('chat-selected', chatId: $newChat->id); // Opcional para notificar a otros componentes
+            $this->messages = collect();
+            $this->newMessage = '';
+            session()->put('activeChatId', $newChat->id);
+            $this->dispatch('chat-selected', chatId: $newChat->id);
 
         } catch (\Exception $e) {
             $this->dispatch('error', message: 'Error al crear nuevo chat: ' . $e->getMessage());
@@ -305,6 +357,7 @@ class Index extends Component
     {
         $this->setActiveFilters($value);
     }
+
     private function setActiveFilters($deep)
     {
         if ($deep) {
@@ -341,7 +394,6 @@ class Index extends Component
         }
     }
 
-
     public function sendMessage()
     {
         // Validar que haya texto y un chat activo
@@ -351,7 +403,7 @@ class Index extends Component
         }
         $config = [
             'fuentes' => $this->selectedOptions,
-            'years' => [$this->from_date,  $this->to_date],
+            'years' => [$this->from_date, $this->to_date],
             'types' => $this->selectedTypeOptions,
             'lang' => 'es', // Por default en todos los Idiomas
         ];
@@ -364,12 +416,33 @@ class Index extends Component
         }
 
         // Crear la pregunta en la base de datos
-        $question = \App\Models\MedisearchQuestion::create([
+        $question = MedisearchQuestion::create([
             'user_id' => \Auth::id(),
             'chat_id' => $this->activeChatId,
             'query' => $query,
             'response' => null, // Se puede actualizar luego con la respuesta del bot
         ]);
+        // Detectar si es la primera pregunta del chat
+        $isFirstMessage = MedisearchQuestion::where('chat_id', $this->activeChatId)->count() === 1;
+        if ($isFirstMessage) {
+            // Llama a tu servicio de IA para el título
+            $titulo = $this->MBIAService->generateTitleFromQuestion($query);
+            // Si la IA no responde, usa el inicio de la pregunta como fallback
+            if (!$titulo['content']) {
+                $titulo = mb_strlen($query) > 20 ? mb_substr($query, 0, 17) . '...' : $query;
+            } else {
+                $titulo = $titulo['content'];
+            }
+
+            // Actualiza el chat en DB
+            $this->chatService->updateTitle($this->activeChatId, $titulo, Auth::id());
+
+            // Refresca el historial y el título activo en Livewire
+            $this->loadChatHistory();
+            $this->activeChatTitle = $titulo;
+            $this->groupChatsByAge();
+        }
+
 
         // Agregar el mensaje del usuario al array de mensajes (frontend inmediato)
         $this->messages[] = [
@@ -408,7 +481,7 @@ class Index extends Component
                         $references = array_map('strip_tags', $refMatches[1] ?? []);
                     }
 
-                    $this->messages[] = [  
+                    $this->messages[] = [
                         'is_new' => true,
                         'from' => 'bot',
                         'text' => $item['respuesta'],
@@ -416,7 +489,7 @@ class Index extends Component
                     ];
                 } elseif ($item['tipo'] === 'articles' && !empty($item['articulos'])) {
                     $this->messages[] = [
-                         'is_new' => true,
+                        'is_new' => true,
                         'from' => 'articles',
                         'data' => $item['articulos'],
                     ];
@@ -478,4 +551,9 @@ class Index extends Component
             : count($this->questionsAdvanced) - 1;
     }
 
+    public function addNewLine()
+    {
+        // Agrega un salto de línea al contenido
+        $this->newMessage .= "\n";
+    }
 }

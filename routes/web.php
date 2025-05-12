@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
 
+
+Route::get('gettigPay/{productId}', [MercadoPagoController::class, 'gettigPay'])->name('gettigPay');
 Route::redirect('/home', '/dashboard');
 if(config('app.env') === 'production') {
     Route::get('/robots.txt', function () {
@@ -213,8 +215,7 @@ Route::middleware([
 Route::middleware(['auth'])->group(function () {
     Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
     Route::post('/subscription/create/{product}', [MercadoPagoController::class, 'createSubscription'])->name('subscription.create');
-    Route::get('/pago-exitoso', function (\Illuminate\Http\Request $request){
-        // URL de la API de Mercado Pago
+    Route::get('/pago-exitoso/{preapproval_id}', function (\Illuminate\Http\Request $request){
         // URL de la API de Mercado Pago
         $url = 'https://api.mercadopago.com/preapproval_plan/search';
 

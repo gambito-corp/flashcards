@@ -47,19 +47,22 @@
             </div>
 
             <div class="flex items-center justify-between mt-4 pt-6">
-                @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md " href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
-                    </a>
-                @endif
+
+                <a href="{{ route('register') }}"
+                   class="ml-4 rounded-md border border-[#0d3a54] text-[#0d3a54] bg-white hover:bg-[#0d3a54] hover:text-white font-bold py-2 px-4 text-xs transition-colors duration-200">
+                    Regístrate ahora
+                </a>
 
                 <x-button class="ml-4 button-primary hover:bg-[#0d3a54]">
                     {{ __('Log in') }}
                 </x-button>
-
-                
             </div>
-            <a href="{{ route('register') }}" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md text-center block pt-6">¿No tienes una cuenta? Regístrate ahora</a>
+            <br>
+            @if (Route::has('password.request'))
+                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md " href="{{ route('password.request') }}">
+                    {{ __('Forgot your password?') }}
+                </a>
+            @endif
         </form>
     </x-authentication-card>
 </x-guest-layout>
@@ -72,7 +75,7 @@
     document.getElementById('togglePassword').addEventListener('click', function() {
         const passwordInput = document.getElementById('password');
         const icon = this.querySelector('i');
-        
+
         // Cambiar tipo de input entre 'password' y 'text'
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';

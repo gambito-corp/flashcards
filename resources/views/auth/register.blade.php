@@ -51,8 +51,9 @@
             @endif
 
             <div class="flex items-center justify-between mt-4 pt-6">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md " href="{{ route('login') }}">
-                    {{ __('Already registered?') }}
+                <a class="ml-4 rounded-md border border-[#0d3a54] text-[#0d3a54] bg-white hover:bg-[#0d3a54] hover:text-white font-bold py-2 px-4 text-xs transition-colors duration-200"
+                    href="{{ route('login') }}">
+                    Inicia Sesion
                 </a>
 
                 <x-button class="ml-4 button-primary">
