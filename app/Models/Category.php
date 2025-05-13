@@ -34,14 +34,20 @@ class Category extends Model
             ->using(CategoryQuestion::class)
             ->withTimestamps();
     }
+//    public function tipos()
+//    {
+//        return $this->belongsToMany(
+//            Tipo::class,
+//            'question_tipo',
+//            'question_id', // Foreign key en la tabla pivot para Question
+//            'tipo_id'      // Foreign key en la tabla pivot para Tipo
+//        ); // Añade esto si hay columnas adicionales en la pivot
+//    }
+// Category.php
     public function tipos()
     {
-        return $this->belongsToMany(
-            Tipo::class,
-            'question_tipo',
-            'question_id', // Foreign key en la tabla pivot para Question
-            'tipo_id'      // Foreign key en la tabla pivot para Tipo
-        ); // Añade esto si hay columnas adicionales en la pivot
+        return $this->hasMany(Tipo::class);
     }
+
 
 }

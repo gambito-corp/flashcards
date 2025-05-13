@@ -170,4 +170,82 @@ class MBIAService
         dd($preguntas);
         return $response['choices'][0]['message'] ?? '';
     }
+
+    public function generateExamQuestions(mixed $examCollection)
+    {
+        $allQuestions = [];
+
+        foreach ($examCollection as $combo) {
+            $tema = $combo['tema'];
+            $dificultad = $combo['dificultad'];
+            $cantidad = (int)$combo['question_count'];
+            $area = $combo['area_name'];
+            $categoria = $combo['category_name'];
+            $tipo = $combo['tipo_name'];
+
+            $prompt = "Actua como un Rector de Medicina de una Prestigiosa Universidad y plantea a tu Alumno $cantidad
+            preguntas tipo test sobre \"$tema\" para un examen de $area, categoría \"$categoria\", tipo \"$tipo\",
+            dificultad $dificultad. " .
+                "Cada pregunta debe tener 4 opciones, una sola respuesta correcta y una breve explicación. " .
+                "Devuelve solo un JSON con este formato:\n" .
+                "[\n" .
+                "  {\n" .
+                "    \"pregunta\": \"...\",\n" .
+                "    \"opciones\": [\"...\", \"...\", \"...\", \"...\"],\n" .
+                "    \"respuesta_correcta\": \"...\",\n" .
+                "    \"explicacion\": \"...\"\n" .
+                "  },\n" .
+                "  ...\n" .
+                "]";
+
+            $retries = 0;
+            $maxRetries = 3;
+            $questions = null;
+
+            while ($retries < $maxRetries) {
+                try {
+                    $response = OpenAI::chat()->create([
+                        'model' => 'gpt-4.1-nano-2025-04-14',
+                        'messages' => [
+                            ['role' => 'system', 'content' => $prompt],
+                            ['role' => 'user', 'content' => 'dame las Preguntas'],
+                        ],
+                        'temperature' => 0.7,
+                        'max_tokens' => 2000,
+                    ]);
+
+                    $content = $response['choices'][0]['message']['content'] ?? '';
+
+                    // Limpieza y decodificación segura del JSON
+                    $jsonStart = strpos($content, '[');
+                    $jsonEnd = strrpos($content, ']');
+                    $json = $jsonStart !== false && $jsonEnd !== false
+                        ? substr($content, $jsonStart, $jsonEnd - $jsonStart + 1)
+                        : $content;
+
+                    $questions = json_decode($json, true);
+
+                    if (!is_array($questions)) {
+                        throw new \Exception('La IA no devolvió un JSON válido. Respuesta: ' . $content);
+                    }
+                    break; // Si todo va bien, salimos del bucle
+                } catch (\Exception $e) {
+                    $retries++;
+                    if ($retries >= $maxRetries) {
+                        Log::critical('Error al generar preguntas de examen', [$e->getMessage(), $e->getTraceAsString(), [$e]]);
+                        throw $e;
+                    }
+                    sleep(1); // Espera breve antes de reintentar
+                }
+            }
+
+            $allQuestions[] = [
+                'combo' => $combo,
+                'questions' => $questions,
+            ];
+        }
+        return $allQuestions;
+    }
+
+
 }

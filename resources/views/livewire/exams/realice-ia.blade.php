@@ -153,25 +153,17 @@
     <script>
         function examComponent() {
             return {
-                // Preguntas y examId
-                questions: @json($examen->questions),
-                examId: {{ $examen->id }},
-
+                questions: @json($examen['questions']),
+                examId: 0, // IA: no hay ID real
                 selectedAnswers: {},
-                correctAnswers: [],
+                correctAnswers: @json(collect($examen['questions'])->pluck('correct_option_id')->filter()->values()),
                 score: 0,
                 examSubmitted: false,
-
-                // Ajustamos el tiempo en segundos
-                remainingTime: {{ $examen->time_limit * 60 }},
+                remainingTime: {{ $examen['examTime'] * 60 }},
                 timerInterval: null,
-
-                // Paginación
                 currentPage: 1,
                 questionsPerPage: 1,
-
-                // Título del examen
-                examTitle: "{{ $examen->title }}",
+                examTitle: "{{ $examen['examTitle'] }}",
 
                 init() {
                     this.startTimer();
@@ -232,35 +224,29 @@
                 },
 
                 submitExam() {
-                    console.log('Enviando examen...');
+                    console.log('Corrigiendo examen IA...');
                     if (this.examSubmitted) return;
 
-                    const payload = {
-                        exam_id: this.examId,
-                        respuestas: this.selectedAnswers
-                    };
+                    let totalCorrectas = 0;
+                    let respuestasCorrectas = [];
 
-                    fetch('{{ route('examenes.evaluar') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            this.examSubmitted = true;
-                            this.score = data.puntuacion;
-                            this.correctAnswers = data.respuestas_correctas;
-                            clearInterval(this.timerInterval);
+                    // Recorre todas las preguntas y compara la respuesta seleccionada con la correcta
+                    this.questions.forEach(q => {
+                        respuestasCorrectas.push(q.correct_option_id);
+                        if (parseInt(this.selectedAnswers[q.id]) === parseInt(q.correct_option_id)) {
+                            totalCorrectas++;
+                        }
+                    });
 
-                            // REINICIAR PAGINACIÓN A LA PRIMERA PREGUNTA
-                            this.currentPage = 1;
-                        })
-                        .catch(error => {
-                            console.error('Error en la evaluación:', error);
-                        });
+                    // Calcula la puntuación
+                    this.score = this.questions.length > 0
+                        ? Math.round((totalCorrectas / this.questions.length) * 100)
+                        : 0;
+
+                    this.examSubmitted = true;
+                    this.correctAnswers = respuestasCorrectas;
+                    clearInterval(this.timerInterval);
+                    this.currentPage = 1;
                 },
 
                 // Clase para cada OPCIÓN de la pregunta

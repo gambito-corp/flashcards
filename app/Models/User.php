@@ -7,16 +7,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable  implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
     use HasFactory;
@@ -47,7 +45,6 @@ class User extends Authenticatable  implements MustVerifyEmail
             }
         });
     }
-
 
 
     public function sendPasswordResetNotification($token)
@@ -103,17 +100,25 @@ class User extends Authenticatable  implements MustVerifyEmail
             ->using(AreaUser::class)
             ->withTimestamps();
     }
+
     public function purchases()
     {
         return $this->hasMany(Purchase::class);
     }
+
     public function latestPurchase()
     {
         return $this->hasOne(Purchase::class)->latestOfMany();
     }
+
     public function products()
     {
         return $this->hasManyThrough(Product::class, Purchase::class);
+    }
+
+    public function examUserAnswers()
+    {
+        return $this->hasMany(ExamUserAnswer::class);
     }
 
 

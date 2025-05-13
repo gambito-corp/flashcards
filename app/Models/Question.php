@@ -19,18 +19,15 @@ class Question extends Model
         'media_url',
         'media_iframe',
         'approved',
-        'explanation'
+        'explanation',
+        'fail_weight'
     ];
-
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Una pregunta puede pertenecer a múltiples tipos.
-     */
     public function tipos()
     {
         return $this->belongsToMany(Tipo::class, 'question_tipo')
@@ -42,9 +39,7 @@ class Question extends Model
         return $this->belongsToMany(Category::class, 'category_question')
             ->withTimestamps();
     }
-    /**
-     * Una pregunta puede pertenecer a múltiples universidades.
-     */
+
     public function universidades()
     {
         return $this->belongsToMany(Universidad::class, 'question_universidad')
@@ -53,9 +48,13 @@ class Question extends Model
             ->select('universidades.id as universidad_id', 'universidades.name');
     }
 
-
     public function options()
     {
         return $this->hasMany(Option::class)->inRandomOrder();
+    }
+
+    public function examUserAnswers()
+    {
+        return $this->hasMany(ExamUserAnswer::class);
     }
 }

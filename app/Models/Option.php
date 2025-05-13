@@ -20,7 +20,7 @@ class Option extends Model
 
     protected $casts = [
         'is_correct' => 'boolean',
-        'points'     => 'float',
+        'points' => 'float',
     ];
 
     /**
@@ -30,4 +30,10 @@ class Option extends Model
     {
         return $this->belongsTo(Question::class)->withTrashed();
     }
+
+    public function examUserAnswers()
+    {
+        return $this->hasMany(ExamUserAnswer::class);
+    }
+
 }

@@ -19,21 +19,18 @@ use App\Http\Controllers\MedisearchController;
 use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\PreguntasController;
 use App\Http\Controllers\WebhookController;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use MercadoPago\Client\Payment\PaymentClient;
-use MercadoPago\MercadoPagoConfig;
 
 
 Route::get('gettigPay/{productId}', [MercadoPagoController::class, 'gettigPay'])->name('gettigPay');
 Route::redirect('/home', '/dashboard');
-if(config('app.env') === 'production') {
+if (config('app.env') === 'production') {
     Route::get('/robots.txt', function () {
         return response('User-agent: *' . PHP_EOL . 'Disallow: /', 200);
     })->name('robots.txt');
     Route::redirect('/', 'https://medbystudents.com/app-banqueo/');
-}else{
+} else {
     Route::redirect('/', '/login');
 }
 
@@ -81,6 +78,10 @@ Route::middleware([
     Route::get('/examenes/{exam}', [ExamController::class, 'show'])->name('examenes.show');
     Route::post('/examenes', [ExamController::class, 'createExam'])->name('examenes.create');
     Route::post('/examenes/evaluar', [ExamController::class, 'evaluarExamen'])->name('examenes.evaluar');
+    Route::post('examenes/failed-global', [ExamController::class, 'createExamFailGlobal'])->name('examenes.failed-global');
+    Route::post('examenes/failed-user', [ExamController::class, 'createExamUserFailed'])->name('examenes.failed-user');
+    Route::post('/examenes/ia', [ExamController::class, 'examenIA'])->name('examenes.ia');
+
 
     /*FLASHCARD*/
     Route::get('/flashcard', [FlashcardController::class, 'index'])->name('flashcard.index');
@@ -215,7 +216,7 @@ Route::middleware([
 Route::middleware(['auth'])->group(function () {
     Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
     Route::post('/subscription/create/{product}', [MercadoPagoController::class, 'createSubscription'])->name('subscription.create');
-    Route::get('/pago-exitoso/{preapproval_id}', function (\Illuminate\Http\Request $request){
+    Route::get('/pago-exitoso/{preapproval_id}', function (\Illuminate\Http\Request $request) {
         // URL de la API de Mercado Pago
         $url = 'https://api.mercadopago.com/preapproval_plan/search';
 
@@ -265,12 +266,11 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago'])->name('webhooks.mercadopago');
 
 
-
-if (config('app.env') === 'local'){
+if (config('app.env') === 'local') {
     // routes/web.php
     Route::get('chatv2', [MedisearchController::class, 'streamChat']);
 
-    Route::get('prueba', function (){
+    Route::get('prueba', function () {
         //Instancia del servicio
         $service = new App\Services\Usuarios\MBIAService();
         $service->newFunction();

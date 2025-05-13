@@ -1,5 +1,5 @@
 <x-main-layout title="Exámenes">
-    <livewire:exams.exam-builder/>
+    <livewire:exams.entry-selector/>
 </x-main-layout>
 
 
