@@ -181,6 +181,7 @@ class Analisis extends Component
             'total_incorrectas' => $totalRespondidas - $totalCorrectas,
             'porcentaje' => $porcentajeGlobal,
         ];
+//        dd($this->estadisticas, $this->global);
     }
 
 

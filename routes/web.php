@@ -276,4 +276,23 @@ if (config('app.env') === 'local') {
         $service->newFunction();
 
     });
+
+
+    route::get('prueba/403', function () {
+        return view('errors.403');
+    });
+    route::get('prueba/404', function () {
+        return view('errors.404');
+    });
+    route::get('prueba/419', function () {
+        return view('errors.419');
+    });
+    route::get('prueba/500', function () {
+        return view('errors.500');
+    });
+    route::get('prueba/503', function () {
+        return view('errors.503');
+    });
+
+
 }

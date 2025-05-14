@@ -4,34 +4,27 @@
     </script>
 @else
     <div x-data="examComponent()" x-init="init()" class="container mx-auto p-4 relative">
-        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden container-ask container-exmans">
-            <!-- Encabezado de la tarjeta -->
-            <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center header-examns">
-                <!-- Título dinámico: si ya se envió el examen, se muestra examTitle; de lo contrario, "Realizar Examen" -->
+        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+            <!-- Encabezado -->
+            <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center">
                 <h4 class="text-xl font-semibold" x-text="examSubmitted ? examTitle : 'Realizar Examen'"></h4>
-                <!-- Tiempo restante solo si no se ha enviado el examen -->
-                <div class="text-lg font-semibold " x-show="!examSubmitted">
+                <div class="text-lg font-semibold" x-show="!examSubmitted">
                     Tiempo restante: <span x-text="formattedTime"></span>
                 </div>
             </div>
 
-            <!-- Cuerpo de la tarjeta -->
-            <div class=" tarjeta-box">
+            <!-- Preguntas/Paginación -->
+            <div>
                 <template x-for="(question, index) in paginatedQuestions" :key="question.id">
-                    <div class="mb-6 mb-45">
-                        <!-- Título de la pregunta con badge -->
-                        <h5 class="flex items-center text-lg font-semibold m-25">
-                            <span
-                                class="inline-block bg-gray-200 text-gray-500 rounded-full px-3 py-1 mr-3 number-question">
+                    <div class="mb-6">
+                        <h5 class="flex items-center text-lg font-semibold">
+                            <span class="inline-block bg-gray-200 text-gray-500 rounded-full px-3 py-1 mr-3">
                                 <span x-text="(currentPage - 1) * questionsPerPage + index + 1"></span>
                             </span>
-                            <span class="text-ask" x-text="question.content"></span>
-
+                            <span x-text="question.content"></span>
                         </h5>
                         <hr>
-
-                        <!-- Opciones de la pregunta -->
-                        <ul class="mt-2 space-y-2 choise-ask">
+                        <ul class="mt-2 space-y-2">
                             <template x-for="option in question.options" :key="option.id">
                                 <li class="p-3 border rounded cursor-pointer"
                                     :class="getOptionClass(question.id, option.id)"
@@ -41,99 +34,63 @@
                                 </li>
                             </template>
                         </ul>
-
-                        <!-- Medios: se muestran después de enviar el examen, debajo de las opciones -->
-                        <template x-if="examSubmitted && question.media_iframe">
-                            <div class="mt-2 m-25 mt-25">
-                                <div x-html="question.media_iframe"></div>
-                            </div>
-
-                        </template>
-
-                        <template x-if="examSubmitted && !question.media_iframe && question.media_url">
-                            <div class="mt-2 m-25 mt-25">
-                                <iframe :src="getEmbedUrl(question.media_url)" class="w-full" height="315"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen></iframe>
-                            </div>
-                        </template>
-                        <template
-                            x-if="examSubmitted && !question.media_iframe && !question.media_url && question.media_type">
+                        <!-- Explicación incorrecta -->
+                        <template x-if="examSubmitted && question.explanation && (
+                            !selectedAnswers[question.id] ||
+                            !correctAnswers.includes(selectedAnswers[question.id])
+                        )">
                             <div class="mt-2">
-                                <p x-text="question.media_type"></p>
-                            </div>
-                        </template>
-
-                        <!-- Explicación:
-                             Se muestra si el examen está enviado,
-                             existe question.explanation,
-                             y la respuesta es incorrecta O no se respondió -->
-                        <template x-if="examSubmitted
-                                        && question.explanation
-                                        && ( !selectedAnswers[question.id]
-                                             || !correctAnswers.includes(selectedAnswers[question.id]) )">
-                            <div class="mt-2">
-                                <strong class="text-red-500">*<span x-text="question.explanation"></span>*</strong>
+                                <strong class="text-red-500">*</strong>
+                                <span x-text="question.explanation"></span>
+                                <strong class="text-red-500">*</strong>
                             </div>
                         </template>
                     </div>
                 </template>
 
-                <!-- Controles de paginación (1 pregunta por página) -->
-                <div class="flex justify-between items-center mt-6 m-25">
-
-                    <div class="buttons-pagination">
-                        <button @click="prevPage()"
-                                :disabled="currentPage === 1"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50 boton-success-m button-c3">
+                <!-- Paginación -->
+                <div class="flex justify-between items-center mt-6">
+                    <div>
+                        <button @click="prevPage()" :disabled="currentPage === 1"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50">
                             Anterior
                         </button>
-
-                        <button @click="nextPage()"
-                                :disabled="currentPage === totalPages"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50 boton-success-m button-c2">
+                        <button @click="nextPage()" :disabled="currentPage === totalPages"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50">
                             Siguiente
                         </button>
-
                     </div>
-
-                    <!-- Navegación con cuadrados numerados -->
-                    <div class="flex flex-wrap gap-2 mt-4  buttons-numbers">
+                    <!-- Navegación con cuadrados -->
+                    <div class="flex flex-wrap gap-2 mt-4">
                         <template x-for="(question, index) in questions" :key="question.id">
                             <div @click="currentPage = index + 1"
-                                 class="w-10 h-10 flex items-center justify-center border cursor-pointer rounded buttons-nv"
+                                 class="w-10 h-10 flex items-center justify-center border cursor-pointer rounded"
                                  :class="getSquareClass(question)">
                                 <span x-text="index + 1"></span>
                             </div>
                         </template>
                     </div>
                 </div>
-
                 <hr>
                 <div class="text-sm">
                     Página <span x-text="currentPage"></span> de <span x-text="totalPages"></span>
                 </div>
-
             </div>
 
-            <!-- Pie de la tarjeta -->
+            <!-- Footer -->
             <div class="px-6 py-4 bg-gray-100 text-right">
-                <!-- Botón para enviar examen si aún no se envió -->
                 <template x-if="!examSubmitted">
-                    <button
-                        type="button"
-                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded boton-success-m button-c2"
-                        @click="submitExam()">
+                    <button type="button"
+                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                            @click="submitExam()">
                         Enviar Examen
                     </button>
                 </template>
-                <!-- Una vez enviado, mostrar score y botón para ir al Home -->
                 <template x-if="examSubmitted">
-                    <div class="results-exam">
+                    <div>
                         <p class="mt-4 font-semibold text-lg">Puntuación: <span x-text="score"></span>/100</p>
                         <a href="{{ route('dashboard') }}"
-                           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block mt-4 boton-success-m button-c2">
+                           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block mt-4">
                             Ir al Home
                         </a>
                     </div>
@@ -141,8 +98,8 @@
             </div>
         </div>
 
-        <!-- Cuadrado flotante para el tiempo restante (oculto al enviar) -->
-        <div x-show="!examSubmitted" class="fixed box-time__exams" x-cloak>
+        <!-- Flotante de tiempo -->
+        <div x-show="!examSubmitted" class="fixed bottom-4 right-4 bg-white shadow-lg rounded p-4" x-cloak>
             <div class="text-base font-bold mb-1">Tiempo restante</div>
             <div class="text-2xl font-extrabold" x-text="formattedTime"></div>
         </div>
@@ -154,7 +111,7 @@
         function examComponent() {
             return {
                 questions: @json($examen['questions']),
-                examId: 0, // IA: no hay ID real
+                examId: {{ $examen['examId'] ?? 0 }},
                 selectedAnswers: {},
                 correctAnswers: @json(collect($examen['questions'])->pluck('correct_option_id')->filter()->values()),
                 score: 0,
@@ -167,17 +124,6 @@
 
                 init() {
                     this.startTimer();
-                },
-
-                getEmbedUrl(url) {
-                    if (url.includes("youtube.com/watch")) {
-                        let videoId = url.split("v=")[1].split("&")[0];
-                        return "https://www.youtube.com/embed/" + videoId;
-                    } else if (url.includes("youtu.be/")) {
-                        let videoId = url.split("youtu.be/")[1].split("?")[0];
-                        return "https://www.youtube.com/embed/" + videoId;
-                    }
-                    return url;
                 },
 
                 get formattedTime() {
@@ -196,14 +142,10 @@
                 },
 
                 nextPage() {
-                    if (this.currentPage < this.totalPages) {
-                        this.currentPage++;
-                    }
+                    if (this.currentPage < this.totalPages) this.currentPage++;
                 },
                 prevPage() {
-                    if (this.currentPage > 1) {
-                        this.currentPage--;
-                    }
+                    if (this.currentPage > 1) this.currentPage--;
                 },
 
                 startTimer() {
@@ -224,13 +166,11 @@
                 },
 
                 submitExam() {
-                    console.log('Corrigiendo examen IA...');
                     if (this.examSubmitted) return;
 
                     let totalCorrectas = 0;
                     let respuestasCorrectas = [];
 
-                    // Recorre todas las preguntas y compara la respuesta seleccionada con la correcta
                     this.questions.forEach(q => {
                         respuestasCorrectas.push(q.correct_option_id);
                         if (parseInt(this.selectedAnswers[q.id]) === parseInt(q.correct_option_id)) {
@@ -238,7 +178,6 @@
                         }
                     });
 
-                    // Calcula la puntuación
                     this.score = this.questions.length > 0
                         ? Math.round((totalCorrectas / this.questions.length) * 100)
                         : 0;
@@ -247,17 +186,29 @@
                     this.correctAnswers = respuestasCorrectas;
                     clearInterval(this.timerInterval);
                     this.currentPage = 1;
+
+                    // Enviar respuestas a Livewire para guardado persistente
+                    if (window.Livewire) {
+                        window.Livewire.dispatch('guardarExamen', {
+                            respuestas: this.selectedAnswers,
+                            score: this.score,
+                            exam_id: this.examId,
+                        });
+                    } else if (this.$wire) {
+                        this.$wire.guardarExamen({
+                            respuestas: this.selectedAnswers,
+                            score: this.score,
+                            exam_id: this.examId,
+                        });
+                    }
                 },
 
-                // Clase para cada OPCIÓN de la pregunta
                 getOptionClass(questionId, optionId) {
                     if (!this.examSubmitted) {
-                        // Durante el examen
                         return this.selectedAnswers[questionId] === optionId
                             ? "bg-blue-500 text-white"
                             : "bg-white";
                     } else {
-                        // Después de enviar
                         if (this.correctAnswers.includes(optionId)) {
                             return "bg-green-500 text-white";
                         } else if (this.selectedAnswers[questionId] === optionId) {
@@ -268,9 +219,7 @@
                     }
                 },
 
-                // Clase para el cuadradito de navegación
                 getSquareClass(question) {
-                    // Antes de enviar: si la pregunta está contestada => azul, si no => blanco
                     if (!this.examSubmitted) {
                         if (this.selectedAnswers[question.id]) {
                             return "bg-blue-500 text-white border-blue-500";
@@ -278,7 +227,6 @@
                             return "bg-white text-gray-800 border-gray-300";
                         }
                     } else {
-                        // Después de enviar: correcto => verde, incorrecto => rojo, sin respuesta => gris
                         const answer = this.selectedAnswers[question.id];
                         if (!answer) {
                             return "bg-gray-400 text-gray-800 border-gray-400";

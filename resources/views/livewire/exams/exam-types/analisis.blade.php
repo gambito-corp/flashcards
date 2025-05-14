@@ -29,23 +29,25 @@
         <h2 class="text-xl font-semibold mb-4 text-[#195b81]">Radar de Áreas: Respondidas, Correctas, Incorrectas</h2>
         <canvas id="radarAreas"></canvas>
     </div>
-    <canvas id="barFavoritismo"></canvas>
-    <canvas id="radarAreas"></canvas>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
-            integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {{-- Pasa los datos SOLO como JSON seguro --}}
+    <script>
+        const areas = @json($estadisticas);
+        console.log('AREAS (estadisticas):', areas);
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let barChart = null;
         let radarChart = null;
 
         function renderCharts() {
-            const areas = @json($estadisticas);
-
             // --- Gráfico de barras: Favoritismo ---
             const barLabels = areas.map(a => a.area_name);
-            const barData = areas.map(a => a.favoritismo);
+            const barData = areas.map(a => a.favoritismo || 0);
+
+            // Límite superior dinámico (mín. 100)
+            const maxBar = Math.max(100, ...barData) || 100;
 
             const ctxBar = document.getElementById('barFavoritismo');
             if (ctxBar) {
@@ -64,8 +66,12 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
-                            y: {beginAtZero: true, max: 100}
+                            y: {
+                                beginAtZero: true,
+                                max: maxBar
+                            }
                         }
                     }
                 });
@@ -73,9 +79,11 @@
 
             // --- Gráfico de Radar: Respondidas, Correctas, Incorrectas ---
             const radarLabels = areas.map(a => a.area_name);
-            const dataRespondidas = areas.map(a => a.total_respondidas);
-            const dataCorrectas = areas.map(a => a.total_correctas);
-            const dataIncorrectas = areas.map(a => a.total_incorrectas);
+            const dataRespondidas = areas.map(a => a.total_respondidas || 0);
+            const dataCorrectas = areas.map(a => a.total_correctas || 0);
+            const dataIncorrectas = areas.map(a => a.total_incorrectas || 0);
+
+            const maxRadar = Math.max(1, ...dataRespondidas, ...dataCorrectas, ...dataIncorrectas) + 2;
 
             const ctxRadar = document.getElementById('radarAreas');
             if (ctxRadar) {
@@ -113,6 +121,7 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         elements: {
                             line: {borderWidth: 2}
                         },
@@ -120,7 +129,7 @@
                             r: {
                                 angleLines: {display: true},
                                 suggestedMin: 0,
-                                suggestedMax: Math.max(...dataRespondidas, 1) + 2
+                                suggestedMax: maxRadar
                             }
                         }
                     }
@@ -128,13 +137,12 @@
             }
         }
 
-        // Inicializa tras cada render Livewire
-        document.addEventListener('livewire:load', function () {
+        // Livewire: Re-render cuando Livewire actualiza el DOM
+        document.addEventListener('livewire:load', () => {
             renderCharts();
-            Livewire.hook('message.processed', () => {
-                renderCharts();
-            });
+            if (window.Livewire) {
+                window.Livewire.hook('message.processed', () => renderCharts());
+            }
         });
     </script>
 </div>
-

@@ -338,6 +338,12 @@ class ExamController extends Controller
         $examCollection = $examCollectionRaw ? json_decode($examCollectionRaw, true) : [];
         $openAI = new MBIAService();
         $iaBlocks = $openAI->generateExamQuestions($examCollection);
+        // Crear el examen
+        $exam = new \App\Models\Exam();
+        $exam->title = $examTitle;
+        $exam->description = '';
+        $exam->time_limit = $examTime;
+        $exam->save();
 
         // 1. Aplanar y transformar las preguntas
         $questions = [];
