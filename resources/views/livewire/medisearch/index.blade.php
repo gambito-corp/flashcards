@@ -468,27 +468,28 @@
         <div>
             @if($showEditModal)
                 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div class="relative w-full max-w-sm p-6 bg-white shadow-lg rounded-xl">
+                    <div class="relative w-full max-w-sm p-8 bg-white shadow-lg rounded-xl">
                         <button class="absolute text-gray-400 top-3 right-3 hover:text-gray-600"
                                 wire:click="closeEditModal">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                         <h2 class="text-lg font-bold text-[#195b81] mb-4">Editar nombre del chat</h2>
+                        <hr>
                         <form wire:submit.prevent="saveChatName">
                             <input type="text"
                                    wire:model.defer="editChatName"
-                                   class="w-full border rounded-lg px-3 py-2 mb-4 focus:border-[#195b81] focus:ring-[#195b81]"
+                                   class="w-full border border-[#e4eaf1] text-[15px] rounded-lg px-3 py-2 mb-4 focus:border-[#195b81] focus:ring-[#195b81] "
                                    placeholder="Nuevo nombre para el chat"
                                    maxlength="50"
                                    required
                             >
                             <div class="flex justify-end gap-2">
                                 <button type="button" wire:click="closeEditModal"
-                                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                                        class="px-4 py-2 text-[#195b81] bg-gray-200 rounded-md hover:bg-gray-300 w-1/2 font-bold">
                                     Cancelar
                                 </button>
                                 <button type="submit"
-                                        class="px-4 py-2 rounded-md bg-[#195b81] text-white hover:bg-[#1a6ca6]">Guardar
+                                        class="px-4 py-2 rounded-md bg-[#195b81] text-white hover:bg-[#1a6ca6] w-1/2 font-bold">Guardar
                                 </button>
                             </div>
                         </form>
@@ -497,21 +498,22 @@
             @endif
             @if($showDeleteModal)
                 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div class="relative w-full max-w-sm p-6 bg-white shadow-lg rounded-xl">
+                    <div class="relative w-full max-w-sm p-8 bg-white shadow-lg rounded-xl">
                         <button class="absolute text-gray-400 top-3 right-3 hover:text-gray-600"
                                 wire:click="closeDeleteModal">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                         <h2 class="text-lg font-bold text-[#195b81] mb-4">Editar nombre del chat</h2>
+                        <hr>
                         <form wire:submit.prevent="deleteChat">
-                            <h1>Eliminar Este Chat</h1>
+                            <h1 class="m-4">Eliminar Este Chat</h1>
                             <div class="flex justify-end gap-2">
                                 <button type="button" wire:click="closeDeleteModal"
-                                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                                        class="px-4 py-2 text-[#195b81] bg-gray-200 rounded-md hover:bg-gray-300 w-1/2 font-bold">
                                     Cancelar
                                 </button>
                                 <button type="submit"
-                                        class="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-800">Eliminar
+                                        class="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-800 w-1/2 font-bold">Eliminar
                                 </button>
                             </div>
                         </form>

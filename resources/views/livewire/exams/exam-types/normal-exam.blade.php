@@ -21,10 +21,10 @@
     </ul>
 
     <!-- Flechas de navegación -->
-    <button class="prev absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full">
+    <button class="prev absolute left-0 top-1/2 transform -translate-y-1/2 w-[35px] h-[35px] bg-[#00000059] text-white p-2 rounded-full">
         <i class="fas fa-chevron-left"></i>
     </button>
-    <button class="next absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full">
+    <button class="next absolute right-0 top-1/2 transform -translate-y-1/2 w-[35px] h-[35px] bg-[#00000059] text-white p-2 rounded-full">
         <i class="fas fa-chevron-right"></i>
     </button>
 </div>
@@ -49,10 +49,10 @@
     </ul>
 
     <!-- Flechas de navegación -->
-    <button class="prev absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full">
+    <button class="prev absolute left-0 top-1/2 transform -translate-y-1/2 w-[35px] h-[35px] bg-[#00000059] text-white p-2 rounded-full">
         <i class="fas fa-chevron-left"></i>
     </button>
-    <button class="next absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full">
+    <button class="next absolute right-0 top-1/2 transform -translate-y-1/2 w-[35px] h-[35px] bg-[#00000059] text-white p-2 rounded-full">
         <i class="fas fa-chevron-right"></i>
     </button>
 </div>
@@ -74,10 +74,10 @@
     </ul>
 
     <!-- Flechas de navegación -->
-    <button class="prev absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full">
+    <button class="prev absolute left-0 top-1/2 transform -translate-y-1/2 w-[35px] h-[35px] bg-[#00000059] text-white p-2 rounded-full">
         <i class="fas fa-chevron-left"></i>
     </button>
-    <button class="next absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full">
+    <button class="next absolute right-0 top-1/2 transform -translate-y-1/2 w-[35px] h-[35px] bg-[#00000059]  text-white p-2 rounded-full">
         <i class="fas fa-chevron-right"></i>
     </button>
 </div>

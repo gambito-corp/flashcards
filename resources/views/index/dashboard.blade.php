@@ -9,7 +9,7 @@
                         <hr>
                         <p class="pb-3"> Lleva tu preparación al siguiente nivel con todas las funcionalidades de medbystudents.</p>
                         <a href="{{route('planes')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
-                            Más información<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
+                            Más información<img src="https://medbystudents.com/doctormbs/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
                         </a>
                         <img class="img-dashboard__regret block" src="/dashboard-img.png"  alt="mas info"/>
                     </div>
@@ -28,7 +28,7 @@
                         <hr>
                         <p class="pb-3">Con nuestro chatbot inteligente, obtén respuestas rápidas, confiables y claras sobre temas de salud, medicamentos, síntomas y mucho más.</p>
                         <a href="{{route('medisearch.index')}}" class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded boton-success-m">
-                            Ir a DoctorMBS<img src="https://medbystudents.com/app-banqueo/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
+                            Ir a DoctorMBS<img src="https://medbystudents.com/doctormbs/wp-content/uploads/2025/03/arrow-mbs.svg" alt="mas info"/>
                         </a>
                         <img class="img-dashboard__regret block w-[410px]" src="/chat-bot-medisearch.webp"  alt="mas info"/>
                     </div>
