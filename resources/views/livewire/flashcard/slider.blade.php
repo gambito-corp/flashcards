@@ -11,28 +11,30 @@
                 $tabCardIds = $cardsToShow->pluck('id')->all();
                 $allSelected = count(array_intersect($tabCardIds, $selectedCards)) === count($tabCardIds) && $tabCardIds;
             @endphp
-<button type="button"
-    wire:click="toggleSelectAllTab('{{ $tabId }}')"
-    class="flex items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white
+            <button type="button"
+                    wire:click="toggleSelectAllTab('{{ $tabId }}')"
+                    class="flex items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white
         {{ $allSelected ? 'bg-[#0e5d60]' : 'bg-[#157b80] hover:bg-[#0e5d60]' }}">
-    
-    {{-- Ícono dinámico --}}
-    @if($allSelected)
-        {{-- Icono X (deseleccionar) --}}
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    @else
-        {{-- Icono Check (seleccionar) --}}
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-    @endif
 
-    <span>
+                {{-- Ícono dinámico --}}
+                @if($allSelected)
+                    {{-- Icono X (deseleccionar) --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                @else
+                    {{-- Icono Check (seleccionar) --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                @endif
+
+                <span>
         {{ $allSelected ? 'Deseleccionar' : 'Seleccionar' }} {{ count($tabCardIds) }} flashcards
     </span>
-</button>
+            </button>
 
 
         </div>
@@ -48,7 +50,7 @@
                 </div>
             @endforeach
         </div>
-        <div class="arrow-flash flex flex-row gap-2 mt-2">
+        <div class="arrow-flash flex flex-row gap-2 mt-8">
             <button type="button" class="p-2 rounded-full hover:bg-gray-300"
                     wire:click="moveSlider('{{ $tabId }}', 'left')">
                 <!-- SVG izquierda -->
