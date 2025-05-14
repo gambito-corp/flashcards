@@ -25,8 +25,6 @@
                     wire:click="toggleCard({{ $card->id }})"
                     class="box-flashcard-game flex-shrink-0 w-64 p-4 border rounded shadow cursor-pointer transition duration-200
                         hover:shadow-lg {{ in_array($card->id, $selectedCards) ? 'bg-green-100 border-green-400' : 'bg-white' }}">
-                    <img src="{{ $card->img_url ?? 'https://dummyimage.com/256x128/cccccc/222.png&text=No+img' }}"
-                         class="mb-2 w-full h-32 object-cover" alt="">
                     <h2 class="font-bold text-lg">{{ $card->pregunta }}</h2>
                 </div>
             @endforeach

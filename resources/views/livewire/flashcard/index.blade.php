@@ -39,14 +39,22 @@
 
             <div class="mb-4">
                 <label for="pregunta" class="block text-gray-700">Pregunta <span class="text-red-500">*</span></label>
-                <input type="text" id="pregunta" wire:model="pregunta"
-                       class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">
+                <textarea
+                    id="pregunta"
+                    wire:model="pregunta"
+                    class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] "
+                    rows="1"></textarea>
                 @error('pregunta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div class="mb-4">
                 <label for="respuesta" class="block text-gray-700">Respuesta <span class="text-red-500">*</span></label>
-                <input type="text" id="respuesta" wire:model="respuesta"
-                       class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">
+                <textarea
+                    id="respuesta"
+                    wire:model="respuesta"
+                    class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] "
+                    rows="1"></textarea>
+                {{--                <input type="text" id="respuesta" wire:model="respuesta"--}}
+                {{--                       class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">--}}
                 @error('respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
@@ -98,8 +106,6 @@
             </button>
         </form>
     </div>
-
-    {{-- ... aquí van tus formularios crear categoría y flashcard previos ... --}}
 
     <hr class="border-gray-300">
     {{--SELECCION DE TARJETAS--}}
