@@ -1,4 +1,5 @@
 <div class="max-w-4xl mx-auto p-6 space-y-8 container-full">
+
     <!-- Mensaje de sesión -->
     @if (session()->has('message'))
         <div class="p-4 bg-green-100 text-green-700 rounded shadow">
@@ -53,11 +54,8 @@
                     wire:model="respuesta"
                     class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] "
                     rows="1"></textarea>
-                {{--                <input type="text" id="respuesta" wire:model="respuesta"--}}
-                {{--                       class="mt-1 block w-full rounded border-gray-300 focus:border-[#195b81] focus:ring-[#195b81] ">--}}
                 @error('respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
-
             <!-- Campos opcionales -->
             <div class="group-form">
                 <div class="mb-4">
@@ -108,8 +106,8 @@
     </div>
 
     <hr class="border-gray-300">
-    {{--SELECCION DE TARJETAS--}}
 
+    <!--  seleccion de Tarjetas -->
     <div class="">
         <!-- Botón seleccionar todas -->
         <div class="flex items-center justify-between mb-2">
