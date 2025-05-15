@@ -21,6 +21,13 @@ class ExamController extends Controller
         return view('examenes.index');
     }
 
+    public function show(Exam $exam)
+    {
+        $exam = $this->examToArray($exam->load('questions.options'));
+        $exam['is_IA'] = false;
+        return view('examenes.show', compact('exam'));
+    }
+
     public function createExam(Request $request)
     {
         $user = Auth::user();
@@ -87,116 +94,6 @@ class ExamController extends Controller
 
         return redirect()->route('examenes.show', $exam)->with('status', 'Examen creado exitosamente.');
     }
-
-
-    public function show(Exam $exam)
-    {
-        $exam = $exam->load('questions.options');
-        return view('examenes.show', compact('exam'));
-    }
-
-    public function evaluarExamen(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'respuestas' => 'required|array',
-                'respuestas.*' => 'exists:options,id',
-                'exam_id' => 'required|integer|exists:exams,id',
-            ]);
-
-            $user = Auth::user();
-            $respuestasUsuario = $validated['respuestas'];
-            $exam = \App\Models\Exam::with('questions.options')->findOrFail($validated['exam_id']);
-            $totalPreguntas = $exam->questions->count();
-
-            // Obtener los IDs de opciones correctas SOLO de las preguntas de este examen
-            $respuestasCorrectas = [];
-            foreach ($exam->questions as $question) {
-                foreach ($question->options as $option) {
-                    if ($option->is_correct) {
-                        $respuestasCorrectas[] = (int)$option->id;
-                    }
-                }
-            }
-
-            $totalCorrectas = 0;
-
-            foreach ($exam->questions as $question) {
-                // Convertimos los IDs a int para evitar problemas de tipo
-                $optionId = isset($respuestasUsuario[$question->id]) ? (int)$respuestasUsuario[$question->id] : null;
-                $option = $question->options->firstWhere('id', $optionId);
-
-                $isCorrect = $option && $option->is_correct;
-
-                if ($isCorrect) {
-                    $totalCorrectas++;
-                }
-
-                // Registrar o actualizar el registro en exam_user_answers
-                $examUserAnswer = \App\Models\ExamUserAnswer::where([
-                    'user_id' => $user->id,
-                    'exam_id' => $exam->id,
-                    'question_id' => $question->id,
-                ])->first();
-
-                if ($examUserAnswer) {
-                    // Si ya existe, actualiza opción y estado, y suma fail_weight si falló
-                    $examUserAnswer->option_id = $optionId;
-                    $examUserAnswer->is_correct = $isCorrect;
-                    if (!$isCorrect) {
-                        $examUserAnswer->fail_weight = $examUserAnswer->fail_weight + 1;
-                    } else {
-                        $examUserAnswer->fail_weight = max(0, $examUserAnswer->fail_weight - 1);
-                    }
-                    $examUserAnswer->save();
-                } else {
-                    // Si no existe, crea el registro
-                    \App\Models\ExamUserAnswer::create([
-                        'user_id' => $user->id,
-                        'exam_id' => $exam->id,
-                        'question_id' => $question->id,
-                        'option_id' => $optionId,
-                        'is_correct' => $isCorrect,
-                        'fail_weight' => $isCorrect ? 0 : 1,
-                    ]);
-                }
-                if (!$isCorrect) {
-                    $question->increment('fail_weight');
-                } else {
-                    // Restar solo si es mayor que 0
-                    if ($question->fail_weight > 0) {
-                        $question->decrement('fail_weight');
-                    }
-                }
-            }
-
-            // Calcular la puntuación
-            $puntuacion = $totalPreguntas > 0
-                ? round(($totalCorrectas / $totalPreguntas) * 100, 2)
-                : 0;
-
-            \App\Models\ExamResult::create([
-                'user_id' => $user->id,
-                'exam_id' => $exam->id,
-                'total_score' => $puntuacion,
-            ]);
-
-            \App\Models\ExamTeam::create([
-                'team_id' => $user->current_team_id,
-                'exam_id' => $exam->id,
-            ]);
-
-            return response()->json([
-                'puntuacion' => $puntuacion,
-                'respuestas_correctas' => array_map('intval', $respuestasCorrectas), // IDs como int
-                'respuestas_enviadas' => array_map('intval', $respuestasUsuario),   // IDs como int
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Error en evaluarExamen: ' . $e->getMessage());
-            return response()->json(['error' => 'Ocurrió un error al evaluar el examen'], 500);
-        }
-    }
-
 
     public function createExamFailGlobal(Request $request)
     {
@@ -381,22 +278,34 @@ class ExamController extends Controller
             'questions' => $questions,
             'examTitle' => $examTitle,
             'examTime' => $examTime,
+            'examId' => $exam->id,
+            'is_IA' => true,
         ];
-//        $exam = $this->arrayToObject($exam);
-
-        return view('examenes.ia', compact('exam'));
+        return view('examenes.show', compact('exam'));
     }
 
-    private function arrayToObject($array)
+    public function examToArray(\App\Models\Exam $exam)
     {
-        if (is_array($array)) {
-            $obj = new \stdClass();
-            foreach ($array as $key => $value) {
-                $obj->{$key} = $this->arrayToObject($value);
-            }
-            return $obj;
-        }
-        return $array;
+        return [
+            'questions' => $exam->questions->map(function ($question) {
+                return [
+                    'id' => $question->id,
+                    'content' => $question->content,
+                    'options' => $question->options->map(function ($option) {
+                        return [
+                            'id' => $option->id,
+                            'content' => $option->content,
+                        ];
+                    })->toArray(),
+                    'explanation' => $question->explanation,
+                    'correct_option_id' => $question->options->firstWhere('is_correct', true)?->id
+                        ?? $question->correct_option_id // fallback por si tienes el campo
+                ];
+            })->toArray(),
+            'examTitle' => $exam->title,
+            'examTime' => $exam->time_limit,
+            'examId' => $exam->id,
+        ];
     }
 
 

@@ -1,310 +1,228 @@
-@if(Auth::user()->current_team_id === null)
-    <script>
-        window.location.href = "{{ route('dashboard') }}?error=Selecciona%20una%20materia%20primero";
-    </script>
-@else
-    <div x-data="examComponent()" x-init="init()" class="container mx-auto p-4 relative">
-        <div class="max-w-3xl mx-auto  shadow-lg rounded-lg overflow-hidden container-ask container-exmans">
-            <!-- Encabezado de la tarjeta -->
-            <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center header-examns">
-                <!-- Título dinámico: si ya se envió el examen, se muestra examTitle; de lo contrario, "Realizar Examen" -->
-                <h4 class="text-xl font-semibold" x-text="examSubmitted ? examTitle : 'Realizar Examen'"></h4>
-                <!-- Tiempo restante solo si no se ha enviado el examen -->
-                <div class="text-lg font-semibold " x-show="!examSubmitted">
-                    Tiempo restante: <span x-text="formattedTime"></span>
+<div class="relative">
+    @dump('soy yo...')
+    <!-- Temporizador en la esquina superior derecha fuera de la card -->
+    <div wire:poll.1s="decrementTimer" class="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg">
+        Tiempo restante: {{ $formattedTime }}
+    </div>
+
+    <!-- Card de la pregunta -->
+    <div class="max-w-5xl w-full mx-auto mt-16 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">{{ $examTitle }}</h2>
+
+        @foreach($paginatedQuestions as $question)
+            <div class="mb-6 border rounded p-4 shadow-sm">
+                <h3 class="font-semibold mb-3">Pregunta: {{ $question['content'] }}</h3>
+                <div class="flex flex-row gap-4 mb-4">
+                    @foreach($question['options'] as $option)
+                        @php
+                            $esModoCorreccion = $mostrar_correccion ?? false;
+                            $seleccionada = $selectedAnswers[$question['id']] ?? null;
+                            $esCorrecta = $option['id'] == $question['correct_option_id'];
+                            $esSeleccionada = $seleccionada == $option['id'];
+                            $correccion = $correcciones[$question['id']] ?? null;
+                        @endphp
+
+                        <button
+                            wire:click="selectAnswer({{ $question['id'] }}, {{ $option['id'] }})"
+                            @if($esModoCorreccion) disabled @endif
+                            class="flex-1 px-4 py-3 border rounded text-left transition
+                @if($esModoCorreccion)
+                    @if($esCorrecta)
+                        bg-green-600 text-white border-green-600
+                    @elseif($esSeleccionada)
+                        bg-red-600 text-white border-red-600
+                    @else
+                        bg-white
+                    @endif
+                @else
+                    {{ $esSeleccionada ? 'bg-blue-600 text-white border-blue-600' : 'bg-white hover:bg-blue-100' }}
+                @endif
+            ">
+                            {{ $option['content'] }}
+                        </button>
+                    @endforeach
                 </div>
-            </div>
-
-            <!-- Cuerpo de la tarjeta -->
-            <div class=" tarjeta-box bg-white rounded-b-[20px]">
-                <template x-for="(question, index) in paginatedQuestions" :key="question.id">
-                    <div class="mb-6 mb-45">
-                        <!-- Título de la pregunta con badge -->
-                        <h5 class="flex items-center text-lg font-semibold m-25">
-                            <span
-                                class="inline-block bg-gray-200 text-gray-500 rounded-full px-3 py-1 mr-3 number-question">
-                                <span x-text="(currentPage - 1) * questionsPerPage + index + 1"></span>
-                            </span>
-                            <span class="text-ask" x-text="question.content"></span>
-
-                        </h5>
-                        <hr>
-
-                        <!-- Opciones de la pregunta -->
-                        <ul class="mt-2 space-y-2 choise-ask">
-                            <template x-for="option in question.options" :key="option.id">
-                                <li class="p-3 border rounded cursor-pointer"
-                                    :class="getOptionClass(question.id, option.id)"
-                                    @click="!examSubmitted ? selectAnswer(question.id, option.id) : null"
-                                >
-                                    <span x-text="option.content"></span>
-                                </li>
-                            </template>
-                        </ul>
-
-                        <!-- Medios: se muestran después de enviar el examen, debajo de las opciones -->
-                        <template x-if="examSubmitted && question.media_iframe">
-                            <div class="mt-2 m-25 mt-25">
-                                <div x-html="question.media_iframe"></div>
-                            </div>
-
-                        </template>
-
-                        <template x-if="examSubmitted && !question.media_iframe && question.media_url">
-                            <div class="mt-2 m-25 mt-25">
-                                <iframe :src="getEmbedUrl(question.media_url)" class="w-full" height="315"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen></iframe>
-                            </div>
-                        </template>
-                        <template
-                            x-if="examSubmitted && !question.media_iframe && !question.media_url && question.media_type">
-                            <div class="mt-2">
-                                <p x-text="question.media_type"></p>
-                            </div>
-                        </template>
-
-                        <!-- Explicación:
-                             Se muestra si el examen está enviado,
-                             existe question.explanation,
-                             y la respuesta es incorrecta O no se respondió -->
-                        <template x-if="examSubmitted
-                                        && question.explanation
-                                        && ( !selectedAnswers[question.id]
-                                             || !correctAnswers.includes(selectedAnswers[question.id]) )">
-                            <div class="mt-2">
-                                <strong class="text-red-500">*<span x-text="question.explanation"></span>*</strong>
-                            </div>
-                        </template>
+                @if($mostrar_correccion && isset($correcciones[$question['id']]) && !$correcciones[$question['id']]['es_correcta'])
+                    <div class="mt-2 text-sm text-red-700">
+                        <strong>Explicación:</strong>
+                        <p class="text-red-700">{{ $question['explanation'] }}</p>
                     </div>
-                </template>
+                @endif
 
-                <!-- Controles de paginación (1 pregunta por página) -->
-                <div class="flex justify-between items-center mt-6 m-25 flex-wrap ">
 
-                    <div class="buttons-pagination">
-                        <button @click="prevPage()"
-                                :disabled="currentPage === 1"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50 boton-success-m button-c3">
+                <div class="flex justify-between items-center mt-4">
+                    <!-- Botones Anterior/Siguiente a la izquierda -->
+                    <div class="flex gap-2">
+                        <button
+                            wire:click="prevPage"
+                            @disabled($currentPage == 1)
+                            class="bg-gray-300 px-4 py-2 rounded disabled:opacity-50">
                             Anterior
                         </button>
-
-                        <button @click="nextPage()"
-                                :disabled="currentPage === totalPages"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50 boton-success-m button-c2">
+                        <button
+                            wire:click="nextPage"
+                            @disabled($currentPage == $totalPages)
+                            class="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">
                             Siguiente
                         </button>
-
                     </div>
 
-                    <!-- Navegación con cuadrados numerados -->
-                    <div class="flex flex-wrap gap-2 mt-4  buttons-numbers">
-                        <template x-for="(question, index) in questions" :key="question.id">
-                            <div @click="currentPage = index + 1"
-                                 class="w-10 h-10 flex items-center justify-center border cursor-pointer rounded buttons-nv"
-                                 :class="getSquareClass(question)">
-                                <span x-text="index + 1"></span>
+
+                    <div class="flex justify-between items-center mt-4 gap-2">
+                        @php $showArrows = $totalPages > 10; @endphp
+                            <!-- Navegación izquierda (solo si hay más de 10 preguntas) -->
+                        @if($showArrows)
+                            <div class="flex gap-1">
+                                <button
+                                    wire:click="goToPage(1)"
+                                    @disabled($currentPage == 1)
+                                    class="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white text-gray-700 rounded-none disabled:opacity-50 font-bold text-xs">
+                                    «
+                                </button>
+                                <button
+                                    wire:click="prevPage"
+                                    @disabled($currentPage == 1)
+                                    class="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white text-gray-700 rounded-none disabled:opacity-50 font-bold text-xs">
+                                    ‹
+                                </button>
                             </div>
-                        </template>
+                        @else
+                            <div class="w-0"></div>
+                        @endif
+
+                        <!-- Paginación central -->
+                        <div class="flex gap-1">
+                            @foreach($this->getVisiblePages() as $page)
+                                @php
+                                    // Calcula el ID de la pregunta asociada a esta página
+                                    $questionIndex = $page - 1;
+                                    $question = $examen['questions'][$questionIndex];
+                                    $correccion = $correcciones[$question['id']] ?? null;
+                                    $color = 'bg-white text-gray-700 hover:bg-blue-50';
+                                    if($mostrar_correccion && $correccion) {
+                                        $color = $correccion['es_correcta'] ? 'bg-green-600 text-white font-bold border-green-600' : 'bg-red-600 text-white font-bold border-red-600';
+                                    } elseif($currentPage == $page) {
+                                        $color = 'bg-blue-600 text-white font-bold border-blue-600';
+                                    }
+                                @endphp
+                                <button
+                                    wire:click="goToPage({{ $page }})"
+                                    class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-none text-xs {{ $color }}">
+                                    {{ $page }}
+                                </button>
+                            @endforeach
+
+                        </div>
+
+                        <!-- Navegación derecha (solo si hay más de 10 preguntas) -->
+                        @if($showArrows)
+                            <div class="flex gap-1">
+                                <button
+                                    wire:click="nextPage"
+                                    @disabled($currentPage == $totalPages)
+                                    class="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white text-gray-700 rounded-none disabled:opacity-50 font-bold text-xs">
+                                    ›
+                                </button>
+                                <button
+                                    wire:click="goToPage({{ $totalPages }})"
+                                    @disabled($currentPage == $totalPages)
+                                    class="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white text-gray-700 rounded-none disabled:opacity-50 font-bold text-xs">
+                                    »
+                                </button>
+                            </div>
+                        @else
+                            <div class="w-0"></div>
+                        @endif
                     </div>
+
+
                 </div>
 
-                <hr>
-                <div class="text-sm">
-                    Página <span x-text="currentPage"></span> de <span x-text="totalPages"></span>
-                </div>
+                @endforeach
 
             </div>
-
-            <!-- Pie de la tarjeta -->
-            <div class="px-6 py-4 text-right">
-                <!-- Botón para enviar examen si aún no se envió -->
-                <template x-if="!examSubmitted">
+            <div class="flex gap-4 mt-6 justify-end">
+                @if($mostrar_correccion)
+                    <a href="{{ route('dashboard') }}"
+                       class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                        Volver al inicio
+                    </a>
+                @else
                     <button
-                        type="button"
-                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded boton-success-m button-c2"
-                        @click="submitExam()">
-                        Enviar Examen
+                        wire:click="$set('showFinishModal', true)"
+                        class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700 transition">
+                        Finalizar Examen
                     </button>
-                </template>
-                <!-- Una vez enviado, mostrar score y botón para ir al Home -->
-                <template x-if="examSubmitted">
-                    <div class="results-exam">
-                        <p class="mt-4 font-semibold text-lg">Puntuación: <span x-text="score"></span>/100</p>
-                        <a href="{{ route('dashboard') }}"
-                           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block mt-4 boton-success-m button-c2">
-                            Ir al Home
-                        </a>
-                    </div>
-                </template>
+                @endif
+                <button
+                    wire:click="$set('showExitModal', true)"
+                    class="bg-gray-300 text-gray-800 px-6 py-2 rounded font-bold hover:bg-gray-400 transition">
+                    Salir
+                </button>
+            </div>
+    </div>
+    @if($showFinishModal)
+        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+                <h3 class="text-lg font-bold mb-4">Finalizar Examen</h3>
+                @php
+                    $total = count($examen['questions']);
+                    $respondidas = count($selectedAnswers);
+                @endphp
+                @if($respondidas < $total)
+                    <p class="mb-4">
+                        Has respondido <span class="font-bold">{{ $respondidas }}</span> de <span
+                            class="font-bold">{{ $total }}</span> preguntas.<br>
+                        ¿Seguro que quieres terminar?
+                    </p>
+                @else
+                    <p class="mb-4">
+                        ¡Respondiste todas las preguntas!<br>
+                        ¿Finalizar examen?
+                    </p>
+                @endif
+                <div class="flex justify-end gap-4 mt-6">
+                    <button
+                        wire:click="$set('showFinishModal', false)"
+                        class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800">
+                        Cancelar
+                    </button>
+                    <button
+                        wire:click="finalizarExamen"
+                        class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold">
+                        Finalizar Examen
+                    </button>
+                </div>
             </div>
         </div>
-
-        <!-- Cuadrado flotante para el tiempo restante (oculto al enviar) -->
-        <div x-show="!examSubmitted" class="fixed box-time__exams flex justify-center items-center gap-[20px] md:gap-[30px]" x-cloak>
-            <div class="text-base font-bold mb-1">Tiempo restante</div>
-            <div class="text-2xl font-extrabold" x-text="formattedTime"></div>
+    @endif
+    @if($showExitModal)
+        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+                <h3 class="text-lg font-bold mb-4">Salir del Examen</h3>
+                <p class="mb-4">
+                    ¿Seguro que quieres salir? Perderás tu progreso.
+                </p>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button
+                        wire:click="$set('showExitModal', false)"
+                        class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800">
+                        Cancelar
+                    </button>
+                    <button
+                        wire:click="salirExamen"
+                        class="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold">
+                        Salir
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-@endif
+    @endif
+    @if($mostrar_correccion)
+        <div class="mb-6 p-4 rounded text-lg font-bold flex items-center justify-between
+    {{ $score > 50 ? 'text-green-800 bg-green-100 border border-green-300' : 'text-red-800 bg-red-100 border border-red-300' }}">
+            <span>Puntuación: {{ $score }}/100</span>
+        </div>
 
-@push('scripts')
-    <script>
-        function examComponent() {
-            return {
-                // Preguntas y examId
-                questions: @json($examen->questions),
-                examId: {{ $examen->id }},
-
-                selectedAnswers: {},
-                correctAnswers: [],
-                score: 0,
-                examSubmitted: false,
-
-                // Ajustamos el tiempo en segundos
-                remainingTime: {{ $examen->time_limit * 60 }},
-                timerInterval: null,
-
-                // Paginación
-                currentPage: 1,
-                questionsPerPage: 1,
-
-                // Título del examen
-                examTitle: "{{ $examen->title }}",
-
-                init() {
-                    this.startTimer();
-                },
-
-                getEmbedUrl(url) {
-                    if (url.includes("youtube.com/watch")) {
-                        let videoId = url.split("v=")[1].split("&")[0];
-                        return "https://www.youtube.com/embed/" + videoId;
-                    } else if (url.includes("youtu.be/")) {
-                        let videoId = url.split("youtu.be/")[1].split("?")[0];
-                        return "https://www.youtube.com/embed/" + videoId;
-                    }
-                    return url;
-                },
-
-                get formattedTime() {
-                    let minutes = Math.floor(this.remainingTime / 60);
-                    let seconds = this.remainingTime % 60;
-                    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                },
-
-                get paginatedQuestions() {
-                    const start = (this.currentPage - 1) * this.questionsPerPage;
-                    return this.questions.slice(start, start + this.questionsPerPage);
-                },
-
-                get totalPages() {
-                    return Math.ceil(this.questions.length / this.questionsPerPage);
-                },
-
-                nextPage() {
-                    if (this.currentPage < this.totalPages) {
-                        this.currentPage++;
-                    }
-                },
-                prevPage() {
-                    if (this.currentPage > 1) {
-                        this.currentPage--;
-                    }
-                },
-
-                startTimer() {
-                    this.timerInterval = setInterval(() => {
-                        if (this.remainingTime > 0) {
-                            this.remainingTime--;
-                        } else {
-                            clearInterval(this.timerInterval);
-                            if (!this.examSubmitted) {
-                                this.submitExam();
-                            }
-                        }
-                    }, 1000);
-                },
-
-                selectAnswer(questionId, optionId) {
-                    this.selectedAnswers[questionId] = optionId;
-                },
-
-                submitExam() {
-                    console.log('Enviando examen...');
-                    if (this.examSubmitted) return;
-
-                    const payload = {
-                        exam_id: this.examId,
-                        respuestas: this.selectedAnswers
-                    };
-
-                    fetch('{{ route('examenes.evaluar') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            this.examSubmitted = true;
-                            this.score = data.puntuacion;
-                            this.correctAnswers = data.respuestas_correctas;
-                            clearInterval(this.timerInterval);
-
-                            // REINICIAR PAGINACIÓN A LA PRIMERA PREGUNTA
-                            this.currentPage = 1;
-                        })
-                        .catch(error => {
-                            console.error('Error en la evaluación:', error);
-                        });
-                },
-
-                // Clase para cada OPCIÓN de la pregunta
-                getOptionClass(questionId, optionId) {
-                    if (!this.examSubmitted) {
-                        // Durante el examen
-                        return this.selectedAnswers[questionId] === optionId
-                            ? "bg-blue-500 text-white"
-                            : "bg-white";
-                    } else {
-                        // Después de enviar
-                        if (this.correctAnswers.includes(optionId)) {
-                            return "bg-green-500 text-white";
-                        } else if (this.selectedAnswers[questionId] === optionId) {
-                            return "bg-red-500 text-white";
-                        } else {
-                            return "bg-white";
-                        }
-                    }
-                },
-
-                // Clase para el cuadradito de navegación
-                getSquareClass(question) {
-                    // Antes de enviar: si la pregunta está contestada => azul, si no => blanco
-                    if (!this.examSubmitted) {
-                        if (this.selectedAnswers[question.id]) {
-                            return "bg-blue-500 text-white border-blue-500";
-                        } else {
-                            return "bg-white text-gray-800 border-gray-300";
-                        }
-                    } else {
-                        // Después de enviar: correcto => verde, incorrecto => rojo, sin respuesta => gris
-                        const answer = this.selectedAnswers[question.id];
-                        if (!answer) {
-                            return "bg-gray-400 text-gray-800 border-gray-400";
-                        }
-                        if (this.correctAnswers.includes(answer)) {
-                            return "bg-green-500 text-white border-green-500";
-                        } else {
-                            return "bg-red-500 text-white border-red-500";
-                        }
-                    }
-                }
-            };
-        }
-    </script>
-@endpush
+    @endif
+</div>
