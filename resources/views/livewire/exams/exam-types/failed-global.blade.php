@@ -1,6 +1,6 @@
 <div class="mb-8">
 
-    <div class="bg-white p-6 rounded container-askt mb-8">
+    <div class="bg-white  rounded container-askt mb-8">
         <h1 class="text-2xl font-semibold mb-4 primary-color title-ask-container">Examen</h1>
         <hr>
         <div class="carousel-container overflow-x-auto mb-5 relative">
@@ -179,7 +179,7 @@
         @endif
     </div>
     <hr class="border-gray-300">
-    <div class="bg-white p-6 rounded container-askt">
+    <div class="bg-white  rounded container-askt">
         <!-- Mostrar la colección de combinaciones agregadas -->
         <div class="">
             <h2 class="text-2xl font-semibold mb-4 primary-color title-ask-container">Combinaciones Agregadas</h2>

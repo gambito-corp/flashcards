@@ -1,7 +1,16 @@
 <div class="mb-8">
-
-    <div class="bg-white p-6 rounded container-askt mb-8">
-        <h1 class="text-2xl font-semibold mb-4 primary-color title-ask-container">Examen</h1>
+    <div class="bg-white  rounded container-askt mb-8">
+        <div class="flex mb-4 flex md:justify-around justify-start items-center flex-wrap">
+        <h1 class="text-2xl font-semibold primary-color title-ask-container md:mb-0 mb-2">Examen</h1>
+        <h3 class="flex justify-around items-center flex-wrap md:text-base text-[14px] px-5 md:px-0">Los usuarios Fremium solo pueden solo seleecionar 10 preguntas. ¿Quieres preguntas ilimitadas?             <div
+                                                                    class="px-0 md:px-3 rounded-lg md:w-auto w-full">
+                                                                    <a href="{{route('planes')}}"
+                                                                       target="_blank"
+                                                                       class="pointer-events-auto px-6 py-4 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base mt-3 md:mt-0">
+                                                                        🔒 Hazte PRO
+                                                                    </a>
+                                                                </div></h3>
+</div>
         <hr>
         <div class="carousel-container overflow-x-auto mb-5 relative">
             <ul class="carousel-list flex gap-4   overflow-x-auto scroll-smooth scroll">

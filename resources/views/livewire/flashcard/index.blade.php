@@ -130,7 +130,7 @@
             <span></span>
             <button type="button"
                     wire:click="toggleSelectAll"
-                    class="flex items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white
+                    class="flex md:w-auto w-full mb-5 md:mb-0 items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white
                     {{ count($selectedCards) === $cards->count() ? 'bg-[#4a6868]' : 'bg-[#5b8080] hover:bg-[#4a6868]' }}">
 
                 {{-- Ícono dinámico --}}
@@ -166,7 +166,7 @@
                 @foreach($availableCategories as $cat)
                     <button type="button"
                             wire:click="setActiveTab('cat-{{ $cat->id }}')"
-                            class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm
+                            class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm md:w-auto w-1/2
                         {{ $activeTab === 'cat-'.$cat->id ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                         {{ $cat->nombre }}
                     </button>
@@ -205,8 +205,8 @@
             <button
                 wire:click="startGame"
                 @disabled(count($selectedCards) === 0)
-                class="px-6 py-3 rounded-[8px] font-bold text-white text-lg transition
-                {{ count($selectedCards) ? 'bg-[#195b81] hover:bg-[#157b80]' : 'bg-gray-400 cursor-not-allowed' }}">
+                class="tw-button rounded text-base font-semibold primary-button text-white  transition md:w-auto w-full
+                {{ count($selectedCards) ? 'bg-[#195b81] hover:primary-button-hover' : 'bg-gray-400 cursor-not-allowed' }}">
                 Iniciar Juego
             </button>
         </div>

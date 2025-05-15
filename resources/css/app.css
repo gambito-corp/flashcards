@@ -10,6 +10,29 @@
     .title-mbs {
         @apply bg-white ;
     }
+    .tw-button{
+        @apply py-[10px] px-[35px];
+    }
+    .button-primary{
+        @apply bg-[#195b81] text-white;
+    }
+    .primary-button-hover{
+       @apply bg-[#113d56]; 
+    }
+    .button-secundary{
+        @apply bg-[#157b80] text-white;
+    }
+    .tw-title{
+        @apply text-[#195b81] font-extrabold text-[20px];
+    }
+    @media (max-width:620px){
+         .tw-title{
+        @apply  text-[17px];
+    }
+       .tw-button{
+        @apply text-[15px];
+    }
+    }
 }
 
 /*Errors*/

@@ -8,16 +8,33 @@
             <span class="text-sm text-gray-600 text-white">Elige áreas y tipos, como siempre.</span>
         </button>
         <button wire:click="selectMode('usuario')"
-                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white">
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white relative pointer-events-none">
+               <div
+                                                                    class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+                                                                    <a href="{{route('planes')}}"
+                                                                       target="_blank"
+                                                                       class="pointer-events-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                                                                        🔒 Hazte PRO
+                                                                    </a>
+                                                                </div>
             <span class="block text-base md:text-lg font-bold mb-2">Preguntas que más fallas</span>
             <span class="text-sm text-gray-600 text-white">Examen solo con tus preguntas más falladas.</span>
         </button>
         <button wire:click="selectMode('global')"
-                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white">
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white relative pointer-events-none">
+                 <div
+                                                                    class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+                                                                    <a href="{{route('planes')}}"
+                                                                       target="_blank"
+                                                                       class="pointer-events-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                                                                        🔒 Hazte PRO
+                                                                    </a>
+                                                                </div>
             <span class="block text-base md:text-lg font-bold mb-2">Preguntas más falladas (todos)</span>
             <span class="text-sm text-gray-600 text-white">Examen con las preguntas más falladas por todos los usuarios.</span>
         </button>
-        <button wire:click="selectMode('ia')" class="p-[40px] rounded-[10px] bg-[#195b81] text-white border-none text-white" >
+        <button wire:click="selectMode('ia')" class="p-[40px] rounded-[10px] bg-[#195b81] text-white border-none text-white relative" >
+            <span class="bg-white p-[10px] rounded-l-[5px] absolute right-0 top-0 text-[#195b81] uppercase font-bold text-[12px] border border-[#195b81]"><i class="fa-regular fa-face-smile mr-1"></i>Freemium</span>
             <span class="block text-base md:text-lg font-bold mb-2">Examen IA</span>
             <span class="text-sm text-gray-600 text-white">Las preguntas las genera una IA.</span>
         </button>
@@ -29,18 +46,14 @@
     </button>
 
     <!-- Overlay -->
-    <div class="absolute inset-0 bg-black/30 rounded-[10px] flex items-center justify-center pointer-events-none">
-        <div class="text-center text-white">
-            <div class="flex items-center justify-center gap-2 text-sm md:text-base font-semibold">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
-                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                </svg>
-                Próximamente
-            </div>
-        </div>
-    </div>
+ <div
+                                                                    class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+                                                                    <a href=""
+                                                                       target="_blank"
+                                                                       class="pointer-events-none px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                                                                        🔒 Proximamente 
+                                                                    </a>
+                                                                </div>
 </div>
 
     </div>
