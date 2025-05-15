@@ -184,7 +184,7 @@
 
             <div class="mt-8">
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                        class="bg-[#157b80] font-semibold text-white px-9 py-2.5 text-base rounded ">
                     Generar Examen IA
                 </button>
             </div>

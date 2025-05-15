@@ -4,7 +4,7 @@
     </script>
 @else
     <div x-data="examComponent()" x-init="init()" class="container mx-auto p-4 relative">
-        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden container-ask container-exmans">
+        <div class="max-w-3xl mx-auto  shadow-lg rounded-lg overflow-hidden container-ask container-exmans">
             <!-- Encabezado de la tarjeta -->
             <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center header-examns">
                 <!-- Título dinámico: si ya se envió el examen, se muestra examTitle; de lo contrario, "Realizar Examen" -->
@@ -16,7 +16,7 @@
             </div>
 
             <!-- Cuerpo de la tarjeta -->
-            <div class=" tarjeta-box">
+            <div class=" tarjeta-box bg-white rounded-b-[20px]">
                 <template x-for="(question, index) in paginatedQuestions" :key="question.id">
                     <div class="mb-6 mb-45">
                         <!-- Título de la pregunta con badge -->
@@ -81,7 +81,7 @@
                 </template>
 
                 <!-- Controles de paginación (1 pregunta por página) -->
-                <div class="flex justify-between items-center mt-6 m-25">
+                <div class="flex justify-between items-center mt-6 m-25 flex-wrap ">
 
                     <div class="buttons-pagination">
                         <button @click="prevPage()"
@@ -118,7 +118,7 @@
             </div>
 
             <!-- Pie de la tarjeta -->
-            <div class="px-6 py-4 bg-gray-100 text-right">
+            <div class="px-6 py-4 text-right">
                 <!-- Botón para enviar examen si aún no se envió -->
                 <template x-if="!examSubmitted">
                     <button
@@ -142,7 +142,7 @@
         </div>
 
         <!-- Cuadrado flotante para el tiempo restante (oculto al enviar) -->
-        <div x-show="!examSubmitted" class="fixed box-time__exams" x-cloak>
+        <div x-show="!examSubmitted" class="fixed box-time__exams flex justify-center items-center gap-[20px] md:gap-[30px]" x-cloak>
             <div class="text-base font-bold mb-1">Tiempo restante</div>
             <div class="text-2xl font-extrabold" x-text="formattedTime"></div>
         </div>
