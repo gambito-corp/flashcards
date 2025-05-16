@@ -166,6 +166,35 @@
                         </a>
                     </div>
                 </div>
+            @else
+                <div class="">
+                    <button type="button"
+                            wire:click="toggleSelectAll"
+                            class="flex md:w-auto w-full mb-5 md:mb-0 items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white
+            {{ count($selectedCards) === $cards->count() ? 'bg-[#4a6868]' : 'bg-[#5b8080] hover:bg-[#4a6868]' }}">
+
+                        {{-- Ícono dinámico --}}
+                        @if(count($selectedCards) === $cards->count())
+                            {{-- Icono X (deseleccionar todas) --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        @else
+                            {{-- Icono Check (seleccionar todas) --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M5 13l4 4L19 7"/>
+                            </svg>
+                        @endif
+
+                        <span>
+            {{ count($selectedCards) === $cards->count() ? 'Deseleccionar todas' : 'Seleccionar todas' }}
+        </span>
+                    </button>
+                </div>
             @endif
         </div>
 
