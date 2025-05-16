@@ -26,6 +26,10 @@ class Index extends Component
     public $cards = [];
     public $selectedCards = [];
     public $availableCategories = [];
+    public $editingCardId = null;
+    public $showEditModal = false;
+
+
     protected MBIAService $openai;
 
     public function boot(MBIAService $openai)
@@ -215,6 +219,55 @@ class Index extends Component
         $this->respuesta = trim($this->openai->completarTexto($prompt, $this->respuesta));
         $this->resetValidation('respuesta');
     }
+
+
+    public function editCard($cardId)
+    {
+        $card = FcCard::where('user_id', auth()->id())->findOrFail($cardId);
+        $this->editingCardId = $cardId;
+        $this->pregunta = $card->pregunta;
+        $this->respuesta = $card->respuesta;
+        $this->url = $card->url;
+        $this->url_respuesta = $card->url_respuesta;
+        $this->showEditModal = true;
+    }
+
+    public function updateCard()
+    {
+        $this->validate();
+
+        $card = FcCard::where('user_id', auth()->id())->findOrFail($this->editingCardId);
+        $card->pregunta = $this->pregunta;
+        $card->respuesta = $this->respuesta;
+        $card->url = $this->url;
+        $card->url_respuesta = $this->url_respuesta;
+        $card->save();
+
+        $this->cards = FcCard::where('user_id', auth()->id())->with('categories')->get();
+        $this->showEditModal = false;
+        session()->flash('message', 'Flashcard actualizada correctamente.');
+    }
+
+
+    public function deleteCard($cardId)
+    {
+        $card = FcCard::where('user_id', auth()->id())->findOrFail($cardId);
+
+        // Eliminar relaciones en fc_card_category
+        \DB::table('fc_card_category')->where('fc_card_id', $cardId)->delete();
+
+        // Eliminar relaciones en fc_card_group_cards
+        \DB::table('fc_cards_group_cards')->where('fc_card_id', $cardId)->delete();
+
+        // Eliminar la flashcard
+        $card->delete();
+
+        // Actualizar la colección local
+        $this->cards = FcCard::where('user_id', auth()->id())->with('categories')->get();
+
+        session()->flash('message', 'Flashcard eliminada correctamente.');
+    }
+
 
     public function render()
     {

@@ -109,11 +109,33 @@
                 @foreach($cardsToShow as $card)
                     <div
                         onclick="toggleCard({{ $card->id }})"
-                        class="box-flashcard-game flex-shrink-0 w-64 p-4 border rounded shadow cursor-pointer transition duration-200
-                    hover:shadow-lg {{ in_array($card->id, $selectedCards) ? 'bg-green-100 border-green-400' : 'bg-white' }}">
-                        <h2 class="font-bold text-lg">{{ $card->pregunta }}</h2>
+                        class="cursor-pointer box-flashcard-game flex-shrink-0 w-64 p-4 border rounded shadow transition duration-200
+        hover:shadow-lg {{ in_array($card->id, $selectedCards) ? 'bg-green-100 border-green-400' : 'bg-white' }}">
+                        <div class="">
+                            <h2 class="font-bold text-lg">{{ $card->pregunta }}</h2>
+                        </div>
+                        @if(Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                            <div class="flex justify-end space-x-2 mt-4">
+                                <button
+                                    type="button"
+                                    wire:click="editCard({{ $card->id }})"
+                                    class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-xs flex items-center gap-1"
+                                    title="Editar">
+                                    ✏️ Editar
+                                </button>
+                                <button
+                                    type="button"
+                                    wire:click="deleteCard({{ $card->id }})"
+                                    wire:confirm="¿Seguro que deseas eliminar esta flashcard?"
+                                    class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs flex items-center gap-1"
+                                    title="Eliminar">
+                                    🗑️ Eliminar
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
+
             </div>
         </div>
     </div>

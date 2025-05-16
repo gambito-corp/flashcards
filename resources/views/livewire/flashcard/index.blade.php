@@ -292,4 +292,45 @@
         </div>
 
     </div>
+    @if($showEditModal)
+        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+            <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
+                <button wire:click="$set('showEditModal', false)"
+                        class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;
+                </button>
+                <h2 class="text-xl font-bold mb-4">Editar Flashcard</h2>
+                <form wire:submit.prevent="updateCard">
+                    <div class="mb-4">
+                        <label class="block mb-1 font-semibold">Pregunta</label>
+                        <textarea wire:model.defer="pregunta" class="w-full border rounded px-3 py-2"
+                                  required></textarea>
+                        @error('pregunta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1 font-semibold">Respuesta</label>
+                        <textarea wire:model.defer="respuesta" class="w-full border rounded px-3 py-2"
+                                  required></textarea>
+                        @error('respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1">URL</label>
+                        <input type="text" wire:model.defer="url" class="w-full border rounded px-3 py-2">
+                        @error('url') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1">URL Respuesta</label>
+                        <input type="text" wire:model.defer="url_respuesta" class="w-full border rounded px-3 py-2">
+                        @error('url_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" wire:click="$set('showEditModal', false)"
+                                class="px-4 py-2 bg-gray-300 rounded">Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
 </div>
