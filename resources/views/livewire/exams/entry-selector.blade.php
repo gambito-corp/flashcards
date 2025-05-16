@@ -10,7 +10,7 @@
         </button>
         @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
             <button
-                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none  relative pointer-events-none">
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none  relative">
                 <div
                     class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
                     <a href="{{route('planes')}}"
@@ -32,7 +32,7 @@
         @endif
         @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
             <button
-                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white relative pointer-events-none">
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white relative">
                 <div
                     class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
                     <a href="{{route('planes')}}"
@@ -57,6 +57,7 @@
                 </span>
             </button>
         @endif
+
         <button wire:click="selectMode('ia')"
                 class="p-[40px] rounded-[10px] bg-[#195b81] text-white border-none text-white relative">
             <span
@@ -66,12 +67,28 @@
             <span class="text-sm text-gray-600 text-white">Las preguntas las genera una IA.</span>
         </button>
         <div class="relative col-span-1 md:col-span-2">
-            <button
-                wire:click="selectMode('analisis')"
-                class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none w-full opacity-50">
-                <span class="block text-base md:text-lg font-bold mb-2">Conócete a ti mismo</span>
-                <span class="text-sm text-white">Métricas y análisis de tu rendimiento.</span>
-            </button>
+            @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                <button
+                    class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none w-full opacity-50">
+                    <div
+                        class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+                        <a href="{{route('planes')}}"
+                           target="_blank"
+                           class="pointer-events-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                            🔒 Hazte PRO
+                        </a>
+                    </div>
+                    <span class="block text-base md:text-lg font-bold mb-2">Conócete a ti mismo</span>
+                    <span class="text-sm text-white">Métricas y análisis de tu rendimiento.</span>
+                </button>
+            @else
+                <button
+                    wire:click="selectMode('analisis')"
+                    class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none w-full opacity-50">
+                    <span class="block text-base md:text-lg font-bold mb-2">Conócete a ti mismo</span>
+                    <span class="text-sm text-white">Métricas y análisis de tu rendimiento.</span>
+                </button>
+            @endif
         </div>
     </div>
 </div>
