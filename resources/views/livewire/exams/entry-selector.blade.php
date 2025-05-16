@@ -66,8 +66,9 @@
             <span class="text-sm text-gray-600 text-white">Las preguntas las genera una IA.</span>
         </button>
         <div class="relative col-span-1 md:col-span-2">
-            <button disabled
-                    class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none w-full opacity-50">
+            <button
+                wire:click="selectMode('analisis')"
+                class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none w-full opacity-50">
                 <span class="block text-base md:text-lg font-bold mb-2">Conócete a ti mismo</span>
                 <span class="text-sm text-white">Métricas y análisis de tu rendimiento.</span>
             </button>
