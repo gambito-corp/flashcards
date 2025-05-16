@@ -309,4 +309,10 @@ class ExamController extends Controller
     }
 
 
+    public function estadisticas()
+    {
+        return view('examenes.estadisticas');
+    }
+
+
 }

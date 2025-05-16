@@ -73,6 +73,5 @@
                 <span class="text-sm text-white">Métricas y análisis de tu rendimiento.</span>
             </button>
         </div>
-
     </div>
 </div>

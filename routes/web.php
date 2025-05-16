@@ -75,11 +75,12 @@ Route::middleware([
 
 //   /*EXAMENES*/
     Route::get('/examenes', [ExamController::class, 'index'])->name('examenes.index');
-    Route::get('/examenes/{exam}', [ExamController::class, 'show'])->name('examenes.show');
     Route::post('/examenes', [ExamController::class, 'createExam'])->name('examenes.create');
     Route::post('examenes/failed-global', [ExamController::class, 'createExamFailGlobal'])->name('examenes.failed-global');
     Route::post('examenes/failed-user', [ExamController::class, 'createExamUserFailed'])->name('examenes.failed-user');
     Route::post('/examenes/ia', [ExamController::class, 'examenIA'])->name('examenes.ia');
+    Route::get('/examenes/estadisticas', [ExamController::class, 'estadisticas'])->name('examenes.estadisticas');
+    Route::get('/examenes/{exam}', [ExamController::class, 'show'])->name('examenes.show');
 
 
     /*FLASHCARD*/
