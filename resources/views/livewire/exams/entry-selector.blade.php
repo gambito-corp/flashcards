@@ -2,19 +2,37 @@
     <h1 class="text-[var(--primary-color)] font-black text-[17px] md:text-[20px] mb-5">¿Qué quieres hacer?</h1>
     <hr>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <button wire:click="selectMode('normal')"
-                class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none">
+        <button
+            wire:click="selectMode('normal')"
+            class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none">
             <span class="block text-base md:text-lg font-bold mb-2">Examen Normal</span>
             <span class="text-sm text-gray-600 text-white">Elige áreas y tipos, como siempre.</span>
         </button>
-        <button
-            {{--            wire:click="selectMode('usuario')"--}}
-
-            @if(Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+            <button
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none  relative pointer-events-none">
+                <div
+                    class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+                    <a href="{{route('planes')}}"
+                       target="_blank"
+                       class="pointer-events-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                        🔒 Hazte PRO
+                    </a>
+                </div>
+                <span class="block text-base md:text-lg font-bold mb-2">Preguntas que más fallas</span>
+                <span class="text-sm text-gray-600 text-white">Examen solo con tus preguntas más falladas.</span>
+            </button>
+        @else
+            <button
                 wire:click="selectMode('usuario')"
-            @endif
-            class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white relative pointer-events-none">
-            @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none">
+                <span class="block text-base md:text-lg font-bold mb-2">Preguntas que más fallas</span>
+                <span class="text-sm ">Examen solo con tus preguntas más falladas.</span>
+            </button>
+        @endif
+        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+            <button
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white relative pointer-events-none">
                 <div
                     class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
                     <a href="{{route('planes')}}"
@@ -23,30 +41,22 @@
                         🔒 Hazte PRO
                     </a>
                 </div>
-            @endif
-            <span class="block text-base md:text-lg font-bold mb-2">Preguntas que más fallas</span>
-            <span class="text-sm text-gray-600 text-white">Examen solo con tus preguntas más falladas.</span>
-        </button>
-        <button
-            @if(Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                <span class="block text-base md:text-lg font-bold mb-2">Preguntas más falladas (todos)</span>
+                <span
+                    class="text-sm text-gray-600 text-white">Examen con las preguntas más falladas por todos los usuarios.</span>
+            </button>
+        @else
+            <button
                 wire:click="selectMode('global')"
-            @endif
-            class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none text-white relative pointer-events-none">
-            @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
-
-                <div
-                    class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
-                    <a href="{{route('planes')}}"
-                       target="_blank"
-                       class="pointer-events-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
-                        🔒 Hazte PRO
-                    </a>
-                </div>
-            @endif
-            <span class="block text-base md:text-lg font-bold mb-2">Preguntas más falladas (todos)</span>
-            <span
-                class="text-sm text-gray-600 text-white">Examen con las preguntas más falladas por todos los usuarios.</span>
-        </button>
+                class="p-[40px] rounded-[10px] bg-[#ff6363] text-white border-none">
+                <span class="block text-base md:text-lg font-bold mb-2">
+                    Preguntas más falladas (todos)
+                </span>
+                <span
+                    class="text-sm ">Examen con las preguntas más falladas por todos los usuarios.
+                </span>
+            </button>
+        @endif
         <button wire:click="selectMode('ia')"
                 class="p-[40px] rounded-[10px] bg-[#195b81] text-white border-none text-white relative">
             <span
