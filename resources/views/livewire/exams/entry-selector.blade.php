@@ -1,5 +1,16 @@
 <div class="max-w-7xl mx-auto bg-white rounded  p-8 mb-10 md:md-5 md:p-10 mt-5 w-full rounded-[20px] ">
     <h1 class="text-[var(--primary-color)] font-black text-[17px] md:text-[20px] mb-5">¿Qué quieres hacer?</h1>
+    @if(session()->has('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">{!! session('error') !!}</span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 20 20"><title>Close</title><path>
+                </svg>
+            </span>
+        </div>
+    @endif
     <hr>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <button
