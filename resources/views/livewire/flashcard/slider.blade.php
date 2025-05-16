@@ -114,7 +114,7 @@
                         <div class="">
                             <h2 class="font-bold text-lg">{{ $card->pregunta }}</h2>
                         </div>
-                        @if(Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status != 0)
                             <div class="flex justify-end space-x-2 mt-4">
                                 <button
                                     type="button"
