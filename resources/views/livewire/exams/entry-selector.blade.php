@@ -67,20 +67,10 @@
         </button>
         <div class="relative col-span-1 md:col-span-2">
             <button disabled
-                    class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none w-full opacity-50 cursor-not-allowed">
+                    class="p-[40px] rounded-[10px] bg-[#5b8080] text-white border-none w-full opacity-50">
                 <span class="block text-base md:text-lg font-bold mb-2">Conócete a ti mismo</span>
                 <span class="text-sm text-white">Métricas y análisis de tu rendimiento.</span>
             </button>
-
-            <!-- Overlay -->
-            <div
-                class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
-                <a href=""
-                   target="_blank"
-                   class="pointer-events-none px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
-                    🔒 Proximamente
-                </a>
-            </div>
         </div>
 
     </div>

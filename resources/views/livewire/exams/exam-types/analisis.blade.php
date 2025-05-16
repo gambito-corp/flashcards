@@ -19,29 +19,28 @@
     </div>
 
     {{-- Gráfico de barras: Favoritismo por Área --}}
-    <div class="bg-white shadow rounded-lg p-6 mb-10">
+    <div class="bg-white shadow rounded-lg p-6 mb-10 h-full ">
         <h2 class="text-xl font-semibold mb-4 text-[#195b81]">Favoritismo Ponderado por Área (%)</h2>
-        <canvas id="barFavoritismo"></canvas>
+        <canvas id="barFavoritismo" class="max-w-[320px] h-full"></canvas>
     </div>
 
     {{-- Gráfico de Radar: Análisis por Área --}}
-    <div class="bg-white shadow rounded-lg p-6 mb-10">
-        <h2 class="text-xl font-semibold mb-4 text-[#195b81]">Radar de Áreas: Respondidas, Correctas, Incorrectas</h2>
-        <canvas id="radarAreas"></canvas>
+    <div class="bg-white shadow rounded-lg p-6 mb-10 h-full">
+        <h2 class="text-xl font-semibold mb-4 text-[#195b81]">Radar de Áreas: Respondidas, Correctas,
+            Incorrectas</h2>
+        <canvas id="radarAreas" class="w-full h-full"></canvas>
     </div>
 
-    {{-- Pasa los datos SOLO como JSON seguro --}}
-    <script>
-        const areas = @json($estadisticas);
-        console.log('AREAS (estadisticas):', areas);
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let barChart = null;
         let radarChart = null;
+        const areas = @json($estadisticas);
 
         function renderCharts() {
+            console.log('AREAS (estadisticas):', areas);
+
             // --- Gráfico de barras: Favoritismo ---
             const barLabels = areas.map(a => a.area_name);
             const barData = areas.map(a => a.favoritismo || 0);
@@ -137,12 +136,6 @@
             }
         }
 
-        // Livewire: Re-render cuando Livewire actualiza el DOM
-        document.addEventListener('livewire:load', () => {
-            renderCharts();
-            if (window.Livewire) {
-                window.Livewire.hook('message.processed', () => renderCharts());
-            }
-        });
+        renderCharts();
     </script>
 </div>
