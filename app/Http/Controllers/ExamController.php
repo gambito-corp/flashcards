@@ -229,6 +229,19 @@ class ExamController extends Controller
 
     public function examenIA(Request $request)
     {
+        $user = Auth::user();
+
+        // 1. Comprobación de límite para usuarios freemium (no root y status == 0)
+        if (!$user->hasAnyRole('root') && $user->status == 0) {
+            // 2. Contar exámenes IA del usuario
+            $iaExamsCount = \App\Models\Exam::where('user_id', $user->id)
+                ->count();
+
+            if ($iaExamsCount >= 20) {
+                return back()->with('error', 'Has alcanzado el límite de 20 exámenes IA permitidos para cuentas gratuitas. Hazte PRO para crear más.');
+            }
+        }
+
         $examTitle = $request->input('examTitle');
         $examTime = $request->input('examTime');
         $examCollectionRaw = $request->input('examCollection');
