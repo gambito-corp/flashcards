@@ -128,30 +128,45 @@
         <!-- Botón seleccionar todas -->
         <div class="flex items-center justify-between mb-2">
             <span></span>
-            <button type="button"
-                    wire:click="toggleSelectAll"
-                    class="flex md:w-auto w-full mb-5 md:mb-0 items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white
-                    {{ count($selectedCards) === $cards->count() ? 'bg-[#4a6868]' : 'bg-[#5b8080] hover:bg-[#4a6868]' }}">
+            @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                <div class="relative inline-block">
+                    <button type="button"
+                            wire:click="toggleSelectAll"
+                            class="flex md:w-auto w-full mb-5 md:mb-0 items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white
+            {{ count($selectedCards) === $cards->count() ? 'bg-[#4a6868]' : 'bg-[#5b8080] hover:bg-[#4a6868]' }}">
 
-                {{-- Ícono dinámico --}}
-                @if(count($selectedCards) === $cards->count())
-                    {{-- Icono X (deseleccionar todas) --}}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                @else
-                    {{-- Icono Check (seleccionar todas) --}}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                @endif
+                        {{-- Ícono dinámico --}}
+                        @if(count($selectedCards) === $cards->count())
+                            {{-- Icono X (deseleccionar todas) --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        @else
+                            {{-- Icono Check (seleccionar todas) --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M5 13l4 4L19 7"/>
+                            </svg>
+                        @endif
 
-                <span>
-                    {{ count($selectedCards) === $cards->count() ? 'Deseleccionar todas' : 'Seleccionar todas' }}
-                </span>
-            </button>
+                        <span>
+            {{ count($selectedCards) === $cards->count() ? 'Deseleccionar todas' : 'Seleccionar todas' }}
+        </span>
+                    </button>
+
+                    <div
+                        class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg pointer-events-auto">
+                        <a href="{{route('planes')}}"
+                           target="_blank"
+                           class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                            🔒 Hazte PRO
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Tabs -->

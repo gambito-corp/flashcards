@@ -30,14 +30,17 @@
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                     <div class="ml-3 relative flex items-center justify-center">
-                                           <div
-                                                                    class=" flex items-center justify-center rounded-lg mr-5">
-                                                                    <a href="{{route('planes')}}"
-                                                                       target="_blank"
-                                                                       class="pointer-events-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
-                                                                        🔒 Hazte PRO
-                                                                    </a>
-                                                                </div>
+                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+
+                            <div
+                                class=" flex items-center justify-center rounded-lg mr-5">
+                                <a href="{{route('planes')}}"
+                                   target="_blank"
+                                   class="pointer-events-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                                    🔒 Hazte PRO
+                                </a>
+                            </div>
+                        @endif
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
                                 <span class="inline-flex rounded-md">
@@ -156,14 +159,17 @@
 
         @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
             <div x-data="{ teamOpen: false }" class="pt-2 pb-3 space-y-1 z-50 ">
+                @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+
                     <div
-                                                                    class="px-3 rounded-lg mr-5 w-full">
-                                                                    <a href="{{route('planes')}}"
-                                                                       target="_blank"
-                                                                       class="pointer-events-auto px-6 py-4 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
-                                                                        🔒 Hazte PRO
-                                                                    </a>
-                                                                </div>
+                        class="px-3 rounded-lg mr-5 w-full">
+                        <a href="{{route('planes')}}"
+                           target="_blank"
+                           class="pointer-events-auto px-6 py-4 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                            🔒 Hazte PRO
+                        </a>
+                    </div>
+                @endif
                 <button @click="teamOpen = !teamOpen"
                         class="z-50 w-full flex justify-between items-center px-4 py-2 text-xs text-gray-400 focus:outline-none">
                     <span>
