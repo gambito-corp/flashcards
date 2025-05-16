@@ -4,6 +4,7 @@ namespace App\Livewire\Flashcard;
 
 use App\Models\FcCard;
 use App\Models\FcCategory;
+use App\Services\Usuarios\MBIAService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -25,6 +26,12 @@ class Index extends Component
     public $cards = [];
     public $selectedCards = [];
     public $availableCategories = [];
+    protected MBIAService $openai;
+
+    public function boot(MBIAService $openai)
+    {
+        $this->openai = $openai;
+    }
 
     public function mount()
     {
@@ -191,6 +198,22 @@ class Index extends Component
         }
         session()->put('selected_cards', $this->selectedCards);
         return redirect()->route('flashcard.game');
+    }
+
+    public function generarPreguntaIA()
+    {
+        $prompt = 'Genera una pregunta de flashcard sobre el tema: ' . ($this->pregunta ?? 'tema general');
+        $this->pregunta = empty($this->pregunta) ? '.' : $this->pregunta;
+        $this->pregunta = trim($this->openai->completarTexto($prompt, $this->pregunta));
+        $this->resetValidation('pregunta'); // Limpia el error visual si la IA rellena el campo
+    }
+
+    public function generarRespuestaIA()
+    {
+        $prompt = 'Genera una respuesta de Flascard breve para la pregunta: ' . ($this->pregunta ?? '...');
+        $this->respuesta = empty($this->respuesta) ? '.' : $this->respuesta;
+        $this->respuesta = trim($this->openai->completarTexto($prompt, $this->respuesta));
+        $this->resetValidation('respuesta');
     }
 
     public function render()

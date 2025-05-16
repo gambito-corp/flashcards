@@ -39,18 +39,18 @@
             {{ $allSelected ? 'Deseleccionar' : 'Seleccionar' }} {{ count($tabCardIds) }} flashcards
         </span>
                     </button>
-
                     <div
                         class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg pointer-events-auto">
-                        <a href="{{ route('planes') }}"
+                        <a href="{{route('planes')}}"
                            target="_blank"
-                           class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                           class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base opacity-0 hover:opacity-100">
                             🔒 Hazte PRO
                         </a>
                     </div>
                 </div>
             @else
                 <div class="relative inline-block">
+
                     <button type="button"
                             wire:click="toggleSelectAllTab('{{ $tabId }}')"
                             class="flex items-center justify-center gap-2 transition duration-300 rounded-[8px] text-[15px] font-medium px-[25px] py-[10px] text-white md:w-auto w-full
