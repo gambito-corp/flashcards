@@ -141,7 +141,8 @@
             renderCharts();
         </script>
     @else
-        <h1 class="text-3xl font-bold mb-8 ">Responde Al Menos 1 Examen para ver Tus Resultados</h1>
+        <h1 class="text-3xl font-bold mb-8 ">Responde Al Menos 1 Examen para ver Tus Resultados, solo se tomaran en
+            cuenta los nuevos Examenes</h1>
     @endif
 
 
