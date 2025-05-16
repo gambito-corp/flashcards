@@ -23,21 +23,24 @@
             </div>
         </div>
 
-
         <div id="Charts">
             {{-- Gráfico de barras: Favoritismo por Área --}}
-            <div class="bg-white shadow rounded-lg p-6 mb-10 h-full ">
+            <div class="bg-white shadow rounded-lg p-6 mb-10 h-full w-full">
                 <h2 class="text-xl font-semibold mb-4 text-[#195b81]">Favoritismo Ponderado por Área (%)</h2>
-                <canvas id="barFavoritismo" class="max-w-[320px] h-full"></canvas>
+                <canvas id="barFavoritismo" class="w-full h-full"></canvas>
             </div>
 
             {{-- Gráfico de Radar: Análisis por Área --}}
             <div class="bg-white shadow rounded-lg p-6 mb-10 h-full">
                 <h2 class="text-xl font-semibold mb-4 text-[#195b81]">Radar de Áreas: Respondidas, Correctas,
                     Incorrectas</h2>
-                <canvas id="radarAreas" class="w-full h-full"></canvas>
+                <div class="relative w-full mx-auto" style="height:600px; max-width:1100px;">
+                    <canvas id="radarAreas" class="w-full h-full"></canvas>
+                </div>
+
             </div>
         </div>
+
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             let barChart = null;
@@ -64,7 +67,9 @@
                                 data: barData,
                                 backgroundColor: 'rgba(30, 144, 255, 0.7)',
                                 borderColor: 'rgba(30, 144, 255, 1)',
-                                borderWidth: 2
+                                borderWidth: 2,
+                                barPercentage: 0.5,
+                                categoryPercentage: 1.0
                             }]
                         },
                         options: {
