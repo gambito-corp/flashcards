@@ -234,7 +234,7 @@ class ExamController extends Controller
         // 1. Comprobación de límite para usuarios freemium (no root y status == 0)
         if (!$user->hasAnyRole('root') && $user->status == 0) {
             // 2. Contar exámenes IA del usuario
-            $iaExamsCount = \App\Models\Exam::where('user_id', $user->id)
+            $iaExamsCount = \App\Models\ExamResult::where('user_id', $user->id)
                 ->count();
 
             if ($iaExamsCount >= 20) {
