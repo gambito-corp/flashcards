@@ -39,8 +39,8 @@ class ExamController extends Controller
                 ->whereBetween('created_at', [now()->firstOfMonth(), now()->lastOfMonth()])
                 ->count();
 
-            if ($iaExamsCount >= 20) {
-                return back()->with('error', 'Has alcanzado el límite de 20 exámenes IA permitidos para cuentas gratuitas. <a href="' . route('planes') . '" class="font-bold underline text-blue-600">Hazte PRO</a> para crear más.');
+            if ($iaExamsCount >= 12) {
+                return back()->with('error', 'Has alcanzado el límite de 12 exámenes permitidos entre Examenes Normales y de IA. <a href="' . route('planes') . '" class="font-bold underline text-blue-600">Hazte PRO</a> para crear más.');
             }
         }
         $validated = $request->validate([
@@ -252,8 +252,8 @@ class ExamController extends Controller
                 ->whereBetween('created_at', [now()->firstOfMonth(), now()->lastOfMonth()])
                 ->count();
 
-            if ($iaExamsCount >= 20) {
-                return back()->with('error', 'Has alcanzado el límite de 20 exámenes IA permitidos para cuentas gratuitas. <a href="' . route('planes') . '" class="font-bold underline text-blue-600">Hazte PRO</a> para crear más.');
+            if ($iaExamsCount >= 12) {
+                return back()->with('error', 'Has alcanzado el límite de 12 exámenes permitidos entre Examenes Normales y de IA. <a href="' . route('planes') . '" class="font-bold underline text-blue-600">Hazte PRO</a> para crear más.');
             }
         }
 
