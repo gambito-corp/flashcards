@@ -58,4 +58,9 @@ return [
         'admin_email' => env('ADMIN_EMAIL', ''),
         'admin2_email' => env('ADMIN2_EMAIL', ''),
     ],
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT'),
+    ]
 ];

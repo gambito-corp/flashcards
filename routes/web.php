@@ -36,6 +36,8 @@ if (config('app.env') === 'production') {
 
 Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
+Route::get('auth/redirect/{provider}', [CustomLoginController::class, 'redirect'])->name('auth.redirect');
+Route::get('auth/callback/{provider}', [CustomLoginController::class, 'callback'])->name('auth.callback');
 
 Route::middleware([
     'auth:sanctum',

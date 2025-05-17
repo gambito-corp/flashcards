@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class CustomLoginController extends Controller
 {
@@ -33,5 +35,28 @@ class CustomLoginController extends Controller
 
         // Si falla, volver atrás con error
         return back()->withErrors(['email' => 'Credenciales inválidas']);
+    }
+
+    public function redirect($provider)
+    {
+        return Socialite::driver($provider)->redirect();
+    }
+
+    public function callback($provider)
+    {
+        $user = Socialite::driver($provider)->user();
+
+        $user = User::firstOrCreate([
+            'email' => $user->getEmail(),
+        ], [
+            'name' => $user->getName(),
+            'avatar' => $user->getAvatar(),
+            'email_verified_at' => now(),
+            'remember_token' => $user->token,
+            'fb_id' => $user->getId(),
+        ]);
+
+        auth()->login($user);
+        return redirect()->route('dashboard');
     }
 }
