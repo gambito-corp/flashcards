@@ -85,7 +85,8 @@
         <div class="relative">
             <!-- Botones Izquierda/Derecha -->
             <div class="absolute top-[-5px] md:top-[-65px] right-0 flex flex-row gap-2">
-                <button type="button" id="slide-left" class="p-2 bg-[#f7f7f7] rounded-full hover:bg-gray-300">
+                <button type="button" id="slide-left{{ $tabId }}"
+                        class="p-2 bg-[#f7f7f7] rounded-full hover:bg-gray-300">
                     <!-- SVG izquierda -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none"
                          viewBox="0 0 24 24" stroke="currentColor">
@@ -93,7 +94,8 @@
                               d="M15 19l-7-7 7-7"/>
                     </svg>
                 </button>
-                <button type="button" id="slide-right" class="p-2 rounded-full bg-[#f7f7f7] hover:bg-gray-300">
+                <button type="button" id="slide-right{{ $tabId }}"
+                        class="p-2 rounded-full bg-[#f7f7f7] hover:bg-gray-300">
                     <!-- SVG derecha -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none"
                          viewBox="0 0 24 24" stroke="currentColor">
@@ -104,7 +106,7 @@
             </div>
 
             <!-- Slider Cards -->
-            <div id="card-slider"
+            <div id="card-slider{{ $tabId }}" data-tab="{{ $tabId }}"
                  class="flex space-x-4 overflow-x-hidden py-2 flash-c-g gap-[10px] mt-5 w-full transition-all duration-300">
                 @foreach($cardsToShow as $card)
                     <div
@@ -144,22 +146,31 @@
 @endif
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const slider = document.getElementById('card-slider');
-        const scrollAmount = 300;
+    function initSliderEvents() {
+        // Para cada slider visible
+        document.querySelectorAll('[id^="card-slider"]').forEach((slider) => {
+            const tabId = slider.getAttribute('data-tab') || '';
+            const leftBtn = document.querySelector(`#slide-left${tabId}`);
+            const rightBtn = document.querySelector(`#slide-right${tabId}`);
+            const scrollAmount = 300;
 
-        document.getElementById('slide-left').addEventListener('click', () => {
-            slider.scrollBy({left: -scrollAmount, behavior: 'smooth'});
+            if (leftBtn && slider) {
+                leftBtn.onclick = () => slider.scrollBy({left: -scrollAmount, behavior: 'smooth'});
+            }
+            if (rightBtn && slider) {
+                rightBtn.onclick = () => slider.scrollBy({left: scrollAmount, behavior: 'smooth'});
+            }
         });
+    }
 
-        document.getElementById('slide-right').addEventListener('click', () => {
-            slider.scrollBy({left: scrollAmount, behavior: 'smooth'});
+    // Inicializa al cargar la página
+    document.addEventListener('DOMContentLoaded', initSliderEvents);
+
+    // Re-inicializa tras cada render de Livewire
+    document.addEventListener('livewire:load', function () {
+        Livewire.hook('message.processed', () => {
+            initSliderEvents();
         });
     });
 
-    // Si usabas Livewire, desactiva esto o cambia a una función JS:
-    function toggleCard(cardId) {
-        @this.
-        call('toggleCard', cardId); // Este código depende de Livewire
-    }
 </script>

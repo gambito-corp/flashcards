@@ -236,7 +236,7 @@
 
         <!-- Tabs -->
         <div class="border-b box-cat-flash">
-            <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+            <nav class="-mb-px flex space-x-4 overflow-x-auto no-scrollbar" style="max-width: 100%;" aria-label="Tabs">
                 <button type="button"
                         wire:click="setActiveTab('sin-categoria')"
                         class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm
@@ -332,5 +332,4 @@
             </div>
         </div>
     @endif
-
 </div>
