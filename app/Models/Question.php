@@ -53,6 +53,11 @@ class Question extends Model
         return $this->hasMany(Option::class)->inRandomOrder();
     }
 
+    public function optionsCorrectas()
+    {
+        return $this->hasMany(Option::class, 'question_id')->where('is_correct', true);
+    }
+
     public function examUserAnswers()
     {
         return $this->hasMany(ExamUserAnswer::class);

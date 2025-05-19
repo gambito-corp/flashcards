@@ -107,7 +107,7 @@
 
             <!-- Slider Cards -->
             <div id="card-slider{{ $tabId }}" data-tab="{{ $tabId }}"
-                 class="flex space-x-4 overflow-x-hidden py-2 flash-c-g gap-[10px] mt-5 w-full transition-all duration-300">
+                 class="flex space-x-4 overflow-x-auto py-2 flash-c-g gap-[10px] mt-5 w-full transition-all duration-300">
                 @foreach($cardsToShow as $card)
                     <div
                         onclick="toggleCard({{ $card->id }})"
@@ -147,7 +147,6 @@
 
 <script>
     function initSliderEvents() {
-        // Para cada slider visible
         document.querySelectorAll('[id^="card-slider"]').forEach((slider) => {
             const tabId = slider.getAttribute('data-tab') || '';
             const leftBtn = document.querySelector(`#slide-left${tabId}`);
@@ -163,14 +162,12 @@
         });
     }
 
-    // Inicializa al cargar la página
     document.addEventListener('DOMContentLoaded', initSliderEvents);
 
-    // Re-inicializa tras cada render de Livewire
-    document.addEventListener('livewire:load', function () {
-        Livewire.hook('message.processed', () => {
+    document.addEventListener('livewire:init', () => {
+        Livewire.hook('commit', () => {
             initSliderEvents();
         });
     });
-
 </script>
+
