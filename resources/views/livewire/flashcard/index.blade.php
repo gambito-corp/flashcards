@@ -302,24 +302,25 @@
                 <form wire:submit.prevent="updateCard">
                     <div class="mb-4">
                         <label class="block mb-1 font-semibold">Pregunta</label>
-                        <textarea wire:model.defer="pregunta" class="w-full border rounded px-3 py-2"
+                        <textarea wire:model.defer="updatePregunta" class="w-full border rounded px-3 py-2"
                                   required></textarea>
                         @error('pregunta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 font-semibold">Respuesta</label>
-                        <textarea wire:model.defer="respuesta" class="w-full border rounded px-3 py-2"
+                        <textarea wire:model.defer="updateRespuesta" class="w-full border rounded px-3 py-2"
                                   required></textarea>
                         @error('respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1">URL</label>
-                        <input type="text" wire:model.defer="url" class="w-full border rounded px-3 py-2">
+                        <input type="text" wire:model.defer="updateUrl" class="w-full border rounded px-3 py-2">
                         @error('url') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1">URL Respuesta</label>
-                        <input type="text" wire:model.defer="url_respuesta" class="w-full border rounded px-3 py-2">
+                        <input type="text" wire:model.defer="updateUrl_respuesta"
+                               class="w-full border rounded px-3 py-2">
                         @error('url_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div class="flex justify-end gap-2 mt-6">

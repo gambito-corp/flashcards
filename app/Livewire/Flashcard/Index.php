@@ -21,6 +21,11 @@ class Index extends Component
     public $respuesta;
     public $url_respuesta;
     public $imagen_respuesta;
+
+    public $updatePregunta;
+    public $updateRespuesta;
+    public $updateUrl;
+    public $updateUrl_respuesta;
     public $selectedCategories = [];
     public $categoryName;
     public $cards = [];
@@ -225,10 +230,10 @@ class Index extends Component
     {
         $card = FcCard::where('user_id', auth()->id())->findOrFail($cardId);
         $this->editingCardId = $cardId;
-        $this->pregunta = $card->pregunta;
-        $this->respuesta = $card->respuesta;
-        $this->url = $card->url;
-        $this->url_respuesta = $card->url_respuesta;
+        $this->updatePregunta = $card->pregunta;
+        $this->updateRespuesta = $card->respuesta;
+        $this->updateUrl = $card->url;
+        $this->updateUrl_respuesta = $card->url_respuesta;
         $this->showEditModal = true;
     }
 
@@ -237,10 +242,10 @@ class Index extends Component
         $this->validate();
 
         $card = FcCard::where('user_id', auth()->id())->findOrFail($this->editingCardId);
-        $card->pregunta = $this->pregunta;
-        $card->respuesta = $this->respuesta;
-        $card->url = $this->url;
-        $card->url_respuesta = $this->url_respuesta;
+        $card->pregunta = $this->updatePregunta;
+        $card->respuesta = $this->updateRespuesta;
+        $card->url = $this->updateUrl;
+        $card->url_respuesta = $this->updateUrl_respuesta;
         $card->save();
 
         $this->cards = FcCard::where('user_id', auth()->id())->with('categories')->get();
