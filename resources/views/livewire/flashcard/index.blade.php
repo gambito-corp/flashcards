@@ -41,7 +41,7 @@
             <div class="mb-4 relative">
                 <button
                     type="button"
-                    @if(Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                    @if(Auth::user()->hasAnyRole('root') || Auth::user()->status == 0)
                         wire:click="generarPreguntaIA"
                     @endif
                     wire:loading.attr="disabled"
@@ -78,7 +78,7 @@
             <div class="mb-4 relative">
                 <button
                     type="button"
-                    @if(Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                    @if(Auth::user()->hasAnyRole('root') || Auth::user()->status == 1)
                         wire:click="generarRespuestaIA"
                     @endif
                     wire:loading.attr="disabled"
