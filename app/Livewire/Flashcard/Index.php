@@ -141,7 +141,8 @@ class Index extends Component
         }
     }
 
-    protected $rules = [
+    // Reglas para crear una nueva tarjeta
+    protected $createRules = [
         'pregunta' => 'required|string',
         'respuesta' => 'required|string',
         'url' => 'nullable|url',
@@ -151,13 +152,21 @@ class Index extends Component
         'selectedCategories' => 'nullable|array',
     ];
 
+// Reglas para editar una tarjeta existente
+    protected $editRules = [
+        'updatePregunta' => 'required|string',
+        'updateRespuesta' => 'required|string',
+        'updateUrl' => 'nullable|url',
+        'updateUrl_respuesta' => 'nullable|url',
+    ];
+
     protected $rulesCategory = [
         'categoryName' => 'required|string|max:255',
     ];
 
     public function createCard()
     {
-        $this->validate();
+        $this->validate($this->createRules);
 
         if (auth()->user()->status == 0 && !auth()->user()->hasAnyRole(['root', 'admin', 'colab', 'Rector'])) {
             $currentCount = FcCard::query()->where('user_id', auth()->id())->count();
@@ -239,7 +248,7 @@ class Index extends Component
 
     public function updateCard()
     {
-        $this->validate();
+        $this->validate($this->editRules);
 
         $card = FcCard::where('user_id', auth()->id())->findOrFail($this->editingCardId);
         $card->pregunta = $this->updatePregunta;
