@@ -212,7 +212,7 @@ Route::middleware([
 });
 
 route::get('ping', function () {
-    return 'pong';
+    return 'pong Update';
 });
 
 //Mercado Pago
