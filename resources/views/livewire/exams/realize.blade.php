@@ -91,29 +91,33 @@
                             <div class="w-0"></div>
                         @endif
 
-                        <!-- Paginación central -->
-                        <div class="flex gap-1">
-                            @foreach($this->getVisiblePages() as $page)
-                                @php
-                                    // Calcula el ID de la pregunta asociada a esta página
-                                    $questionIndex = $page - 1;
-                                    $question = $examen['questions'][$questionIndex];
-                                    $correccion = $correcciones[$question['id']] ?? null;
-                                    $color = 'bg-white text-gray-700 hover:bg-blue-50';
-                                    if($mostrar_correccion && $correccion) {
-                                        $color = $correccion['es_correcta'] ? 'bg-[#5b8080] text-white font-bold border-green-600' : 'bg-red-600 text-white font-bold border-red-600';
-                                    } elseif($currentPage == $page) {
-                                        $color = 'bg-[#5b8080] text-white font-bold border-[#5b8080]';
-                                    }
-                                @endphp
-                                <button
-                                    wire:click="goToPage({{ $page }})"
-                                    class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-none text-xs {{ $color }}">
-                                    {{ $page }}
-                                </button>
-                            @endforeach
+                    <div class="flex gap-1">
+    @foreach($this->getVisiblePages() as $page)
+        @php
+            $questionIndex = $page - 1;
+            $question = $examen['questions'][$questionIndex];
+            $correccion = $correcciones[$question['id']] ?? null;
+            $color = 'bg-white text-gray-700 hover:bg-blue-50';
 
-                        </div>
+            if ($mostrar_correccion && $correccion) {
+                $color = $correccion['es_correcta'] 
+                    ? 'bg-[#5b8080] text-white font-bold border-green-600' 
+                    : 'bg-red-600 text-white font-bold border-red-600';
+            } elseif ($page < $currentPage) {
+                // Página ya pasada:
+                $color = 'bg-[#5b8080] text-white font-bold border-[#5b8080]';
+            } elseif ($currentPage == $page) {
+                $color = 'bg-[#f7f7f7] text-[#5b8080] font-bold border-[#5b8080]';
+            }
+        @endphp
+        <button
+            wire:click="goToPage({{ $page }})"
+            class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-none text-xs {{ $color }}">
+            {{ $page }}
+        </button>
+    @endforeach
+</div>
+
 
                         <!-- Navegación derecha (solo si hay más de 10 preguntas) -->
                         @if($showArrows)

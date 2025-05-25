@@ -95,7 +95,9 @@
                             </div>
                         </div>
                     @endforeach
+                    
                 </nav>
+                
                 <!-- Barra para redimensionar -->
                 <div id="sidebarResizer" class="sidebar-resizer"></div>
             </aside>
@@ -318,7 +320,7 @@
                                                 @endif
 
                                                 @if(!empty($message['references']))
-                                                    <div class="flex flex-wrap gap-2 mt-2">
+                                                    <div class="flex flex-wrap gap-2 mt-2 hidden">
                                                         @foreach($message['references'] as $ref)
                                                             <span
                                                                 class="bg-[#d9e6f7] text-[#195b81] px-3 py-1 rounded-full text-xs">
@@ -330,82 +332,127 @@
                                             </div>
                                         </div>
                                     </div>
-                                @elseif($message['from'] === 'articles' && !empty($message['data']))
-                                    <div class="ml-0 md:ml-20">
-                                        <div class="text-left">
-                                            <div class="font-semibold text-[#195b81] mb-2">
-                                                Artículos relacionados:
-                                            </div>
-                                            <div class="flex gap-3 flex-wrap" id="article-container">
-                                                @foreach($message['data'] as $index => $article)
-                                                    @php
-                                                        $url = $article['url'];
-                                                        $fecha = $article['fecha'] ?? $article['year'];
-                                                        $titulo = $article['titulo'] ?? $article['title'];
-                                                        $autores = $article['autores'] ?? $article['authors'];
-                                                        $tipoEstudio = $article['tipo_estudio'] ?? $article['journal'];
-                                                    @endphp
+                       @elseif($message['from'] === 'articles' && !empty($message['data']))
+    <div class="ml-0 md:ml-20"
+         x-data="{ showArticles: {{ isset($message['is_new']) && $message['is_new'] !== 'false' ? 'false' : 'true' }} }"
+         x-show="showArticles"
+         x-transition
+         @typing-finished.window="showArticles = true"
+         id="articles-{{ $loop->index }}">
+        <div class="text-left">
+            <div class="font-semibold text-[#195b81] mb-2">
+                Artículos relacionados:
+            </div>
+            <div class="flex gap-3 flex-wrap" id="article-container">
+                @foreach($message['data'] as $index => $article)
+                    @php
+                        $url = $article['url'];
+                        $fecha = $article['fecha'] ?? $article['year'];
+                        $titulo = $article['titulo'] ?? $article['title'];
+                        $autores = $article['autores'] ?? $article['authors'];
+                        $tipoEstudio = $article['tipo_estudio'] ?? $article['journal'];
+                    @endphp
 
-                                                    <div class="relative bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-1/5 w-full
-                                                        {{ $index >= 3 ? 'hidden extra-article' : '' }}">
-                                                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
-                                                            @if($index >= 2)
-                                                                <div
-                                                                    class="absolute inset-0 bg-white/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
-                                                                    <a href="{{route('planes')}}"
-                                                                       target="_blank"
-                                                                       class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
-                                                                        🔒 Hazte PRO
-                                                                    </a>
-                                                                </div>
-                                                                <div class="opacity-50 pointer-events-none">
-                                                                    @endif
-                                                                    @endif
-                                                                    <a href="{{ $url ?? '#' }}" target="_blank"
-                                                                       class="block">
-                                                                        <h4 class="font-bold text-[#195b81] text-[13px] line-clamp-2">{{ $titulo }}</h4>
-                                                                        <div class="mt-1 text-xs text-gray-500">
-                                                                            @if(!empty($fecha))
-                                                                                · {{ $fecha }}
-                                                                            @endif
-                                                                        </div>
-                                                                        @if(!empty($tipoEstudio))
-                                                                            <span
-                                                                                class="inline-block bg-[#d9e6f7] text-[#195b81] px-2 py-0.5 rounded-full text-xs mt-2">
-                                                                        {{ $tipoEstudio }}
-                                                                    </span>
-                                                                        @endif
-                                                                    </a>
-                                                                    @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
-                                                                        @if($index >= 2)
-                                                                </div> {{-- cierre del div que aplica opacidad y deshabilita interacción --}}
-                                                            @endif
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-
-                                                {{-- Caja "Ver más" --}}
-                                                @if(count($message['data']) >= 3)
-                                                    <div
-                                                        class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-1/5 w-full flex items-center justify-center cursor-pointer extra-article-toggle">
-                                                        <button
-                                                            onclick="document.querySelectorAll('.extra-article').forEach(e => e.classList.remove('hidden')); document.querySelector('.extra-article-toggle').remove();"
-                                                            class="text-sm text-[#195b81] font-semibold hover:underline flex justify-center items-center">
-                                                            Mostrar Más
-                                                            <svg class="ml-2 -mr-0.5 h-4 w-4"
-                                                                 xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                 viewBox="0 0 24 24" stroke-width="1.5"
-                                                                 stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
+                    <div class="relative bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-1/5 w-full
+                        {{ $index >= 3 ? 'hidden extra-article' : '' }}">
+                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                            @if($index >= 2)
+                                <div
+                                    class="absolute inset-0 bg-white/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+                                    <a href="{{route('planes')}}"
+                                       target="_blank"
+                                       class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base">
+                                        🔒 Hazte PRO
+                                    </a>
+                                </div>
+                                <div class="opacity-50 pointer-events-none">
+                            @endif
+                        @endif
+                        <a href="{{ $url ?? '#' }}" target="_blank"
+                           class="block">
+                            <h4 class="font-bold text-[#195b81] text-[13px] line-clamp-2">{{ $titulo }}</h4>
+                            <div class="mt-1 text-xs text-gray-500">
+                                @if(!empty($fecha))
+                                    · {{ $fecha }}
                                 @endif
+                            </div>
+                            @if(!empty($tipoEstudio))
+                                <span
+                                    class="inline-block bg-[#d9e6f7] text-[#195b81] px-2 py-0.5 rounded-full text-xs mt-2">
+                                    {{ $tipoEstudio }}
+                                </span>
+                            @endif
+                        </a>
+                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                            @if($index >= 2)
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+                @endforeach
+ @if(count($message['data']) >= 3)
+    <div
+        class="bg-white p-3 rounded-lg border border-[#d9e6f7] hover:shadow-md transition md:w-1/5 w-full flex items-center justify-center cursor-pointer extra-article-toggle">
+    <button
+    type="button"
+    onclick="toggleArticles(event, this)"
+    class="text-sm text-[#195b81] font-semibold hover:underline flex justify-center items-center">
+    Mostrar Más
+    <svg class="ml-2 -mr-0.5 h-4 w-4"
+         xmlns="http://www.w3.org/2000/svg" fill="none"
+         viewBox="0 0 24 24" stroke-width="1.5"
+         stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+    </svg>
+</button>
+
+    </div>
+
+    <script>
+function toggleArticles(event, button) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const container = button.closest('.extra-article-toggle').parentElement;
+    const extraArticles = container.querySelectorAll('.extra-article');
+    const isHidden = extraArticles[0]?.classList.contains('hidden');
+
+    if (isHidden) {
+        extraArticles.forEach(el => el.classList.remove('hidden'));
+        button.innerHTML = `
+            Mostrar Menos
+            <svg class="ml-2 -mr-0.5 h-4 w-4"
+                 xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M8.25 15.75l7.5-7.5 7.5 7.5"></path>
+            </svg>
+        `;
+    } else {
+        extraArticles.forEach(el => el.classList.add('hidden'));
+        button.innerHTML = `
+            Mostrar Más
+            <svg class="ml-2 -mr-0.5 h-4 w-4"
+                 xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+            </svg>
+        `;
+    }
+}
+
+    </script>
+@endif
+
+            </div>
+        </div>
+    </div>
+@endif
+
 
                             @endforeach
                         </div>
@@ -617,72 +664,53 @@
             @endif
 
             <script>
-                function typingEffectWithHtml() {
-                    return {
-                        displayedHtml: '',
-                        content: '',
-                        startTyping(content) {
-                            this.content = content;
-                            let index = 0;
-                            const interval = setInterval(() => {
-                                if (index < this.content.length) {
-                                    this.displayedHtml += this.content[index];
-                                    index++;
-                                } else {
-                                    clearInterval(interval);
-                                }
-                            }, 10);
+        function decodeHTMLEntities(text) {
+    var textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+}
+
+function typingEffectWithHtml() {
+    return {
+        fullContent: '',
+        displayedHtml: '',
+        index: 0,
+        interval: null,
+        autoScrollEnabled: true,
+        startTyping(content) {
+            this.fullContent = content;
+            this.displayedHtml = '';
+            this.index = 0;
+
+            const chatMessages = document.querySelector('#chat-messages');
+
+            if (chatMessages) {
+                chatMessages.addEventListener('scroll', () => {
+                    const nearBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 50;
+                    this.autoScrollEnabled = nearBottom;
+                });
+            }
+
+            this.interval = setInterval(() => {
+                if (this.index < this.fullContent.length) {
+                    this.displayedHtml += this.fullContent[this.index];
+                    this.index++;
+
+                    this.$nextTick(() => {
+                        const chatMessages = document.querySelector('#chat-messages');
+                        if (chatMessages && this.autoScrollEnabled) {
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
                         }
-                    };
+                    });
+                } else {
+                    clearInterval(this.interval);
+                    // Lanzar evento al finalizar el tipeo
+                    window.dispatchEvent(new CustomEvent('typing-finished'));
                 }
-
-                function decodeHTMLEntities(text) {
-                    var textarea = document.createElement('textarea');
-                    textarea.innerHTML = text;
-                    return textarea.value;
-                }
-
-
-                function typingEffectWithHtml() {
-                    return {
-                        fullContent: '',
-                        displayedHtml: '',
-                        index: 0,
-                        interval: null,
-                        autoScrollEnabled: true, // para saber si forzar el scroll o no
-                        startTyping(content) {
-                            this.fullContent = content;
-                            this.displayedHtml = '';
-                            this.index = 0;
-
-                            const chatMessages = document.querySelector('#chat-messages');
-
-                            if (chatMessages) {
-                                chatMessages.addEventListener('scroll', () => {
-                                    const nearBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 50;
-                                    this.autoScrollEnabled = nearBottom;
-                                });
-                            }
-
-                            this.interval = setInterval(() => {
-                                if (this.index < this.fullContent.length) {
-                                    this.displayedHtml += this.fullContent[this.index];
-                                    this.index++;
-
-                                    this.$nextTick(() => {
-                                        const chatMessages = document.querySelector('#chat-messages');
-                                        if (chatMessages && this.autoScrollEnabled) {
-                                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                                        }
-                                    });
-                                } else {
-                                    clearInterval(this.interval);
-                                }
-                            }, 10); // Ajusta la velocidad según tu preferencia
-                        }
-                    };
-                }
-
+            }, 10);
+        }
+    };
+}
             </script>
         </div>
 
@@ -734,6 +762,24 @@
                     padding-top: 15px;
                     padding-bottom: 10px;
                 }
+                                .referencias li{
+                    margin-bottom: 10px;
+                    font-size: 12px;
+                    color:#195b81;
+                        line-height: 1rem;
+                        padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    background-color: #d9e6f7;
+    border-radius: 50px;
+
+                }
+                .referencias ol{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
 
                 @media (max-width: 620px) {
                     #answer-div table {
