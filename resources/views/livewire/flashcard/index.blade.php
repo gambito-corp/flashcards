@@ -297,40 +297,41 @@
     </div>
     @if($showEditModal)
     <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
+        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative max-w-xl w-full p-6">
             <button wire:click="$set('showEditModal', false)"
                 class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;
             </button>
-            <h2 class="text-xl font-bold mb-4">Editar Flashcard</h2>
+            <h2 class=" mb-4 tw-title">Editar Flashcard</h2>
+            <hr>
             <form wire:submit.prevent="updateCard">
                 <div class="mb-4">
-                    <label class="block mb-1 font-semibold">Pregunta</label>
-                    <textarea wire:model.defer="updatePregunta" class="w-full border rounded px-3 py-2"
+                    <label class="block mb-1 font-semibold text-[14px]">Pregunta</label>
+                    <textarea wire:model.defer="updatePregunta" class="border border-[#e4eaf1] text-[15px] outline-none rounded-[5px] w-full focus:border-[#195b81] focus:ring-[#195b81]"
                         required></textarea>
                     @error('pregunta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1 font-semibold">Respuesta</label>
-                    <textarea wire:model.defer="updateRespuesta" class="w-full border rounded px-3 py-2"
+                    <label class="block mb-1 font-semibold text-[14px]">Respuesta</label>
+                    <textarea wire:model.defer="updateRespuesta" class="border border-[#e4eaf1] text-[15px] outline-none rounded-[5px] w-full focus:border-[#195b81] focus:ring-[#195b81]"
                         required></textarea>
                     @error('respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1">URL</label>
-                    <input type="text" wire:model.defer="updateUrl" class="w-full border rounded px-3 py-2">
+                    <label class="block mb-1 text-[14px]">URL</label>
+                    <input type="text" wire:model.defer="updateUrl" class="border border-[#e4eaf1] text-[15px] outline-none rounded-[5px] w-full h-[50] focus:border-[#195b81] focus:ring-[#195b81]">
                     @error('url') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1">URL Respuesta</label>
+                    <label class="block mb-1 text-[14px]">URL Respuesta</label>
                     <input type="text" wire:model.defer="updateUrl_respuesta"
-                        class="w-full border rounded px-3 py-2">
+                        class="border border-[#e4eaf1] text-[15px] outline-none rounded-[5px] w-full h-[50] focus:border-[#195b81] focus:ring-[#195b81]">
                     @error('url_respuesta') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex justify-end gap-2 mt-6">
                     <button type="button" wire:click="$set('showEditModal', false)"
-                        class="px-4 py-2 bg-gray-300 rounded">Cancelar
+                        class="rounded tw-button  w-1/2 button-secundary text-white font-semibold">Cancelar
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Guardar</button>
+                    <button type="submit" class="rounded tw-button w-1/2 button-primary text-white font-semibold">Guardar</button>
                 </div>
             </form>
         </div>

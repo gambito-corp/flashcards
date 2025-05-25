@@ -659,11 +659,11 @@ nav .text-gray-900 {
     color: var(--text-color);
     font-weight: 500;
 }*/
-.flash-c-g img {
+/*.flash-c-g img {
     width: 35px;
     margin-bottom: 15px;
     filter: brightness(0.8) invert(1);
-}
+}*/
 
 .arrow-flash {
     position: absolute;

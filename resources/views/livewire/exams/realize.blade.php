@@ -107,7 +107,7 @@
                 // Página ya pasada:
                 $color = 'bg-[#5b8080] text-white font-bold border-[#5b8080]';
             } elseif ($currentPage == $page) {
-                $color = 'bg-[#f7f7f7] text-[#5b8080] font-bold border-[#5b8080]';
+                $color = 'bg-[#195b81] text-[#ffffff] font-bold border-[#5b8080]';
             }
         @endphp
         <button
