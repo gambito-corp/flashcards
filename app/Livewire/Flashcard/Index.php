@@ -21,6 +21,11 @@ class Index extends Component
     public $respuesta;
     public $url_respuesta;
     public $imagen_respuesta;
+
+    public $updatePregunta;
+    public $updateRespuesta;
+    public $updateUrl;
+    public $updateUrl_respuesta;
     public $selectedCategories = [];
     public $categoryName;
     public $cards = [];
@@ -136,7 +141,8 @@ class Index extends Component
         }
     }
 
-    protected $rules = [
+    // Reglas para crear una nueva tarjeta
+    protected $createRules = [
         'pregunta' => 'required|string',
         'respuesta' => 'required|string',
         'url' => 'nullable|url',
@@ -146,13 +152,21 @@ class Index extends Component
         'selectedCategories' => 'nullable|array',
     ];
 
+// Reglas para editar una tarjeta existente
+    protected $editRules = [
+        'updatePregunta' => 'required|string',
+        'updateRespuesta' => 'required|string',
+        'updateUrl' => 'nullable|url',
+        'updateUrl_respuesta' => 'nullable|url',
+    ];
+
     protected $rulesCategory = [
         'categoryName' => 'required|string|max:255',
     ];
 
     public function createCard()
     {
-        $this->validate();
+        $this->validate($this->createRules);
 
         if (auth()->user()->status == 0 && !auth()->user()->hasAnyRole(['root', 'admin', 'colab', 'Rector'])) {
             $currentCount = FcCard::query()->where('user_id', auth()->id())->count();
@@ -225,22 +239,22 @@ class Index extends Component
     {
         $card = FcCard::where('user_id', auth()->id())->findOrFail($cardId);
         $this->editingCardId = $cardId;
-        $this->pregunta = $card->pregunta;
-        $this->respuesta = $card->respuesta;
-        $this->url = $card->url;
-        $this->url_respuesta = $card->url_respuesta;
+        $this->updatePregunta = $card->pregunta;
+        $this->updateRespuesta = $card->respuesta;
+        $this->updateUrl = $card->url;
+        $this->updateUrl_respuesta = $card->url_respuesta;
         $this->showEditModal = true;
     }
 
     public function updateCard()
     {
-        $this->validate();
+        $this->validate($this->editRules);
 
         $card = FcCard::where('user_id', auth()->id())->findOrFail($this->editingCardId);
-        $card->pregunta = $this->pregunta;
-        $card->respuesta = $this->respuesta;
-        $card->url = $this->url;
-        $card->url_respuesta = $this->url_respuesta;
+        $card->pregunta = $this->updatePregunta;
+        $card->respuesta = $this->updateRespuesta;
+        $card->url = $this->updateUrl;
+        $card->url_respuesta = $this->updateUrl_respuesta;
         $card->save();
 
         $this->cards = FcCard::where('user_id', auth()->id())->with('categories')->get();

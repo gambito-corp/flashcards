@@ -211,6 +211,9 @@ Route::middleware([
         });
 });
 
+route::get('ping', function () {
+    return 'pong Update';
+});
 
 //Mercado Pago
 Route::middleware(['auth'])->group(function () {

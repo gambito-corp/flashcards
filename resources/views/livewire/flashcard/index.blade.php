@@ -78,7 +78,7 @@
 
             <div class="mb-4 relative">
                   <div class="flex justify-between">
-        
+
                 <label for="respuesta" class="block text-gray-700">Respuesta <span class="text-red-500">*</span></label>
                         <button
                     type="button"
