@@ -75,6 +75,8 @@ class IaExam extends Component
             'numPreguntas' => 'required|integer|min:1|max:200',
         ]);
 
+        $user = Auth::user();
+
         $combinationKey = $this->selectedArea->id . '-' .
             $this->selectedCategory->id . '-' .
             $this->selectedTipo->id . '-' .
@@ -94,10 +96,27 @@ class IaExam extends Component
             }
         }
 
+        $currentTotal = collect($this->examCollection)->sum('question_count');
+
         if ($existingIndex !== null) {
+            // Si la combinación ya existe, calcula el nuevo total sustituyendo la cantidad anterior por la nueva
+            $oldCount = $this->examCollection[$existingIndex]['question_count'];
+            $newTotal = ($currentTotal - $oldCount) + $this->numPreguntas;
+
+            if (!$user->hasAnyRole('root') && $user->status == 0 && $newTotal > 10) {
+                session()->flash('error', 'La suma total de preguntas no puede superar 10 para usuarios con cuenta gratuita.');
+                return;
+            }
+
             $this->examCollection[$existingIndex]['question_count'] = $this->numPreguntas;
             session()->flash('success', 'La combinación ya existía y se ha actualizado la cantidad de preguntas.');
         } else {
+            // Si la combinación no existe, verifica la suma total antes de agregar
+            if ($user->status == 0 && ($currentTotal + $this->numPreguntas) > 10) {
+                session()->flash('error', 'La suma total de preguntas no puede superar 10 para usuarios con cuenta gratuita.');
+                return;
+            }
+
             $this->examCollection[] = [
                 'area_id' => $this->selectedArea->id,
                 'area_name' => $this->selectedArea->name,

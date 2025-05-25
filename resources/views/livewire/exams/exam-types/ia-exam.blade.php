@@ -2,18 +2,29 @@
     @csrf
     <div class="mb-8">
         <div class="bg-white  rounded container-askt mb-8">
-              <div class="flex mb-4 flex md:justify-around justify-start items-center flex-wrap">
-            <h1 class="text-2xl font-semibold mb-4 primary-color title-ask-container md:mb-0 mb-2">Examen IA</h1>
-                    <h3 class="flex justify-around items-center flex-wrap md:text-base text-[14px] px-5 md:px-0">Los usuarios Fremium solo pueden solo seleecionar 10 preguntas. ¿Quieres preguntas ilimitadas?             <div
-                                                                    class="px-0 md:px-3 rounded-lg md:w-auto w-full">
-                                                                    <a href="{{route('planes')}}"
-                                                                       target="_blank"
-                                                                       class="pointer-events-auto px-6 py-4 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base mt-3 md:mt-0">
-                                                                        🔒 Hazte PRO
-                                                                    </a>
-                                                                </div></h3>
-                                                                <p class="px-5 text-[12px] bg-[#ffeaea] p-[7px] rounded-[5px] mt-[13px] text-[#3c3c3c]"><strong>Descargo de responsabilidad:</strong>El contenido de estas preguntas ha sido generado por sistemas de inteligencia artificial. Aunque se busca la mayor precisión posible, es imprescindible contrastar las respuestas con bibliografía especializada. El uso de esta información es responsabilidad exclusiva del usuario.</p>
-</div>
+            <div class="flex mb-4 flex md:justify-around justify-start items-center flex-wrap">
+                <h1 class="text-2xl font-semibold mb-4 primary-color title-ask-container md:mb-0 mb-2">Examen IA</h1>
+                @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0)
+                    <h3 class="flex justify-around items-center flex-wrap md:text-base text-[14px] px-5 md:px-0">Los
+                        usuarios Fremium solo pueden solo seleecionar 10 preguntas. ¿Quieres preguntas ilimitadas?
+
+                        <div
+                            class="px-0 md:px-3 rounded-lg md:w-auto w-full">
+                            <a href="{{route('planes')}}"
+                               target="_blank"
+                               class="pointer-events-auto px-6 py-4 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg  hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base mt-3 md:mt-0">
+                                🔒 Hazte PRO
+                            </a>
+                        </div>
+                    </h3>
+                @endif
+
+                <p class="px-5 text-[12px] bg-[#ffeaea] p-[7px] rounded-[5px] mt-[13px] text-[#3c3c3c]"><strong>Descargo
+                        de responsabilidad:</strong>El contenido de estas preguntas ha sido generado por sistemas de
+                    inteligencia artificial. Aunque se busca la mayor precisión posible, es imprescindible contrastar
+                    las respuestas con bibliografía especializada. El uso de esta información es responsabilidad
+                    exclusiva del usuario.</p>
+            </div>
             <hr>
 
             <!-- Carrusel de Áreas -->
@@ -199,10 +210,10 @@
                     Generar Examen IA
                 </button>
             </div>
-            
+
         </div>
     </div>
-    
+
 </form>
 
 

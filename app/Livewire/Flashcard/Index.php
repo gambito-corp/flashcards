@@ -4,6 +4,7 @@ namespace App\Livewire\Flashcard;
 
 use App\Models\FcCard;
 use App\Models\FcCategory;
+use App\Services\Usuarios\MBIAService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -25,6 +26,16 @@ class Index extends Component
     public $cards = [];
     public $selectedCards = [];
     public $availableCategories = [];
+    public $editingCardId = null;
+    public $showEditModal = false;
+
+
+    protected MBIAService $openai;
+
+    public function boot(MBIAService $openai)
+    {
+        $this->openai = $openai;
+    }
 
     public function mount()
     {
@@ -192,6 +203,71 @@ class Index extends Component
         session()->put('selected_cards', $this->selectedCards);
         return redirect()->route('flashcard.game');
     }
+
+    public function generarPreguntaIA()
+    {
+        $prompt = 'Genera una pregunta de flashcard sobre el tema: ' . ($this->pregunta ?? 'tema general');
+        $this->pregunta = empty($this->pregunta) ? '.' : $this->pregunta;
+        $this->pregunta = trim($this->openai->completarTexto($prompt, $this->pregunta));
+        $this->resetValidation('pregunta'); // Limpia el error visual si la IA rellena el campo
+    }
+
+    public function generarRespuestaIA()
+    {
+        $prompt = 'Genera una respuesta de Flascard breve para la pregunta: ' . ($this->pregunta ?? '...');
+        $this->respuesta = empty($this->respuesta) ? '.' : $this->respuesta;
+        $this->respuesta = trim($this->openai->completarTexto($prompt, $this->respuesta));
+        $this->resetValidation('respuesta');
+    }
+
+
+    public function editCard($cardId)
+    {
+        $card = FcCard::where('user_id', auth()->id())->findOrFail($cardId);
+        $this->editingCardId = $cardId;
+        $this->pregunta = $card->pregunta;
+        $this->respuesta = $card->respuesta;
+        $this->url = $card->url;
+        $this->url_respuesta = $card->url_respuesta;
+        $this->showEditModal = true;
+    }
+
+    public function updateCard()
+    {
+        $this->validate();
+
+        $card = FcCard::where('user_id', auth()->id())->findOrFail($this->editingCardId);
+        $card->pregunta = $this->pregunta;
+        $card->respuesta = $this->respuesta;
+        $card->url = $this->url;
+        $card->url_respuesta = $this->url_respuesta;
+        $card->save();
+
+        $this->cards = FcCard::where('user_id', auth()->id())->with('categories')->get();
+        $this->showEditModal = false;
+        session()->flash('message', 'Flashcard actualizada correctamente.');
+    }
+
+
+    public function deleteCard($cardId)
+    {
+        $card = FcCard::where('user_id', auth()->id())->findOrFail($cardId);
+
+        // Eliminar relaciones en fc_card_category
+        \DB::table('fc_card_category')->where('fc_card_id', $cardId)->delete();
+
+        // Eliminar relaciones en fc_card_group_cards
+        \DB::table('fc_cards_group_cards')->where('fc_card_id', $cardId)->delete();
+
+        // Eliminar la flashcard
+        $card->delete();
+
+        // Actualizar la colección local
+        $this->cards = FcCard::where('user_id', auth()->id())->with('categories')->get();
+
+        session()->flash('message', 'Flashcard eliminada correctamente.');
+    }
+
 
     public function render()
     {

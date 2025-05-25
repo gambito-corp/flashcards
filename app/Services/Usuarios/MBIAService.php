@@ -247,5 +247,18 @@ class MBIAService
         return $allQuestions;
     }
 
+    public function completarTexto($prompt, $text)
+    {
+        $response = OpenAI::chat()->create([
+            'model' => 'gpt-4.1-nano-2025-04-14',
+            'messages' => [
+                ['role' => 'system', 'content' => $prompt],
+                ['role' => 'user', 'content' => $text],
+            ],
+            'temperature' => 0.7,
+            'max_tokens' => 2000,
+        ]);
+        return $response['choices'][0]['message']['content'] ?? '';
+    }
 
 }

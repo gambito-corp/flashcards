@@ -40,10 +40,17 @@
         </span>
                     </button>
                     <div
+<<<<<<< HEAD
                         class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg pointer-events-auto h-max">
                         <a href="{{route('planes')}}"
                            target="_blank"
                            class="h-px-4 h-10 py-2 z-10 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded shadow-lg hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base opacity:1 md:opacity-0 hover:opacity-100 absolute top-[-21px] w-full text-[11px] p-0 h-[31px] md:static md:top-auto md:w-auto  md:p-4 md:h-auto ">
+=======
+                        class="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg pointer-events-auto">
+                        <a href="{{route('planes')}}"
+                           target="_blank"
+                           class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:scale-105 transition flex items-center justify-center text-[13px] md:tex-base opacity-0 hover:opacity-100">
+>>>>>>> c8792f5f4beef8c8f5d80efef87c1633c90f66be
                             🔒 Hazte PRO
                         </a>
                     </div>
@@ -85,8 +92,12 @@
         <div class="relative">
             <!-- Botones Izquierda/Derecha -->
             <div class="absolute top-[-5px] md:top-[-65px] right-0 flex flex-row gap-2">
+<<<<<<< HEAD
                 <button type="button" id="slide-left{{ $tabId }}"
                         class="p-2 bg-[#f7f7f7] rounded-full hover:bg-gray-300">
+=======
+                <button type="button" id="slide-left" class="p-2 bg-[#f7f7f7] rounded-full hover:bg-gray-300">
+>>>>>>> c8792f5f4beef8c8f5d80efef87c1633c90f66be
                     <!-- SVG izquierda -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none"
                          viewBox="0 0 24 24" stroke="currentColor">
@@ -94,8 +105,12 @@
                               d="M15 19l-7-7 7-7"/>
                     </svg>
                 </button>
+<<<<<<< HEAD
                 <button type="button" id="slide-right{{ $tabId }}"
                         class="p-2 rounded-full bg-[#f7f7f7] hover:bg-gray-300">
+=======
+                <button type="button" id="slide-right" class="p-2 rounded-full bg-[#f7f7f7] hover:bg-gray-300">
+>>>>>>> c8792f5f4beef8c8f5d80efef87c1633c90f66be
                     <!-- SVG derecha -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none"
                          viewBox="0 0 24 24" stroke="currentColor">
@@ -103,6 +118,7 @@
                               d="M9 5l7 7-7 7"/>
                     </svg>
                 </button>
+<<<<<<< HEAD
             </div>
 
             <!-- Slider Cards -->
@@ -142,6 +158,44 @@
 
 </div>
 
+=======
+            </div>
+
+            <!-- Slider Cards -->
+            <div id="card-slider"
+                 class="flex space-x-4 overflow-x-hidden py-2 flash-c-g gap-[10px] mt-5 w-full transition-all duration-300">
+                @foreach($cardsToShow as $card)
+                    <div
+                        onclick="toggleCard({{ $card->id }})"
+                        class="cursor-pointer box-flashcard-game flex-shrink-0 w-64 p-4 border rounded shadow transition duration-200
+        hover:shadow-lg {{ in_array($card->id, $selectedCards) ? 'bg-green-100 border-green-400' : 'bg-white' }}">
+                        <div class="">
+                            <h2 class="font-bold text-lg">{{ $card->pregunta }}</h2>
+                        </div>
+                        @if(!Auth::user()->hasAnyRole('root') && Auth::user()->status != 0)
+                            <div class="flex justify-end space-x-2 mt-4">
+                                <button
+                                    type="button"
+                                    wire:click="editCard({{ $card->id }})"
+                                    class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-xs flex items-center gap-1"
+                                    title="Editar">
+                                    ✏️ Editar
+                                </button>
+                                <button
+                                    type="button"
+                                    wire:click="deleteCard({{ $card->id }})"
+                                    wire:confirm="¿Seguro que deseas eliminar esta flashcard?"
+                                    class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs flex items-center gap-1"
+                                    title="Eliminar">
+                                    🗑️ Eliminar
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+
+            </div>
+>>>>>>> c8792f5f4beef8c8f5d80efef87c1633c90f66be
         </div>
     </div>
 @else
@@ -156,21 +210,40 @@
             const rightBtn = document.querySelector(`#slide-right${tabId}`);
             const scrollAmount = 300;
 
+<<<<<<< HEAD
             if (leftBtn && slider) {
                 leftBtn.onclick = () => slider.scrollBy({left: -scrollAmount, behavior: 'smooth'});
             }
             if (rightBtn && slider) {
                 rightBtn.onclick = () => slider.scrollBy({left: scrollAmount, behavior: 'smooth'});
             }
+=======
+        document.getElementById('slide-left').addEventListener('click', () => {
+            slider.scrollBy({left: -scrollAmount, behavior: 'smooth'});
+>>>>>>> c8792f5f4beef8c8f5d80efef87c1633c90f66be
         });
     }
 
+<<<<<<< HEAD
     document.addEventListener('DOMContentLoaded', initSliderEvents);
 
     document.addEventListener('livewire:init', () => {
         Livewire.hook('commit', () => {
             initSliderEvents();
+=======
+        document.getElementById('slide-right').addEventListener('click', () => {
+            slider.scrollBy({left: scrollAmount, behavior: 'smooth'});
+>>>>>>> c8792f5f4beef8c8f5d80efef87c1633c90f66be
         });
     });
 </script>
 
+<<<<<<< HEAD
+=======
+    // Si usabas Livewire, desactiva esto o cambia a una función JS:
+    function toggleCard(cardId) {
+        @this.
+        call('toggleCard', cardId); // Este código depende de Livewire
+    }
+</script>
+>>>>>>> c8792f5f4beef8c8f5d80efef87c1633c90f66be

@@ -4,6 +4,7 @@ namespace App\Livewire\Exams\ExamTypes;
 
 use App\Models\Area;
 use App\Models\Category;
+use App\Models\ExamResult;
 use App\Models\Tipo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -121,11 +122,22 @@ class NormalExam extends Component
 
     public function addCombination()
     {
-        // Sumar el número de preguntas de la colección actual
-        $total = collect($this->examCollection)->sum('question_count');
-        if (($total + $this->selectedQuestionCount) > 200) {
-            session()->flash('error', 'La suma total de preguntas no puede superar 200.');
-            return;
+        $user = Auth::user();
+        $currentTotal = collect($this->examCollection)->sum('question_count');
+
+        // Validación especial para usuarios status == 0
+        if (!$user->hasAnyRole('root') && $user->status == 0) {
+            // Si se intenta añadir una combinación nueva
+            if (($currentTotal + $this->selectedQuestionCount) > 10) {
+                session()->flash('error', 'La suma total de preguntas no puede superar 10 para usuarios con cuenta gratuita.');
+                return;
+            }
+        } else {
+            // Validación estándar para usuarios PRO
+            if (($currentTotal + $this->selectedQuestionCount) > 200) {
+                session()->flash('error', 'La suma total de preguntas no puede superar 200.');
+                return;
+            }
         }
 
         // Crear la clave única para la combinación actual ignorando la universidad
@@ -148,22 +160,25 @@ class NormalExam extends Component
         if ($existingIndex !== null) {
             // Si la combinación ya existe, se calcula la suma total sustituyendo la cantidad anterior por la nueva
             $oldCount = $this->examCollection[$existingIndex]['question_count'];
-            $currentTotal = collect($this->examCollection)->sum('question_count');
             $newTotal = ($currentTotal - $oldCount) + $this->selectedQuestionCount;
-            if ($newTotal > 200) {
-                session()->flash('error', 'La suma total de preguntas no puede superar 200.');
-                return;
+
+            if (!$user->hasAnyRole('root') && $user->status == 0) {
+                if ($newTotal > 10) {
+                    session()->flash('error', 'La suma total de preguntas no puede superar 10 para usuarios con cuenta gratuita.');
+                    return;
+                }
+            } else {
+                if ($newTotal > 200) {
+                    session()->flash('error', 'La suma total de preguntas no puede superar 200.');
+                    return;
+                }
             }
+
             // Actualiza la cantidad de preguntas para la combinación duplicada
             $this->examCollection[$existingIndex]['question_count'] = $this->selectedQuestionCount;
             session()->flash('success', 'La combinación ya existía y se ha actualizado la cantidad de preguntas.');
         } else {
-            // Si la combinación no existe, se verifica la suma total y se agrega la nueva combinación
-            $total = collect($this->examCollection)->sum('question_count');
-            if (($total + $this->selectedQuestionCount) > 200) {
-                session()->flash('error', 'La suma total de preguntas no puede superar 200.');
-                return;
-            }
+            // Si la combinación no existe, se agrega la nueva combinación
             $this->examCollection[] = [
                 'area_id' => $this->selectedArea->id,
                 'area_name' => $this->selectedArea->name,
@@ -178,8 +193,17 @@ class NormalExam extends Component
         }
     }
 
+
     public function createExam()
     {
+        // Comprobación de límite para usuarios freemium
+        if (!Auth::user()->hasAnyRole('root') && Auth::user()->status == 0) {
+            $examsCount = ExamResult::where('user_id', Auth::user()->id)->count();
+            if ($examsCount >= 20) {
+                session()->flash('error', 'Has alcanzado el límite de 20 exámenes permitidos para cuentas gratuitas. Hazte PRO para crear más.');
+                return;
+            }
+        }
         if (!$this->examTitle || !$this->examTime || count($this->examCollection) === 0) {
             session()->flash('error', 'Debe completar el título, el tiempo y agregar al menos una combinación.');
             return;

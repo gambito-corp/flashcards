@@ -31,6 +31,18 @@ class ExamController extends Controller
     public function createExam(Request $request)
     {
         $user = Auth::user();
+
+        // 1. Comprobación de límite para usuarios freemium (no root y status == 0)
+        if (!$user->hasAnyRole('root') && $user->status == 0) {
+            // 2. Contar exámenes IA del usuario
+            $iaExamsCount = \App\Models\ExamResult::where('user_id', $user->id)
+                ->whereBetween('created_at', [now()->firstOfMonth(), now()->lastOfMonth()])
+                ->count();
+
+            if ($iaExamsCount >= 12) {
+                return back()->with('error', 'Has alcanzado el límite de 12 exámenes permitidos entre Examenes Normales y de IA. <a href="' . route('planes') . '" class="font-bold underline text-blue-600">Hazte PRO</a> para crear más.');
+            }
+        }
         $validated = $request->validate([
             'examCollection' => 'required|json',
             'examTitle' => 'required|string',
@@ -229,6 +241,22 @@ class ExamController extends Controller
 
     public function examenIA(Request $request)
     {
+
+
+        $user = Auth::user();
+
+        // 1. Comprobación de límite para usuarios freemium (no root y status == 0)
+        if (!$user->hasAnyRole('root') && $user->status == 0) {
+            // 2. Contar exámenes IA del usuario
+            $iaExamsCount = \App\Models\ExamResult::where('user_id', $user->id)
+                ->whereBetween('created_at', [now()->firstOfMonth(), now()->lastOfMonth()])
+                ->count();
+
+            if ($iaExamsCount >= 12) {
+                return back()->with('error', 'Has alcanzado el límite de 12 exámenes permitidos entre Examenes Normales y de IA. <a href="' . route('planes') . '" class="font-bold underline text-blue-600">Hazte PRO</a> para crear más.');
+            }
+        }
+
         $examTitle = $request->input('examTitle');
         $examTime = $request->input('examTime');
         $examCollectionRaw = $request->input('examCollection');
@@ -306,6 +334,12 @@ class ExamController extends Controller
             'examTime' => $exam->time_limit,
             'examId' => $exam->id,
         ];
+    }
+
+
+    public function estadisticas()
+    {
+        return view('examenes.estadisticas');
     }
 
 
