@@ -427,6 +427,7 @@ class Index extends Component
         if ($isFirstMessage) {
             // Llama a tu servicio de IA para el título
             $titulo = $this->MBIAService->generateTitleFromQuestion($query);
+
             // Si la IA no responde, usa el inicio de la pregunta como fallback
             if (!$titulo['content']) {
                 $titulo = mb_strlen($query) > 20 ? mb_substr($query, 0, 17) . '...' : $query;
@@ -434,13 +435,26 @@ class Index extends Component
                 $titulo = $titulo['content'];
             }
 
-            // Actualiza el chat en DB
-            $this->chatService->updateTitle($this->activeChatId, $titulo, Auth::id());
+            // SANITIZAR EL TÍTULO ANTES DE GUARDAR
+            $titulo = $this->sanitizeTitle($titulo);
 
-            // Refresca el historial y el título activo en Livewire
-            $this->loadChatHistory();
-            $this->activeChatTitle = $titulo;
-            $this->groupChatsByAge();
+            try {
+                // Actualiza el chat en DB
+                $this->chatService->updateTitle($this->activeChatId, $titulo, Auth::id());
+
+                // Refresca el historial y el título activo en Livewire
+                $this->loadChatHistory();
+                $this->activeChatTitle = $titulo;
+                $this->groupChatsByAge();
+            } catch (\Exception $e) {
+                \Log::error('Error al actualizar título: ' . $e->getMessage());
+
+                // Fallback con título genérico
+                $tituloFallback = 'Chat ' . now()->format('Y-m-d H:i');
+                $this->chatService->updateTitle($this->activeChatId, $tituloFallback, Auth::id());
+                $this->activeChatTitle = $tituloFallback;
+                $this->groupChatsByAge();
+            }
         }
 
 
