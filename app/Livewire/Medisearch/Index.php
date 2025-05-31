@@ -175,7 +175,18 @@ class Index extends Component
             $originalTitle = $chat->title;
             if (strlen($originalTitle) > 20) {
                 $chat->title = substr($originalTitle, 0, 17) . '...';
-                $chat->save();
+                try {
+                    if ($chat->title) {
+                        $chat->title = $this->sanitizeTitle($chat->title);
+                    }
+                    $chat->save();
+                } catch (\Exception $e) {
+                    \Log::error('Error al guardar chat: ' . $e->getMessage());
+
+                    // Fallback: asignar título genérico
+                    $chat->title = 'Chat ' . $chat->created_at->format('Y-m-d H:i');
+                    $chat->save();
+                }
             }
             $diffDays = $now->diffInDays($chat->created_at);
 
@@ -576,19 +587,23 @@ class Index extends Component
         // Convertir a UTF-8 válido
         $title = mb_convert_encoding($title, 'UTF-8', 'UTF-8');
 
-        // Remover caracteres de control y caracteres problemáticos
-        $title = preg_replace('/[\x00-\x1F\x7F]/', '', $title);
+        // Remover caracteres problemáticos
+        $title = preg_replace('/[\x00-\x1F\x7F\xC2\xC3]/', '', $title);
 
-        // Limitar longitud para evitar problemas
+        // Reemplazar caracteres problemáticos específicos
+        $title = str_replace(['í', 'é', 'á', 'ó', 'ú', 'ñ'], ['i', 'e', 'a', 'o', 'u', 'n'], $title);
+
+        // Limitar longitud
         if (mb_strlen($title) > 200) {
             $title = mb_substr($title, 0, 197) . '...';
         }
 
-        // Si queda vacío después de la sanitización, usar fallback
+        // Si queda vacío, usar fallback
         if (empty(trim($title))) {
             $title = 'Chat ' . now()->format('Y-m-d H:i');
         }
 
         return $title;
     }
+
 }
