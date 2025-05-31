@@ -64,7 +64,7 @@ class MBIAService
 
     public function generateTitleFromQuestion($question)
     {
-        $prompt = "Resume la siguiente pregunta en un título breve y descriptivo para un chat médico:\n\n\"$question\"\n\nTítulo:, dicho resumenno puede superar los 20 caracteres...\n\nRespuesta:";
+        $prompt = "Resume la siguiente pregunta en un título breve y descriptivo para un chat médico:\n\n\"$question\"\n\nTítulo:, dicho resumen no puede superar los 20 caracteres y bajo ningun concepto puedes usar Acerntos... asi los tenga la palabra...\n\nRespuesta:";
         $messages = [];
         array_unshift($messages, [
             'role' => 'system',
