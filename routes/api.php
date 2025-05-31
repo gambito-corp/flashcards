@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\Commons\MenuController;
+use App\Http\Controllers\Api\FlashcardController;
 use App\Http\Controllers\MedisearchController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
@@ -22,3 +24,29 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('conversation/{id}', [MedisearchController::class, 'conversation']);
+
+// Rutas para el menú (requieren autenticación web)
+Route::middleware('auth:sanctum')->group(function () {
+    //Auth
+
+    //Commons
+    Route::get('/menu', [MenuController::class, 'getMenu']);
+    Route::get('/teams', [MenuController::class, 'getTeams']);
+    Route::post('/teams/switch', [MenuController::class, 'switchTeam']);
+    //Flashcards
+    Route::get('/flashcard/', [FlashcardController::class, 'index']);
+    Route::get('/flashcard/{id}', [FlashcardController::class, 'show'])->where('id', '[0-9]+');
+    Route::post('/flashcard', [FlashcardController::class, 'store']);
+    Route::put('/flashcard/{id}', [FlashcardController::class, 'update'])->where('id', '[0-9]+');
+    Route::delete('/flashcard/{id}', [FlashcardController::class, 'destroy'])->where('id', '[0-9]+');
+
+    Route::get('/flashcard/categories', [FlashcardController::class, 'categoryIndex']);
+    Route::post('/flashcard/category', [FlashcardController::class, 'categoryStore']);
+    // Nueva ruta para IA
+    Route::get('/flashcard/ai-generate', [FlashcardController::class, 'generateAI']);
+    // Ruta de Inicio del Juego
+    Route::post('/flashcard/start-game', [FlashcardController::class, 'setGame']);
+    Route::get('/flashcard/game', [FlashcardController::class, 'getGame']);
+
+});
+

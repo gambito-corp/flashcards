@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TiposController;
 use App\Http\Controllers\Admin\UniversidadesController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\CurrentTeamController;
 use App\Http\Controllers\CustomLoginController;
 use App\Http\Controllers\ExamController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MedisearchController;
 use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\PreguntasController;
+use App\Http\Controllers\ReactRedirectController;
 use App\Http\Controllers\WebhookController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -296,6 +298,11 @@ if (config('app.env') === 'local') {
     route::get('prueba/503', function () {
         return view('errors.503');
     });
+
+
+    Route::middleware('auth:web')->get('/api/get-token', [AuthController::class, 'getToken']);
+
+    Route::get('new', [ReactRedirectController::class, 'redirectToReact'])->name('new');
 
 
 }
