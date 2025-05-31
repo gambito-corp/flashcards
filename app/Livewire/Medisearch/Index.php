@@ -570,4 +570,25 @@ class Index extends Component
         // Agrega un salto de línea al contenido
         $this->newMessage .= "\n";
     }
+
+    private function sanitizeTitle($title)
+    {
+        // Convertir a UTF-8 válido
+        $title = mb_convert_encoding($title, 'UTF-8', 'UTF-8');
+
+        // Remover caracteres de control y caracteres problemáticos
+        $title = preg_replace('/[\x00-\x1F\x7F]/', '', $title);
+
+        // Limitar longitud para evitar problemas
+        if (mb_strlen($title) > 200) {
+            $title = mb_substr($title, 0, 197) . '...';
+        }
+
+        // Si queda vacío después de la sanitización, usar fallback
+        if (empty(trim($title))) {
+            $title = 'Chat ' . now()->format('Y-m-d H:i');
+        }
+
+        return $title;
+    }
 }
