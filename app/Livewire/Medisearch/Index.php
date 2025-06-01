@@ -499,17 +499,18 @@ class Index extends Component
         if (isset($responseData['data']['resultados'])) {
             foreach ($responseData['data']['resultados'] as $item) {
                 if ($item['tipo'] === 'llm_response') {
-                    // Extrae referencias del HTML si existen
+                    // Limpiar la respuesta antes de mostrarla
                     $references = [];
                     if (preg_match('/<div class="referencias">(.*?)<\/div>/s', $item['respuesta'], $matches)) {
                         preg_match_all('/<li>(.*?)<\/li>/s', $matches[1], $refMatches);
                         $references = array_map('strip_tags', $refMatches[1] ?? []);
                     }
+                    $respuestaLimpia = $this->limpiarRespuestaHTML($item['respuesta']);
 
                     $this->messages[] = [
                         'is_new' => true,
                         'from' => 'bot',
-                        'text' => $item['respuesta'],
+                        'text' => $respuestaLimpia,
                         'references' => $references,
                     ];
                 } elseif ($item['tipo'] === 'articles' && !empty($item['articulos'])) {
@@ -604,6 +605,24 @@ class Index extends Component
         }
 
         return $title;
+    }
+
+    private function limpiarRespuestaHTML($respuesta)
+    {
+        // Eliminar bloques de código markdown (con y sin especificación de lenguaje)
+        $respuestaLimpia = preg_replace('/```html\n?/', '', $respuesta);
+        $respuestaLimpia = preg_replace('/```\n?/', '', $respuestaLimpia);
+
+        // Eliminar código inline si existe
+        $respuestaLimpia = preg_replace('/`([^`]+)`/', '$1', $respuestaLimpia);
+
+        // Limpiar saltos de línea excesivos
+        $respuestaLimpia = preg_replace('/\n\s*\n/', "\n", $respuestaLimpia);
+
+        // Eliminar espacios al inicio y final
+        $respuestaLimpia = trim($respuestaLimpia);
+
+        return $respuestaLimpia;
     }
 
 }
