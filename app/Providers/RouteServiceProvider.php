@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Api\Questions\QuestionsController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -32,6 +33,17 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
+
+            Route::middleware('api')
+                ->prefix('api/auth')
+                ->name('auth.')
+                ->group(base_path('routes/Api/Auth.php'));
+
+            Route::middleware('api', 'auth:sanctum')
+                ->prefix('api/questions')
+                ->name('questions.')
+                ->controller(QuestionsController::class)
+                ->group(base_path('routes/Api/Question.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

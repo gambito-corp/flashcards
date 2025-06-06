@@ -11,11 +11,12 @@
         "laravel/jetstream": "4.0",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
-        "league/csv": "^9.21",
+        "league/csv": "^9.23",
         "league/flysystem-aws-s3-v3": "^3.29",
         "livewire/livewire": "^3.0",
         "mercadopago/dx-php": "^3.3",
         "openai-php/laravel": "^0.11.0",
+        "smalot/pdfparser": "^2.12",
         "spatie/laravel-permission": "^6.12"
     },
     "require-dev": {

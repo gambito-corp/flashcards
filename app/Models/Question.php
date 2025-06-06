@@ -20,7 +20,9 @@ class Question extends Model
         'media_iframe',
         'approved',
         'explanation',
-        'fail_weight'
+        'fail_weight',
+        'image_url',
+        'image_description'
     ];
 
     public function user()

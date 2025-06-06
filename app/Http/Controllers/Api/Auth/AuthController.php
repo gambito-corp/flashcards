@@ -3,13 +3,40 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\Api\Auth\AuthService;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    /**
-     * Obtener token de Sanctum para usuario autenticado via web
-     */
+
+    protected AuthService $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
+    public function login(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string|min:6',
+            ]);
+            return response()->json($this->authService->login(['email' => $request->email, 'password' => $request->password]));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Datos de autenticación inválidos',
+                'message' => $e->getMessage()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al iniciar sesión',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function getToken(Request $request)
     {
         try {

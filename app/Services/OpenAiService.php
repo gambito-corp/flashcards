@@ -37,7 +37,7 @@ class OpenAiService
             ni wikipedia, no quiero informacion nunca de esas webs solo de las antes mencionadas debes revisar un minimo
             de 3 a 6 fuentes diferentes nunca menos de 3 fuentes.
         ";
-        $completePrompt ="Pregunta: " . $query;
+        $completePrompt = "Pregunta: " . $query;
 
         $model = $investigar ? 'gpt-4o-mini-search-preview' : 'gpt-4o-mini';
         $result = OpenAI::chat()->create([
@@ -86,9 +86,10 @@ class OpenAiService
         ];
     }
 
-    public function resumeForPubMed(?string $response){
+    public function resumeForPubMed(?string $response)
+    {
         $initial_prompt = "necesito que crees un parametro de busqueda para lo que te estoy solicitando en pubmed no pueden exceder de las 3 o 7 palabras, y que se refiera exclusivamente a la sintomatologia y/o Tratamiento, no le antepongas ningun texto al principio de la respuesta, solo la respuesta y siempre en ingles tecnico medico.";
-        $completePrompt ="query: " . $response;
+        $completePrompt = "query: " . $response;
 
         $result = OpenAI::chat()->create([
             'model' => 'gpt-3.5-turbo',
@@ -160,7 +161,7 @@ class OpenAiService
             // Paso 1: Realizar la solicitud a ScienceDirect
             $response = $this->client->get(config('services.elsevier.base_url'), [
                 'headers' => [
-                    'Authorization' => 'bearer '.config('services.elsevier.token'),
+                    'Authorization' => 'bearer ' . config('services.elsevier.token'),
                     'Accept' => 'application/json' // Formato de salida JSON
                 ],
                 'query' => [
@@ -194,5 +195,10 @@ class OpenAiService
                 'error' => 'No se pudo realizar la búsqueda. Detalles: ' . $e->getMessage(),
             ];
         }
+    }
+
+    public function chekQuestion(mixed $question)
+    {
+
     }
 }
