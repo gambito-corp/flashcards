@@ -6,7 +6,7 @@ use App\Models\Question;
 
 class PreguntasSevices
 {
-    public function crearPregunta($pregunta, $approved, $tipos) : Question
+    public function crearPregunta($pregunta, $approved, $tipos): Question
     {
         $question = Question::query()->create([
             'content' => $pregunta->newContent,
@@ -35,17 +35,18 @@ class PreguntasSevices
         }
         return $question;
     }
+
     public function updatePregunta(Question $question, \App\Livewire\Admin\Preguntas\Edit $param, bool $approved, $addedSelections)
     {
 
         // Actualizar los datos básicos de la pregunta
         $question->update([
-            'content'       => $param->newContent,
+            'content' => $param->newContent,
             'question_type' => $param->questionType,
-            'explanation'   => $param->newExplanation,
-            'media_url'     => $param->newMediaUrl,
-            'media_iframe'  => $param->newMediaIframe,
-            'approved'      => $approved,
+            'explanation' => $param->newExplanation,
+            'media_url' => $param->newMediaUrl,
+            'media_iframe' => $param->newMediaIframe,
+            'approved' => $approved,
         ]);
 
         // Actualizar las relaciones many-to-many (Tipos y Universidades)
@@ -60,9 +61,9 @@ class PreguntasSevices
             // Crear nuevas opciones
             foreach ($param->newOptions as $index => $optionContent) {
                 $question->options()->create([
-                    'content'    => $optionContent,
+                    'content' => $optionContent,
                     'is_correct' => ($index == $param->newCorrectOption),
-                    'points'     => ($index == $param->newCorrectOption) ? 1 : 0,
+                    'points' => ($index == $param->newCorrectOption) ? 1 : 0,
                 ]);
             }
         }
@@ -99,7 +100,6 @@ class PreguntasSevices
     }
 
 
-
     public function crearPreguntaCSV($row, $user)
     {
         try {
@@ -116,8 +116,8 @@ class PreguntasSevices
                 'approved' => $approved,
                 'user_id' => $user->id,
             ]);
-        }catch (\Exception $e){
-            dd($e->getMessage(),  $row);
+        } catch (\Exception $e) {
+            dd($e->getMessage(), $row);
         }
 
         foreach ($tipoIds as $key => $tipoId) {
@@ -137,22 +137,22 @@ class PreguntasSevices
         if ($row['answer2'] != '') {
             $question->options()->create([
                 'content' => $this->limpiarCodificacion($row['answer2']),
-                'is_correct' => ($row['is_correct2'] == '1'||$row['is_correct2'] == 'true'),
-                'points' => ($row['is_correct2'] == '1'||$row['is_correct2'] == 'true') ? 1 : 0,
+                'is_correct' => ($row['is_correct2'] == '1' || $row['is_correct2'] == 'true'),
+                'points' => ($row['is_correct2'] == '1' || $row['is_correct2'] == 'true') ? 1 : 0,
             ]);
         }
         if ($row['answer3'] != '') {
             $question->options()->create([
                 'content' => $this->limpiarCodificacion($row['answer3']),
-                'is_correct' => ($row['is_correct3'] == '1'||$row['is_correct3'] == 'true'),
-                'points' => ($row['is_correct3'] == '1'||$row['is_correct3'] == 'true') ? 1 : 0,
+                'is_correct' => ($row['is_correct3'] == '1' || $row['is_correct3'] == 'true'),
+                'points' => ($row['is_correct3'] == '1' || $row['is_correct3'] == 'true') ? 1 : 0,
             ]);
         }
         if ($row['answer4'] != '') {
             $question->options()->create([
                 'content' => $this->limpiarCodificacion($row['answer4']),
-                'is_correct' => ($row['is_correct4'] == '1'||$row['is_correct4'] == 'true'),
-                'points' => ($row['is_correct4'] == '1'||$row['is_correct4'] == 'true') ? 1 : 0,
+                'is_correct' => ($row['is_correct4'] == '1' || $row['is_correct4'] == 'true'),
+                'points' => ($row['is_correct4'] == '1' || $row['is_correct4'] == 'true') ? 1 : 0,
             ]);
         }
     }

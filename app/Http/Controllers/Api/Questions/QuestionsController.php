@@ -63,4 +63,34 @@ class QuestionsController extends Controller
             ], 422);
         }
     }
+
+    public function getLastExamsResults()
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'results' => $this->questionsServices->getLastResults(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al obtener los resultados de los exámenes',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getGraphExamsDataResults()
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'grahs' => $this->questionsServices->getGraphExamsDataResults(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al obtener los datos de los gráficos de exámenes',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

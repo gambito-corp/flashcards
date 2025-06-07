@@ -2,7 +2,10 @@
 
 namespace App\Services\Api\Questions;
 
+use App\Models\Exam;
+use App\Models\ExamResult;
 use App\Services\Api\OpenAI\Questions;
+use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use League\Csv\Reader;
 use League\Csv\Statement;
@@ -295,5 +298,59 @@ class QuestionsServices
         }
 
         return $bestDelimiter;
+    }
+
+    public function getLastResults()
+    {
+        return Exam::query()
+            ->with('examResults')
+            ->whereHas('examResults', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
+            ->latest()
+            ->take(5)
+            ->get();
+    }
+
+    public function getGraphExamsDataResults()
+    {
+        $userId = auth()->id();
+        $results = ExamResult::query()->where('user_id', $userId)->orderBy('created_at')->get();
+
+        // Agrupación diaria
+        $daily = $results->groupBy(function ($item) {
+            return Carbon::parse($item->created_at)->format('d/m/Y');
+        })->map(function ($group) {
+            return round($group->avg('total_score'), 2);
+        });
+
+        // Agrupación semanal (por semana del año y año)
+        $weekly = $results->groupBy(function ($item) {
+            return Carbon::parse($item->created_at)->format('W/Y');
+        })->map(function ($group) {
+            return round($group->avg('total_score'), 2);
+        });
+
+        // Agrupación mensual
+        $monthly = $results->groupBy(function ($item) {
+            return Carbon::parse($item->created_at)->format('m/Y');
+        })->map(function ($group) {
+            return round($group->avg('total_score'), 2);
+        });
+
+        return [
+            'daily' => [
+                'labels' => $daily->keys(),
+                'data' => $daily->values(),
+            ],
+            'weekly' => [
+                'labels' => $weekly->keys(),
+                'data' => $weekly->values(),
+            ],
+            'monthly' => [
+                'labels' => $monthly->keys(),
+                'data' => $monthly->values(),
+            ]
+        ];
     }
 }
