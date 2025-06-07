@@ -70,4 +70,58 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function check(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+            if (!$token) {
+                return response()->json([
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
+            return response()->json([$this->authService->checkToken($token)]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al verificar usuario',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function refresh(Request $request)
+    {
+        try {
+            return response()->json($this->authService->refreshToken());
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al refrescar token',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function logout(Request $request)
+    {
+        try {
+            $user = $request->user();
+            if (!$user) {
+                return response()->json([
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+            // Revocar todos los tokens del usuario
+            $user->tokens()->delete();
+
+            return response()->json(['message' => 'Sesión cerrada correctamente'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al cerrar sesión',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

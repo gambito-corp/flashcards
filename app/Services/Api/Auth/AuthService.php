@@ -55,4 +55,66 @@ class AuthService
             ];
         }
     }
+
+    public function checkToken(string $token)
+    {
+        try {
+            $user = Auth::guard('sanctum')->user();
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'error' => 'Token no válido o expirado',
+                    'status' => 401
+                ];
+            }
+            return [
+                'success' => true,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'status' => 200
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Error al verificar el token',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    public function refreshToken()
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'error' => 'Usuario no autenticado',
+                    'status' => 401
+                ];
+            }
+            $token = $user->createToken('react-app')->plainTextToken;
+            return [
+                'success' => true,
+                'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'status' => 200
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Error al refrescar el token',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
 }
