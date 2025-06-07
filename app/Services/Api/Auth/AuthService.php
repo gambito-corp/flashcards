@@ -2,8 +2,10 @@
 
 namespace App\Services\Api\Auth;
 
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
@@ -73,6 +75,9 @@ class AuthService
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'telefono' => $user->telefono,
+                    'pais' => $user->pais,
+                    'image' => $user->profile_photo_path,
                 ],
                 'status' => 200
             ];
@@ -112,6 +117,40 @@ class AuthService
             return [
                 'success' => false,
                 'error' => 'Error al refrescar el token',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    public function register(array $only)
+    {
+        try {
+            DB::beginTransaction();
+            $user = User::create([
+                'name' => $only['name'],
+                'email' => $only['email'],
+                'password' => bcrypt($only['password']),
+                'telefono' => $only['telefono'] ?? null,
+                'pais' => $only['pais'] ?? null,
+            ]);
+            $token = $user->createToken('react-app')->plainTextToken;
+            DB::commit();
+            return [
+                'success' => true,
+                'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'status' => 201
+            ];
+        } catch (Exception $e) {
+            DB::rollBack();
+            return [
+                'success' => false,
+                'error' => 'Error al registrar usuario',
                 'message' => $e->getMessage(),
                 'status' => 500
             ];

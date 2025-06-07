@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Enums\Pais;
 use App\Http\Controllers\Controller;
 use App\Services\Api\Auth\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Enum;
 
 class AuthController extends Controller
 {
@@ -120,6 +122,30 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error al cerrar sesión',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function register(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:6|confirmed',
+                'telefono' => 'nullable|string|max:15',
+                'pais' => ['nullable', new Enum(Pais::class)],
+            ]);
+            return response()->json($this->authService->register($request->only('name', 'email', 'password', 'telefono', 'pais')));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->getMessage()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al registrar usuario',
                 'message' => $e->getMessage()
             ], 500);
         }
