@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Enums\Pais;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\Api\Auth\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
@@ -146,6 +147,30 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error al registrar usuario',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function resendVerificationEmail(Request $request)
+    {
+        try {
+            $userId = $this->check($request)->original[0]['user']['id'] ?? null;
+            $user = User::find($userId);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+
+            if ($user->hasVerifiedEmail()) {
+                return response()->json(['message' => 'El correo electrónico ya está verificado.'], 200);
+            }
+
+            $user->sendEmailVerificationNotification();
+            return response()->json(['message' => 'Correo electrónico de verificación enviado.'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al reenviar correo electrónico de verificación',
                 'message' => $e->getMessage()
             ], 500);
         }

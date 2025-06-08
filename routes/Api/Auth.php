@@ -8,6 +8,7 @@ Route::get('check', [AuthController::class, 'check'])->name('check');
 Route::get('refresh', [AuthController::class, 'refresh'])->name('refresh');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('register', [AuthController::class, 'register'])->name('register');
+Route::post('resend-verification-email', [AuthController::class, 'resendVerificationEmail'])->name('email.resend');
 //Route::post('password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
 //Route::post('password/forgot', [AuthController::class, 'forgotPassword'])->name('password.forgot');
 //Route::post('password/change', [AuthController::class, 'changePassword'])->name('password.change');

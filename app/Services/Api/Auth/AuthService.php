@@ -135,6 +135,7 @@ class AuthService
                 'pais' => $only['pais'] ?? null,
             ]);
             $token = $user->createToken('react-app')->plainTextToken;
+            $user->sendEmailVerificationNotification();
             DB::commit();
             return [
                 'success' => true,
