@@ -38,6 +38,12 @@ class AuthService
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'telefono' => $user->telefono,
+                    'pais' => $user->pais,
+                    'image' => $user->profile_photo_path,
+                    'email_verified_at' => $user->email_verified_at,
+                    'roles' => $user->roles->pluck('name')->toArray(),
+                    'is_pro' => $user->status,
                 ],
                 'status' => 200
             ];
@@ -78,6 +84,9 @@ class AuthService
                     'telefono' => $user->telefono,
                     'pais' => $user->pais,
                     'image' => $user->profile_photo_path,
+                    'email_verified_at' => $user->email_verified_at,
+                    'roles' => $user->roles->pluck('name')->toArray(),
+                    'is_pro' => $user->status,
                 ],
                 'status' => 200
             ];
