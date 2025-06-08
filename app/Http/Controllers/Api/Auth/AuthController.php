@@ -175,4 +175,27 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        try {
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado'], 404);
+            }
+
+            $user->sendPasswordResetNotification($user->createToken('react-app')->plainTextToken);
+            return response()->json(['message' => 'Correo electrónico de restablecimiento de contraseña enviado.'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al enviar correo electrónico de restablecimiento de contraseña',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
