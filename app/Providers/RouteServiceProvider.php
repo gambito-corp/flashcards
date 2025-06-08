@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Api\Medflash\MedflashController;
 use App\Http\Controllers\Api\Questions\QuestionsController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -44,6 +45,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->name('questions.')
                 ->controller(QuestionsController::class)
                 ->group(base_path('routes/Api/Question.php'));
+
+            Route::middleware('api', 'auth:sanctum')
+                ->prefix('api/med-flash')
+                ->name('medFlash.')
+                ->controller(MedflashController::class)
+                ->group(base_path('routes/Api/MedFlash.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
