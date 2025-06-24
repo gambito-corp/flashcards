@@ -25,7 +25,7 @@ class Chat
     {
         $pubmedArticles = [];
         $pubmedSearchQuery = [];
-        
+
         try {
             if ($searchType !== 'simple') {
                 $pubmedSearchQuery = $this->generatePubMedSearchQuery($question);
@@ -38,20 +38,17 @@ class Chat
                 $limitedArticles = array_slice($pubmedArticles, 0, 10);
                 foreach ($limitedArticles as $index => $article) {
                     $refNum = $index + 1;
-                    $systemPrompt .= "[$refNum] {$article['authors']} ({$article['year']}). {$article['title']}. {$article['journal']}.\n";
+                    $systemPrompt .= "[$refNum] {$article['authors']} ({$article['year']}). {$article['title']}. {$article['journal']}. {$article['abstract']}.\n";
                 }
                 $systemPrompt .= "\nPuedes referenciar estos artículos en tu respuesta usando [número].";
-            } else {
-                Log::info('📝 Modo estándar o simple - Sin artículos en el prompt');
             }
 
             // ✅ PASO 5: PREPARAR MENSAJES PARA OPENAI
             $messages = $this->prepareMessages($systemPrompt, $question, $conversationHistory);
-
             switch ($searchType) {
                 case 'deep_research':
                     $model = 'gpt-4.1-2025-04-14';
-                    $maxTokens = 15000;
+                    $maxTokens = 32768;
                     config('openai.http_client_options.timeout', 600); // Aseguramos que el timeout sea de 10 minutos
                     break;
                 case 'simple':

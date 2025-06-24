@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\MedChat;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\MedChat\MedChatAskRequest;
 use App\Models\MedisearchChat;
 use App\Models\MedisearchQuestion;
+use App\Services\Api\Commons\UserLimitService;
 use App\Services\Api\OpenAI\Chat;
 use App\Services\Api\OpenAI\PubMedService;
 use Illuminate\Http\JsonResponse;
@@ -17,48 +19,34 @@ class MedChatController extends Controller
 {
     protected $openAI;
     protected $pubMedService;
+    protected $limitService;
 
-    public function __construct(Chat $openAI, PubMedService $pubMedService)
+    public function __construct(Chat $openAI, PubMedService $pubMedService, UserLimitService $limitService)
     {
         $this->openAI = $openAI;
         $this->pubMedService = $pubMedService;
+        $this->limitService = $limitService;
     }
 
     /**
      * ✅ MÉTODO ASK MODIFICADO PARA PERSISTENCIA
      */
-    public function ask(Request $request): JsonResponse
+    public function ask(MedChatAskRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'question' => 'required|string|min:5|max:2000',
-                'conversation_id' => 'nullable|integer|exists:medisearch_chats,id',
-                'chat_history' => 'nullable|array',
-                'filters.year_from' => 'nullable|integer',
-                'filters.year_to' => 'nullable|integer',
-                'filters.article_types' => 'nullable|array',
-                'filters.article_types.*' => 'string|in:meta_analyses,systematic_reviews,reviews,clinical_trials,randomized_controlled_trials,observational_studies,case_reports,practice_guidelines,guidelines,editorials,letters,news,others',
-                'filters.language' => 'nullable|string',
-                'filters.free_full_text' => 'nullable|boolean',
-                'filters.has_abstract' => 'nullable|boolean',
-                'filters.has_structured_abstract' => 'nullable|boolean',
-                'filters.has_associated_data' => 'nullable|boolean',
-                'filters.species' => 'nullable|string|in:humans,animals,mice,rats',
-                'filters.sex' => 'nullable|string|in:male,female',
-                'filters.age_groups' => 'nullable|array',
-                'filters.age_groups.*' => 'string|in:infant,child,adolescent,adult,middle_aged,aged',
-                'filters.journal_subset' => 'nullable|string|in:core_clinical_journals,dental_journals,nursing_journals',
-                'search_type' => 'nullable|string|in:standard,deep_research,simple',
-            ]);
 
-            if ($validator->fails()) {
+
+            $user = Auth::user();
+            $searchType = $request->input('search_type', 'standard');
+            $canSearch = $this->limitService->canUserSearch($user, $searchType);
+            if (!$canSearch['allowed']) {
                 return response()->json([
                     'success' => false,
-                    'errors' => $validator->errors()
-                ], 422);
+                    'error' => 'Límite de búsquedas alcanzado',
+                    'details' => $canSearch['message'],
+                    'usage_info' => $canSearch
+                ], 429);
             }
-
-            $userId = Auth::id();
             $question = $request->input('question');
             $conversationId = $request->input('conversation_id');
             $chatHistory = $request->input('chat_history', []);
@@ -68,13 +56,13 @@ class MedChatController extends Controller
             // ✅ PASO 1: Crear o obtener conversación
             if (!$conversationId) {
                 $chat = MedisearchChat::create([
-                    'user_id' => $userId,
+                    'user_id' => $user->id,
                     'title' => 'Nuevo Chat ' . now()->format('d/m H:i')
                 ]);
                 $conversationId = $chat->id;
             } else {
                 $chat = MedisearchChat::find($conversationId);
-                if (!$chat || $chat->user_id !== $userId) {
+                if (!$chat || $chat->user_id !== $user->id) {
                     return response()->json([
                         'success' => false,
                         'error' => 'Conversación no encontrada o sin permisos'
@@ -93,14 +81,14 @@ class MedChatController extends Controller
                     'error' => $response['error']
                 ], 500);
             }
-
             // ✅ PASO 4: OBTENER ARTÍCULOS DE PUBMED CON FILTROS (DIRECTAMENTE)
             $pubmedArticles = $response['pubmed_articles'] ?? [];
 
             // ✅ PASO 5: Guardar pregunta y respuesta en BD
             $questionRecord = MedisearchQuestion::create([
-                'user_id' => $userId,
+                'user_id' => $user->id,
                 'chat_id' => $conversationId,
+                'model' => $searchType,
                 'query' => $question,
                 'response' => [
                     'data' => [
@@ -124,6 +112,10 @@ class MedChatController extends Controller
                 $chat->update(['title' => $autoTitle]);
             }
 
+            // ✅ OBTENER INFORMACIÓN DE USO ACTUALIZADA
+            $usageSummary = $this->limitService->getUserUsageSummary($user);
+            $upgradeInfo = $this->limitService->shouldSuggestUpgrade($user);
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -133,6 +125,13 @@ class MedChatController extends Controller
                         'pubmed_articles' => $pubmedArticles,
                         'pubmed_query' => $response['pubmed_query'] ?? null // ✅ PARA DEBUG
                     ]
+                ],
+                'usage_info' => [
+                    'current_search_type' => $searchType,
+                    'remaining_searches' => $canSearch['remaining'],
+                    'user_type' => $canSearch['user_type'],
+                    'monthly_summary' => $usageSummary,
+                    'upgrade_suggestion' => $upgradeInfo,
                 ],
                 'message' => 'Respuesta generada correctamente'
             ]);

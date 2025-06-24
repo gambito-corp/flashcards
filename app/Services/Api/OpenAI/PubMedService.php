@@ -22,7 +22,6 @@ class PubMedService
 
             // ✅ PASO 2: OBTENER ARTÍCULOS COMPLETOS CON BioC API
             $articles = $this->getArticlesFromBioC($pmids);
-            dd($articles);
             Log::info("✅ Encontrados " . count($articles) . " artículos completos");
             return $articles;
 
@@ -36,9 +35,37 @@ class PubMedService
         }
     }
 
+//    private function searchPMIDs(string $query, ?array $filters, $searchType): array
+//    {
+//        $searchQuery = $this->buildQuery($query, $filters);
+//        switch ($searchType) {
+//            case 'standard':
+//                $maxArticles = 10;
+//                break;
+//            case 'deep_research':
+//                $maxArticles = 100;
+//                break;
+//            default:
+//                $maxArticles = 3; // Valor por defecto
+//        }
+//        $response = Http::timeout(30)->get($this->eutilsBaseUrl . 'esearch.fcgi', [
+//            'db' => 'pubmed',
+//            'term' => $searchQuery,
+//            'retmax' => $maxArticles,
+//            'retmode' => 'json'
+//        ]);
+//
+//        if (!$response->successful()) {
+//            return [];
+//        }
+//
+//        $data = $response->json();
+//        return $data['esearchresult']['idlist'] ?? [];
+//    }
     private function searchPMIDs(string $query, ?array $filters, $searchType): array
     {
         $searchQuery = $this->buildQuery($query, $filters);
+
         switch ($searchType) {
             case 'standard':
                 $maxArticles = 10;
@@ -47,22 +74,47 @@ class PubMedService
                 $maxArticles = 100;
                 break;
             default:
-                $maxArticles = 3; // Valor por defecto
+                $maxArticles = 3;
         }
+
+        Log::info('🔍 Búsqueda PubMed:', [
+            'query' => $query,
+            'filters' => $filters,
+            'final_query' => $searchQuery,
+            'max_articles' => $maxArticles
+        ]);
+
+        // ✅ PARÁMETROS ADICIONALES QUE SÍ PUEDES AGREGAR
         $response = Http::timeout(30)->get($this->eutilsBaseUrl . 'esearch.fcgi', [
             'db' => 'pubmed',
-            'term' => $searchQuery,
+            'term' => $searchQuery,              // ✅ Aquí van TODOS los filtros
             'retmax' => $maxArticles,
-            'retmode' => 'json'
+            'retmode' => 'json',
+            'sort' => 'relevance',               // ✅ Ordenar por relevancia
+            'tool' => 'medchat_app',             // ✅ Identificar tu aplicación
+            'email' => 'contact@medchat.com',    // ✅ Email de contacto (requerido)
+            'usehistory' => 'n',                 // ✅ No usar historial
+            'retstart' => 0,                     // ✅ Empezar desde el primer resultado
         ]);
 
         if (!$response->successful()) {
+            Log::error('❌ Error en búsqueda PubMed:', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
             return [];
         }
 
         $data = $response->json();
-        return $data['esearchresult']['idlist'] ?? [];
+        $pmids = $data['esearchresult']['idlist'] ?? [];
+
+        Log::info('📋 PMIDs encontrados:', [
+            'count' => count($pmids),
+            'pmids' => array_slice($pmids, 0, 5) // Solo mostrar primeros 5 en log
+        ]);
+        return $pmids;
     }
+
 
     /**
      * ✅ CONSTRUIR QUERY CON TODOS LOS FILTROS DISPONIBLES
@@ -228,26 +280,23 @@ class PubMedService
     private function getArticlesFromBioC(array $pmids): array
     {
         $articles = [];
-
         // ✅ PROCESAR EN LOTES DE 5 PARA EVITAR RATE LIMITING
         $batches = array_chunk($pmids, 5);
-
-        foreach ($batches as $batch) {
-            foreach ($batch as $pmid) {
+        foreach ($batches as $key => $batch) {
+            foreach ($batch as $subKey => $pmid) {
                 try {
                     // ✅ INTENTAR OBTENER ARTÍCULO COMPLETO DE PMC
                     $article = $this->getArticleFromPMC($pmid);
-
                     if ($article) {
                         $articles[] = $article;
                     } else {
                         // ✅ FALLBACK: USAR E-UTILITIES PARA METADATOS BÁSICOS
                         $fallbackArticle = $this->getBasicArticleInfo($pmid);
+
                         if ($fallbackArticle) {
                             $articles[] = $fallbackArticle;
                         }
                     }
-
                     // ✅ PAUSA PARA EVITAR RATE LIMITING
                     usleep(50000); // 50ms entre requests
 
@@ -257,8 +306,7 @@ class PubMedService
                 }
             }
         }
-
-        return array_slice($articles, 0, 10); // ✅ LIMITAR A 10 ARTÍCULOS
+        return $articles;
     }
 
     /**
