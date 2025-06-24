@@ -24,7 +24,10 @@ return [
     | for a response. By default, the client will time out after 30 seconds.
     */
 
-    'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
+    'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 120),
+    'http_client_options' => [
+        'timeout' => env('OPENAI_REQUEST_TIMEOUT', 120), // ✅ TIMEOUT HTTP
+    ],
     'http' => [
         'headers' => [
             'OpenAI-Beta' => 'assistants=v2'

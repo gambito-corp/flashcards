@@ -15,20 +15,25 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
-
+    // config/cors.php - ✅ CONFIGURACIÓN CORRECTA
+    'paths' => ['api/*', 'auth/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
+    'allowed_origins' => [
+        'http://front.flashcard.test',  // ✅ Tu frontend
+        'http://flashcard.test',
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'https://react.medbystudents.com',
+        'https://front.react.medbystudents.com',
+    ],
+    'allowed_headers' => ['*'],
+    'supports_credentials' => true,
 
-    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
-
-    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
     'max_age' => 0,
-
-    'supports_credentials' => false,
 
 ];

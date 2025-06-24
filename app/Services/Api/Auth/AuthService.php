@@ -44,6 +44,7 @@ class AuthService
                     'email_verified_at' => $user->email_verified_at,
                     'roles' => $user->roles->pluck('name')->toArray(),
                     'is_pro' => $user->status,
+                    'current_team_id' => $user->current_team_id,
                 ],
                 'status' => 200
             ];

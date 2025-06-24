@@ -61,15 +61,34 @@ class CommonService
      */
     public function formatMenuForReact(array $menuItems): array
     {
-        return array_map(function ($item) {
+        $routeMapping = $this->getRouteMapping();
+
+        return array_map(function ($item) use ($routeMapping) {
+            // Mapear ruta de Laravel a ruta de React
+            $frontendRoute = $routeMapping[$item['route']] ?? '/dashboard';
+
             return [
                 'name' => $item['name'],
-                'route' => $item['route'],
-                'url' => route($item['route']),
+                'route' => $frontendRoute, // Ruta para React Router
+                'backend_route' => $item['route'], // Ruta original de Laravel (por si la necesitas)
+                'url' => $frontendRoute, // URL relativa para React
                 'active' => false,
                 'need_premium' => $item['need_premium'] ?? false,
             ];
         }, $menuItems);
+    }
+
+
+    private function getRouteMapping(): array
+    {
+        return [
+            'dashboard' => 'dashboard',
+            'admin.index' => 'admin',
+            'examenes.index' => 'medbanks',
+            'flashcard.index' => 'medflash',
+            'doctor-mbs.index' => 'medchat',
+            // Agrega más mapeos según necesites
+        ];
     }
 
     /**
@@ -205,7 +224,6 @@ class CommonService
 
         // Obtener teams
         $teamsData = $this->getUserTeams($user);
-
         return [
             'menu' => $formattedMenu,
             'user' => $userInfo,

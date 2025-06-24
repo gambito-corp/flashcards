@@ -5,13 +5,11 @@ use App\Http\Controllers\Admin\AsignaturasController;
 use App\Http\Controllers\Admin\CarrerasController;
 use App\Http\Controllers\Admin\CategoriasController;
 use App\Http\Controllers\Admin\ConfigController;
-use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TiposController;
 use App\Http\Controllers\Admin\UniversidadesController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\CurrentTeamController;
 use App\Http\Controllers\CustomLoginController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FlashcardController;
@@ -19,22 +17,21 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MedisearchController;
 use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\PreguntasController;
-use App\Http\Controllers\ReactRedirectController;
 use App\Http\Controllers\WebhookController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 
 Route::get('gettigPay/{productId}', [MercadoPagoController::class, 'gettigPay'])->name('gettigPay');
-Route::redirect('/home', '/dashboard');
-if (config('app.env') === 'production') {
-    Route::get('/robots.txt', function () {
-        return response('User-agent: *' . PHP_EOL . 'Disallow: /', 200);
-    })->name('robots.txt');
-    Route::redirect('/', 'https://medbystudents.com/app-banqueo/');
-} else {
-    Route::redirect('/', '/login');
-}
+//Route::redirect('/home', '/dashboard');
+//if (config('app.env') === 'production') {
+//    Route::get('/robots.txt', function () {
+//        return response('User-agent: *' . PHP_EOL . 'Disallow: /', 200);
+//    })->name('robots.txt');
+//    Route::redirect('/', 'https://medbystudents.com/app-banqueo/');
+//} else {
+//    Route::redirect('/', '/login');
+//}
 
 Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
@@ -47,7 +44,7 @@ Route::middleware([
 ])->group(callback: function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
-    Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.updates');
+//    Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.updates');
 //    /*PREGUNTAS*/
     Route::get('/preguntas', [PreguntasController::class, 'index'])
         ->middleware('role:root|admin|colab')
@@ -100,7 +97,7 @@ Route::middleware([
         ->group(callback: function () {
 
             // Ruta principal (dashboard) del panel de administración
-            Route::get('/', [MainController::class, 'index'])->name('index');
+//            Route::get('/', [MainController::class, 'index'])->name('index');
 
             Route::prefix('roles')
                 ->as('roles.')
@@ -219,7 +216,7 @@ route::get('ping', function () {
 
 //Mercado Pago
 Route::middleware(['auth'])->group(function () {
-    Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
+//    Route::get('/planes', [MercadoPagoController::class, 'planes'])->name('planes');
     Route::post('/subscription/create/{product}', [MercadoPagoController::class, 'createSubscription'])->name('subscription.create');
     Route::get('/pago-exitoso/{preapproval_id}', function (\Illuminate\Http\Request $request) {
         // URL de la API de Mercado Pago
@@ -302,7 +299,7 @@ if (config('app.env') === 'local') {
 
     Route::middleware('auth:web')->get('/api/get-token', [AuthController::class, 'getToken']);
 
-    Route::get('new', [ReactRedirectController::class, 'redirectToReact'])->name('new');
+//    Route::get('new', [ReactRedirectController::class, 'redirectToReact'])->name('new');
 
 
 }

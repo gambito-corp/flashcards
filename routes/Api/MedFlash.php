@@ -1,37 +1,37 @@
 <?php
+// ========================================
+// RUTAS DE CATEGORÍAS
+// ========================================
+Route::get('categories', 'categoryIndex');           // Listar con paginación
+Route::get('categories/search', 'categorySearch');   // ✅ NUEVA RUTA de búsqueda
+Route::post('category', 'categoryStore');            // Crear
+Route::put('category/{id}', 'categoryUpdate');       // Actualizar
+Route::delete('category/{id}', 'categoryDestroy');   // Eliminar individual
+Route::delete('categories/bulk', 'categoryBulkDestroy'); // Eliminar múltiples
+Route::delete('/delete-by-category', 'deleteByCategory');
+Route::delete('/delete-all', 'deleteAll');
 
-// Clave: api/med-flash
+Route::delete('categories/all', 'categoryDestroyAll');   // Eliminar todas
+Route::get('categories/count', 'categoriesWithCount');
 
-/*
-//Flashcards
-Route::get('', 'index');
-Route::get('{id}', 'show')->where('id', '[0-9]+');
-Route::post('', 'store');
-Route::put('{id}', 'update')->where('id', '[0-9]+');
-Route::delete('{id}', 'destroy')->where('id', '[0-9]+');
 
-Route::get('categories', 'categoryIndex');
-Route::post('category', 'categoryStore');
-// Nueva ruta para IA
-Route::get('ai-generate', 'generateAI');
-// Ruta de Inicio del Juego
-Route::post('start-game', 'setGame');
-Route::get('game', 'getGame');
-*/
-
-/*
-//Flashcards
-Route::get('/', 'index');
-Route::get('/{id}', 'show')->where('id', '[0-9]+');
-Route::post('/', 'store');
+// ========================================
+// RUTAS DE FLASHCARDS
+// ========================================
+Route::get('', 'index');                            // Listar flashcards
+Route::get('{id}', 'show')->where('id', '[0-9]+'); // Ver flashcard
+Route::post('', 'store');                           // Crear flashcard
 Route::put('/{id}', 'update')->where('id', '[0-9]+');
-Route::delete('/{id}', 'destroy')->where('id', '[0-9]+');
+Route::post('/{id}', 'update')->where('id', '[0-9]+'); // Para formularios
+Route::delete('{id}', 'destroy')->where('id', '[0-9]+'); // Eliminar flashcard
 
-Route::get('/categories', 'categoryIndex');
-Route::post('/category', 'categoryStore');
-// Nueva ruta para IA
-Route::get('/ai-generate', 'generateAI');
-// Ruta de Inicio del Juego
-Route::post('/start-game', 'setGame');
-Route::get('/game', 'getGame');
-*/
+// ========================================
+// RUTAS DE IA Y JUEGOS
+// ========================================
+Route::post('/ai-generate', 'generateAI'); // Generar con IA
+Route::post('/start-game', 'setGame'); // Iniciar juego
+Route::get('/game', 'getGame'); // Obtener datos del juego
+
+// ✅ NUEVAS RUTAS PARA EL JUEGO
+Route::post('/{id}/increment-error', 'incrementError')->where('id', '[0-9]+');
+Route::post('/game/finish', 'finishGame');

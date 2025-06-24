@@ -20,19 +20,25 @@ class FlashcardService
         $this->imageService = $imageService;
     }
 
-    public function index($userId, $filters = [])
+    // En tu FlashcardService.php
+    // En tu FlashcardService.php - actualizar el método index
+    public function index($userId, $filters = [], $page = 1, $perPage = 10)
     {
         try {
             $query = Flashcard::query()->with('categories')->where('user_id', $userId)
                 ->orderBy('errors', 'desc');
 
-            // Filtros opcionales
-            if (isset($filters['categoria']) && !empty($filters['categoria'])) {
+            // ✅ FILTRO PARA FLASHCARDS SIN CATEGORÍA (CORREGIDO)
+            if (isset($filters['sin_categoria']) && $filters['sin_categoria'] === 'true') {
+                $query->doesntHave('categories');
+            } // Filtro por categoría específica
+            elseif (isset($filters['categoria']) && !empty($filters['categoria'])) {
                 $query->whereHas('categories', function ($q) use ($filters) {
                     $q->where('fc_category_id', $filters['categoria']);
                 });
             }
 
+            // Filtro de búsqueda
             if (isset($filters['search']) && !empty($filters['search'])) {
                 $query->where(function ($q) use ($filters) {
                     $q->where('pregunta', 'LIKE', '%' . $filters['search'] . '%')
@@ -40,62 +46,47 @@ class FlashcardService
                 });
             }
 
-            $flashcards = $query->get();
-
-            // ← NUEVA LÓGICA: Crear una entrada por cada categoría
-            $expandedFlashcards = collect();
-
-            foreach ($flashcards as $flashcard) {
-                if ($flashcard->categories->isNotEmpty()) {
-                    // Para cada categoría, crear una entrada separada
-                    foreach ($flashcard->categories as $category) {
-                        $expandedFlashcards->push([
-                            'id' => $flashcard->id,
-                            'pregunta' => $flashcard->pregunta,
-                            'respuesta' => $flashcard->respuesta,
-                            'imagen' => $flashcard->imagen ? asset('storage/' . $flashcard->imagen) : null,
-                            'imagen_respuesta' => $flashcard->imagen_respuesta ? asset('storage/' . $flashcard->imagen_respuesta) : null,
-                            'url' => $flashcard->url,
-                            'url_respuesta' => $flashcard->url_respuesta,
-                            'user_id' => $flashcard->user_id,
-                            'errors' => $flashcard->errors ?? 0,
-                            'created_at' => $flashcard->created_at,
-                            'updated_at' => $flashcard->updated_at,
-
-                            // ← CATEGORÍA ESPECÍFICA PARA ESTA ENTRADA
-                            'category' => $category->nombre,
-                            'category_id' => $category->id,
-                            'categories' => $flashcard->categories->map(function ($cat) {
-                                return [
-                                    'id' => $cat->id,
-                                    'name' => $cat->nombre,
-                                    'user_id' => $cat->user_id
-                                ];
-                            })
-                        ]);
-                    }
-                } else {
-                    // Sin categoría
-                    $expandedFlashcards->push([
-                        'id' => $flashcard->id,
-                        'pregunta' => $flashcard->pregunta,
-                        'respuesta' => $flashcard->respuesta,
-                        'imagen' => $flashcard->imagen ? asset('storage/' . $flashcard->imagen) : null,
-                        'imagen_respuesta' => $flashcard->imagen_respuesta ? asset('storage/' . $flashcard->imagen_respuesta) : null,
-                        'url' => $flashcard->url,
-                        'url_respuesta' => $flashcard->url_respuesta,
-                        'user_id' => $flashcard->user_id,
-                        'errors' => $flashcard->errors ?? 0,
-                        'created_at' => $flashcard->created_at,
-                        'updated_at' => $flashcard->updated_at,
-                        'category' => 'Sin Categoría',
-                        'category_id' => null,
-                        'categories' => []
-                    ]);
-                }
+            // ✅ DEBUG: Agregar este log para ver qué está pasando
+            if (isset($filters['sin_categoria']) && $filters['sin_categoria'] === 'true') {
+                Log::info('Filtrando cards sin categoría. Query SQL: ' . $query->toSql());
+                Log::info('Parámetros: ', $query->getBindings());
             }
 
-            return $expandedFlashcards;
+            // Obtener flashcards con paginación
+            $flashcards = $query->paginate($perPage, ['*'], 'page', $page);
+
+            // ✅ DEBUG: Log del total encontrado
+            Log::info('Total de flashcards encontradas: ' . $flashcards->total());
+
+            // Transformar los datos manteniendo la estructura de paginación
+            $transformedData = $flashcards->getCollection()->map(function ($flashcard) {
+                return [
+                    'id' => $flashcard->id,
+                    'pregunta' => $flashcard->pregunta,
+                    'respuesta' => $flashcard->respuesta,
+                    'imagen' => $flashcard->imagen ? $this->imageService->getUrl($flashcard->imagen) : null,
+                    'imagen_respuesta' => $flashcard->imagen_respuesta ? $this->imageService->getUrl($flashcard->imagen_respuesta) : null,
+                    'url' => $flashcard->url,
+                    'url_respuesta' => $flashcard->url_respuesta,
+                    'user_id' => $flashcard->user_id,
+                    'errors' => $flashcard->errors ?? 0,
+                    'created_at' => $flashcard->created_at,
+                    'updated_at' => $flashcard->updated_at,
+
+                    // Categorías como array
+                    'categories' => $flashcard->categories->map(function ($cat) {
+                        return [
+                            'id' => $cat->id,
+                            'nombre' => $cat->nombre,
+                            'user_id' => $cat->user_id
+                        ];
+                    })->toArray()
+                ];
+            });
+
+            $flashcards->setCollection($transformedData);
+
+            return $flashcards;
 
         } catch (\Exception $e) {
             Log::error('Error obteniendo flashcards: ' . $e->getMessage());
@@ -183,30 +174,202 @@ class FlashcardService
 
     public function update($id, $data, $userId)
     {
+        $imagenesSubidas = [];
+        $imagenesEliminadas = [];
+
         try {
             DB::beginTransaction();
 
-            // Buscar flashcard existente
+            // ✅ BUSCAR FLASHCARD EXISTENTE
             $flashcard = Flashcard::where('id', $id)
                 ->where('user_id', $userId)
+                ->with('categories')
                 ->first();
 
             if (!$flashcard) {
                 throw new \Exception('Flashcard no encontrada');
             }
+
+            // ✅ GUARDAR IMÁGENES ANTIGUAS PARA POSIBLE ELIMINACIÓN
+            $imagenAnteriorPregunta = $flashcard->imagen;
+            $imagenAnteriorRespuesta = $flashcard->imagen_respuesta;
+
+            // ✅ ACTUALIZAR CAMPOS BÁSICOS
             $flashcard->pregunta = $data['pregunta'];
             $flashcard->respuesta = $data['respuesta'];
+
+            // ✅ MANEJAR IMAGEN DE PREGUNTA
+            if (isset($data['remove_imagen']) && $data['remove_imagen']) {
+                // Eliminar imagen actual
+                if ($imagenAnteriorPregunta) {
+                    $imagenesEliminadas[] = $imagenAnteriorPregunta;
+                }
+                $flashcard->imagen = null;
+                $flashcard->url = null;
+            } elseif (isset($data['imagen']) && $data['imagen'] !== null) {
+                // Subir nueva imagen
+                $nuevaImagenPregunta = $this->subirImagen($data['imagen'], 'pregunta', $userId);
+                $imagenesSubidas['pregunta'] = $nuevaImagenPregunta;
+
+                if ($imagenAnteriorPregunta) {
+                    $imagenesEliminadas[] = $imagenAnteriorPregunta;
+                }
+
+                $flashcard->imagen = $nuevaImagenPregunta;
+                $flashcard->url = null; // Limpiar URL si se sube imagen
+            } elseif (isset($data['url']) && !empty($data['url'])) {
+                // Usar URL en lugar de imagen
+                if ($imagenAnteriorPregunta) {
+                    $imagenesEliminadas[] = $imagenAnteriorPregunta;
+                }
+                $flashcard->imagen = null;
+                $flashcard->url = $data['url'];
+            } else {
+                // Mantener URL existente si no hay cambios
+                $flashcard->url = $data['url'] ?? $flashcard->url;
+            }
+
+            // ✅ MANEJAR IMAGEN DE RESPUESTA
+            if (isset($data['remove_imagen_respuesta']) && $data['remove_imagen_respuesta']) {
+                // Eliminar imagen actual
+                if ($imagenAnteriorRespuesta) {
+                    $imagenesEliminadas[] = $imagenAnteriorRespuesta;
+                }
+                $flashcard->imagen_respuesta = null;
+                $flashcard->url_respuesta = null;
+            } elseif (isset($data['imagen_respuesta']) && $data['imagen_respuesta'] !== null) {
+                // Subir nueva imagen
+                $nuevaImagenRespuesta = $this->subirImagen($data['imagen_respuesta'], 'respuesta', $userId);
+                $imagenesSubidas['respuesta'] = $nuevaImagenRespuesta;
+
+                if ($imagenAnteriorRespuesta) {
+                    $imagenesEliminadas[] = $imagenAnteriorRespuesta;
+                }
+
+                $flashcard->imagen_respuesta = $nuevaImagenRespuesta;
+                $flashcard->url_respuesta = null; // Limpiar URL si se sube imagen
+            } elseif (isset($data['url_respuesta']) && !empty($data['url_respuesta'])) {
+                // Usar URL en lugar de imagen
+                if ($imagenAnteriorRespuesta) {
+                    $imagenesEliminadas[] = $imagenAnteriorRespuesta;
+                }
+                $flashcard->imagen_respuesta = null;
+                $flashcard->url_respuesta = $data['url_respuesta'];
+            } else {
+                // Mantener URL existente si no hay cambios
+                $flashcard->url_respuesta = $data['url_respuesta'] ?? $flashcard->url_respuesta;
+            }
+
+            // ✅ GUARDAR CAMBIOS
             $flashcard->save();
+
+            // ✅ ACTUALIZAR CATEGORÍAS
+            if (isset($data['categorias'])) {
+                $this->actualizarCategorias($flashcard, $data['categorias'], $userId);
+            }
+
+            // ✅ ELIMINAR IMÁGENES ANTIGUAS DESPUÉS DE ÉXITO
+            if (!empty($imagenesEliminadas)) {
+                $this->eliminarImagenesAnteriores($imagenesEliminadas);
+            }
+
             DB::commit();
-            return $this->formatearRespuesta($flashcard, []);
+
+            // ✅ RECARGAR RELACIONES
+            $flashcard->load('categories');
+
+            return $this->formatearRespuesta($flashcard, $data['categorias'] ?? []);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // ✅ LIMPIAR IMÁGENES NUEVAS EN CASO DE ERROR
+            $this->cleanupImages($imagenesSubidas);
+
             Log::error('Error en update de flashcard: ' . $e->getMessage());
             throw $e;
         }
     }
 
+    /**
+     * Eliminar flashcards por categoría
+     */
+    public function deleteByCategory($userId, $categoryId = null)
+    {
+        try {
+            DB::beginTransaction();
+
+            $query = Flashcard::where('user_id', $userId);
+
+            if ($categoryId) {
+                // Eliminar por categoría específica
+                $query->whereHas('categories', function ($q) use ($categoryId) {
+                    $q->where('fc_category_id', $categoryId);
+                });
+            } else {
+                // Eliminar cards sin categoría
+                $query->doesntHave('categories');
+            }
+
+            // Obtener las flashcards antes de eliminarlas para manejar las imágenes
+            $flashcards = $query->get();
+            $deletedCount = $flashcards->count();
+
+            // Eliminar imágenes de S3 y relaciones
+            foreach ($flashcards as $flashcard) {
+                $this->deleteFlashcardResources($flashcard);
+            }
+
+            // Eliminar las flashcards
+            $query->delete();
+
+            DB::commit();
+
+            Log::info("Eliminadas {$deletedCount} flashcards por categoría para usuario {$userId}");
+            return $deletedCount;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error eliminando flashcards por categoría: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Eliminar todas las flashcards del usuario
+     */
+    public function deleteAll($userId)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Obtener todas las flashcards del usuario
+            $flashcards = Flashcard::where('user_id', $userId)->get();
+            $deletedCount = $flashcards->count();
+
+            // Eliminar imágenes de S3 y relaciones
+            foreach ($flashcards as $flashcard) {
+                $this->deleteFlashcardResources($flashcard);
+            }
+
+            // Eliminar todas las flashcards
+            Flashcard::where('user_id', $userId)->delete();
+
+            DB::commit();
+
+            Log::info("Eliminadas {$deletedCount} flashcards para usuario {$userId}");
+            return $deletedCount;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error eliminando todas las flashcards: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Actualizar el método destroy existente para incluir eliminación de imágenes
+     */
     public function destroy($id, $userId)
     {
         try {
@@ -215,22 +378,18 @@ class FlashcardService
             $flashcard = Flashcard::where('id', $id)
                 ->where('user_id', $userId)
                 ->first();
+
             if (!$flashcard) {
                 throw new \Exception('Flashcard no encontrada');
             }
 
-            $CategoriaCard = FcCardCategory::where('fc_card_id', $id)->get();
-            $CategoriaCard->each(function ($item) {
-                $item->delete();
-            });
+            // Eliminar recursos (imágenes y relaciones)
+            $this->deleteFlashcardResources($flashcard);
 
-            $fc_cards_groupcard = FcCardsGroupCard::where('fc_card_id', $id)->get();
-            $fc_cards_groupcard->each(function ($item) {
-                $item->delete();
-            });
+            // Eliminar la flashcard
             $flashcard->delete();
-            DB::commit();
 
+            DB::commit();
             return true;
 
         } catch (\Exception $e) {
@@ -239,6 +398,69 @@ class FlashcardService
             throw $e;
         }
     }
+
+    /**
+     * Método privado para eliminar recursos de una flashcard (imágenes y relaciones)
+     */
+    private function deleteFlashcardResources(Flashcard $flashcard)
+    {
+        try {
+            // Eliminar imágenes de S3
+            if ($flashcard->imagen) {
+                $this->deleteImageFromS3($flashcard->imagen);
+            }
+
+            if ($flashcard->imagen_respuesta) {
+                $this->deleteImageFromS3($flashcard->imagen_respuesta);
+            }
+
+            // Eliminar relaciones con categorías
+            $categoriaCards = FcCardCategory::where('fc_card_id', $flashcard->id)->get();
+            foreach ($categoriaCards as $item) {
+                $item->delete();
+            }
+
+            // Eliminar relaciones con grupos
+            $groupCards = FcCardsGroupCard::where('fc_card_id', $flashcard->id)->get();
+            foreach ($groupCards as $item) {
+                $item->delete();
+            }
+
+            Log::info("Recursos eliminados para flashcard {$flashcard->id}");
+
+        } catch (\Exception $e) {
+            Log::error("Error eliminando recursos de flashcard {$flashcard->id}: " . $e->getMessage());
+            // No lanzar excepción aquí para no interrumpir el proceso principal
+        }
+    }
+
+    /**
+     * Eliminar imagen de S3
+     */
+    private function deleteImageFromS3($imagePath)
+    {
+        try {
+            if (empty($imagePath)) {
+                return;
+            }
+
+            // Si la imagen es una URL completa, extraer solo el path
+            if (str_contains($imagePath, 'http')) {
+                $parsedUrl = parse_url($imagePath);
+                $imagePath = ltrim($parsedUrl['path'] ?? '', '/');
+            }
+
+            // Eliminar de S3 usando el ImageService
+            $this->imageService->delete($imagePath);
+
+            Log::info("Imagen eliminada de S3: {$imagePath}");
+
+        } catch (\Exception $e) {
+            Log::error("Error eliminando imagen de S3 ({$imagePath}): " . $e->getMessage());
+            // No lanzar excepción para no interrumpir el proceso principal
+        }
+    }
+
 
     private function subirImagen($archivo, $tipo, $userId)
     {
@@ -291,17 +513,13 @@ class FlashcardService
     public function getGame()
     {
         $cacheKey = 'selected_cards_' . Auth()->user()->id;
-
-        // ✅ OBTENER DATOS DEL CACHE
         $gameData = Cache::get($cacheKey);
 
         if (!$gameData) {
             return null;
         }
 
-        // ✅ OBTENER LAS FLASHCARDS REALES
         $flashcardIds = $gameData['flashcard_ids'] ?? [];
-
         if (empty($flashcardIds)) {
             return null;
         }
@@ -311,7 +529,6 @@ class FlashcardService
             ->where('user_id', Auth()->user()->id)
             ->get();
 
-        // ✅ PREPARAR DATOS COMPLETOS
         return [
             'game_session' => $gameData,
             'flashcards' => $flashcards->map(function ($flashcard) {
@@ -319,8 +536,9 @@ class FlashcardService
                     'id' => $flashcard->id,
                     'pregunta' => $flashcard->pregunta,
                     'respuesta' => $flashcard->respuesta,
-                    'imagen' => $flashcard->imagen,
-                    'imagen_respuesta' => $flashcard->imagen_respuesta,
+                    // ✅ USAR URLs COMPLETAS DE S3
+                    'imagen' => $flashcard->imagen ? $this->imageService->getUrl($flashcard->imagen) : null,
+                    'imagen_respuesta' => $flashcard->imagen_respuesta ? $this->imageService->getUrl($flashcard->imagen_respuesta) : null,
                     'url' => $flashcard->url,
                     'url_respuesta' => $flashcard->url_respuesta,
                     'categories' => $flashcard->categories->pluck('nombre')->toArray()

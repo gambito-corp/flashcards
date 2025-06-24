@@ -26,7 +26,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('conversation/{id}', [MedisearchController::class, 'conversation']);
 
 
-
 // Rutas para el menú (requieren autenticación web)
 Route::middleware('auth:sanctum')->group(function () {
     //Auth
@@ -42,13 +41,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/flashcard/{id}', [FlashcardController::class, 'update'])->where('id', '[0-9]+');
     Route::delete('/flashcard/{id}', [FlashcardController::class, 'destroy'])->where('id', '[0-9]+');
 
-    Route::get('/flashcard/categories', [FlashcardController::class, 'categoryIndex']);
-    Route::post('/flashcard/category', [FlashcardController::class, 'categoryStore']);
+//    Route::get('/flashcard/categories', [FlashcardController::class, 'categoryIndex']);
+//    Route::post('/flashcard/category', [FlashcardController::class, 'categoryStore']);
     // Nueva ruta para IA
     Route::get('/flashcard/ai-generate', [FlashcardController::class, 'generateAI']);
     // Ruta de Inicio del Juego
     Route::post('/flashcard/start-game', [FlashcardController::class, 'setGame']);
     Route::get('/flashcard/game', [FlashcardController::class, 'getGame']);
+
+
+    Route::get('/test-basic', function () {
+        return response()->json(['message' => 'Ruta básica funciona']);
+    });
 
 });
 

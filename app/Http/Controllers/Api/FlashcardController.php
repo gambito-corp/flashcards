@@ -320,6 +320,7 @@ class FlashcardController extends Controller
 
     public function generateAI(Request $request)
     {
+        dd($request->all());
         try {
             $userId = Auth::id();
 
