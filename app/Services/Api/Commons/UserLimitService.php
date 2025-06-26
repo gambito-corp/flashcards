@@ -12,9 +12,9 @@ class UserLimitService
     // ✅ LÍMITES POR TIPO DE USUARIO
     const LIMITS = [
         'normal' => [
-            'simple' => 200,
-            'standard' => 50,
-            'deep_research' => 4,
+            'simple' => 10,
+            'standard' => 10,
+            'deep_research' => 2,
         ],
         'premium' => [
             'simple' => -1, // -1 = ilimitado

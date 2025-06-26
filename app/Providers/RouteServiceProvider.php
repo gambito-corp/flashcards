@@ -53,8 +53,8 @@ class RouteServiceProvider extends ServiceProvider
                 ->controller(MedflashController::class)
                 ->group(base_path('routes/Api/MedFlash.php'));
 
-            Route::middleware('api', 'auth:sanctum')
-                ->prefix('api/medchat')
+            Route::middleware(['api', 'auth:sanctum'])  // Array con corchetes
+            ->prefix('api/medchat')
                 ->name('medChat.')
                 ->controller(MedChatController::class)
                 ->group(base_path('routes/Api/MedChat.php'));

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\MedChat;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\MedChat\MedChatAskRequest;
 use App\Models\MedisearchChat;
 use App\Models\MedisearchQuestion;
 use App\Services\Api\Commons\UserLimitService;
@@ -31,11 +30,9 @@ class MedChatController extends Controller
     /**
      * ✅ MÉTODO ASK MODIFICADO PARA PERSISTENCIA
      */
-    public function ask(MedChatAskRequest $request): JsonResponse
+    public function ask(Request $request): JsonResponse
     {
         try {
-
-
             $user = Auth::user();
             $searchType = $request->input('search_type', 'standard');
             $canSearch = $this->limitService->canUserSearch($user, $searchType);
@@ -662,12 +659,147 @@ class MedChatController extends Controller
         Cache::put($statsKey, $stats, 86400);
     }
 
-// En MedChatController.php
-    public function test()
+    /**
+     * ✅ OBTENER LÍMITES Y USO ACTUAL DEL USUARIO
+     */
+    public function getUserLimits(Request $request): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'message' => 'Controller funcionando correctamente'
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+            // ✅ Usar tu UserLimitService existente
+            $userType = $this->limitService->getUserType($user);
+            $currentUsage = $this->limitService->getCurrentMonthUsage($user->id);
+            $usageSummary = $this->limitService->getUserUsageSummary($user);
+            $resetInfo = $this->limitService->getResetInfo();
+
+            // ✅ Calcular mensajes restantes y permisos
+            $limits = UserLimitService::LIMITS[$userType];
+            $remainingMessages = [];
+            $canSendMessage = [];
+
+            foreach (['simple', 'standard', 'deep_research'] as $searchType) {
+                $limit = $limits[$searchType];
+                $used = $currentUsage[$searchType];
+
+                if ($limit === -1) {
+                    $remainingMessages[$searchType] = -1; // Ilimitado
+                    $canSendMessage[$searchType] = true;
+                } else {
+                    $remainingMessages[$searchType] = max(0, $limit - $used);
+                    $canSendMessage[$searchType] = $used < $limit;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'user_type' => $userType,
+                    'user_limits' => $limits,
+                    'usage_count' => $currentUsage,
+                    'remaining_messages' => $remainingMessages,
+                    'can_send_message' => $canSendMessage,
+                    'reset_info' => $resetInfo,
+                    'usage_summary' => $usageSummary,
+                    'current_date' => now()->format('Y-m-d')
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo límites de usuario:', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error interno del servidor'
+            ], 500);
+        }
+    }
+
+    /**
+     * ✅ VERIFICAR SI PUEDE ENVIAR MENSAJE
+     */
+    public function canSendMessage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'search_type' => 'required|string|in:simple,standard,deep_research'
         ]);
+
+        try {
+            $user = Auth::user();
+            $searchType = $request->search_type;
+
+            // ✅ Usar tu UserLimitService existente
+            $canSearch = $this->limitService->canUserSearch($user, $searchType);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'can_send' => $canSearch['allowed'],
+                    'remaining' => $canSearch['remaining'],
+                    'used' => $canSearch['current_usage'] ?? 0,
+                    'limit' => $canSearch['limit'],
+                    'search_type' => $searchType,
+                    'user_type' => $canSearch['user_type'],
+                    'message' => $canSearch['message'],
+                    'reset_info' => $canSearch['reset_info']
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error verificando límites:', [
+                'user_id' => Auth::id(),
+                'search_type' => $searchType,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error interno del servidor'
+            ], 500);
+        }
+    }
+
+    /**
+     * ✅ OBTENER ESTADÍSTICAS DE USO DEL USUARIO
+     */
+    public function getUserStats(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+
+            // ✅ Usar tu UserLimitService existente
+            $stats = $this->limitService->getUserStats($user);
+            $usageHistory = $this->limitService->getUserUsageHistory($user, 6);
+            $upgradeInfo = $this->limitService->shouldSuggestUpgrade($user);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'stats' => $stats,
+                    'usage_history' => $usageHistory,
+                    'upgrade_suggestion' => $upgradeInfo
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo estadísticas:', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error interno del servidor'
+            ], 500);
+        }
     }
 }
