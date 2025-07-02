@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Api\Medbanks\MedbanksController;
 use App\Http\Controllers\Api\MedChat\MedChatController;
 use App\Http\Controllers\Api\Medflash\MedflashController;
 use App\Http\Controllers\Api\Questions\QuestionsController;
@@ -58,6 +59,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->name('medChat.')
                 ->controller(MedChatController::class)
                 ->group(base_path('routes/Api/MedChat.php'));
+
+            Route::middleware(['api', 'auth:sanctum'])  // Array con corchetes
+            ->prefix('api/medbank')
+                ->name('medBank.')
+                ->controller(MedbanksController::class)
+                ->group(base_path('routes/Api/MedBank.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

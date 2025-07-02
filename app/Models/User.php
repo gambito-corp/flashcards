@@ -121,5 +121,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(ExamUserAnswer::class);
     }
 
+    public function examUserAnswersIncorrect()
+    {
+        return $this->hasMany(ExamUserAnswer::class)->where('is_correct', false);
+    }
+
+    public function examUserAnswersCorrect()
+    {
+        return $this->hasMany(ExamUserAnswer::class)->where('is_correct', true);
+    }
+
 
 }
