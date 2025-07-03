@@ -4,7 +4,7 @@
 namespace App\Http\Controllers\Api\Medbanks;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Medbanks\{GetAreasRequest, GetCategoriesRequest, GetDifficultiesRequest, GetTiposRequest};
+use App\Http\Requests\Api\MedBanks\{GetAreasRequest, GetCategoriesRequest, GetDifficultiesRequest, GetTiposRequest};
 use App\Http\Requests\Api\MedBanks\CountingQuestionsRequest;
 use App\Http\Requests\Api\MedBanks\ProcessDocumentRequest;
 use App\Http\Requests\Api\MedBanks\ProcessPdfRequest;
