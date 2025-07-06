@@ -42,7 +42,3 @@ class Resume
         traduciras al Español y empezas con la palabra 'Este Documento Trata de....'.";
     }
 }
-
-{
-
-}
