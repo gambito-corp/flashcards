@@ -120,6 +120,7 @@ class MedbanksController extends Controller
 
     public function countingQuestions(CountingQuestionsRequest $request)
     {
+        \Log::info('🔢 Iniciando conteo de preguntas', $request->all());
         try {
             $filters = array_filter([
                 'tipo' => $request->input('tipo'),
@@ -127,10 +128,8 @@ class MedbanksController extends Controller
                 'category_id' => $request->integer('category_id'),
                 'tipo_id' => $request->integer('tipo_id'),
                 'university_id' => $request->integer('university_id'),
+                'failed_type' => $request->input('failed_type', null),
             ]);
-
-            \Log::info('🔢 Contando preguntas', $filters);
-
 
             $result = $this->medBankService->countAvailableQuestions($filters);
 
@@ -271,7 +270,7 @@ class MedbanksController extends Controller
         }
     }
 
-    public function generateExam(string $type, Request $request): JsonResponse
+    public function generateExam(string $type, Request $request)
     {
         $strategy = ExamGenerationStrategyFactory::create($type);
         $exam = $strategy->generateExam($request->all());
@@ -281,6 +280,7 @@ class MedbanksController extends Controller
             'data' => $exam
         ], 200);
     }
+
 
     public function getExam($examId)
     {
@@ -298,7 +298,8 @@ class MedbanksController extends Controller
             'message' => 'Examen resuelto correctamente',
             'data' => $this->medBankService->resolveExam(
                 $request->input('exam_id'),
-                $request->input('answers', [])
+                $request->input('answers', []),
+                $request->input('ai', false)
             ),
         ], 200);
     }

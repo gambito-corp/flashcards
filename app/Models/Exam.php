@@ -44,4 +44,11 @@ class Exam extends Model
     {
         return $this->hasMany(ExamResult::class);
     }
+
+    // SECCIÓN AI
+
+    public function aiQuestions()
+    {
+        return $this->hasMany(AiQuestion::class, 'exam_id');
+    }
 }

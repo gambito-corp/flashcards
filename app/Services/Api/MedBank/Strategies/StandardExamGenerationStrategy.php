@@ -15,7 +15,7 @@ class StandardExamGenerationStrategy implements ExamGenerationStrategyInterface
             DB::beginTransaction();
             $exam = Exam::query()->create([
                 'title' => $data['title'],
-                'description' => $data['mode'] ?? null,
+                'description' => 'standard exam',
                 'time_limit' => $data['duration'] ?? null,
             ]);
             $allSelectedQuestions = collect();

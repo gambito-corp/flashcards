@@ -18,6 +18,7 @@ class CountingQuestionsRequest extends FormRequest
             'tipo' => 'nullable|string|in:area,categoria',
             'tipo_id' => 'nullable|integer|exists:tipos,id',
             'university_id' => 'nullable|integer|exists:universidades,id',
+            'failed_type' => 'nullable|string|in:personal-failed,global-failed',
         ];
 
         // Si viene 'tipo', entonces puede venir area_id o category_id

@@ -5,9 +5,9 @@ namespace App\Enums\Api\MedBank;
 enum DataTypeEnum: string
 {
     case STANDARD = 'standard';
-    case IA = 'ia';
+    case AI = 'ai';
     case PDF = 'pdf';
-    case LOCAL_FAILED = 'local-failed';
+    case LOCAL_FAILED = 'personal-failed';
     case GLOBAL_FAILED = 'global-failed';
 
     public static function getDefault(): self

@@ -5,11 +5,11 @@ namespace App\Services\Api\MedBank;
 
 use App\Enums\Api\MedBank\DataTypeEnum;
 use App\Enums\Api\MedBank\DifficultyEnum;
+use App\Models\AiExamQuestion;
 use App\Models\Area;
 use App\Models\Category;
 use App\Models\Exam;
 use App\Models\ExamResult;
-use App\Models\ExamTeam;
 use App\Models\ExamUserAnswer;
 use App\Models\Question;
 use App\Models\Tipo;
@@ -19,6 +19,7 @@ use App\Services\Api\OpenAI\Exams;
 use App\Services\Api\OpenAI\Resume;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\IOFactory;
 use Smalot\PdfParser\Parser as PdfParser;
 
@@ -26,7 +27,7 @@ use Smalot\PdfParser\Parser as PdfParser;
 class MedBankService
 {
     public function __construct(
-        private readonly Exams  $examsService,
+        public Exams            $examsService,
         private readonly Resume $resumeService
     )
     {
@@ -86,7 +87,6 @@ class MedBankService
         $extractedText = $this->convertDocumentToText($pdfFile);
         return $this->resumeService->generateResume($extractedText['extracted_text']);
     }
-
 
     public function generateExamFromText(string $extractedText, array $options = []): array
     {
@@ -243,7 +243,6 @@ class MedBankService
     {
         // Crear clave de cache
         $cacheKey = 'question_count_' . md5(serialize(array_filter($filters)));
-
         // Intentar obtener del cache (2 minutos)
         return \Cache::remember($cacheKey, 120, function () use ($filters) {
             try {
@@ -264,60 +263,48 @@ class MedBankService
 
     private function countByAreaOrCategory(array $filters): array
     {
-        if (!empty($filters['area_id'])) {
-            // Contar preguntas por área usando relaciones
-            $area = Area::find($filters['area_id']);
+        $query = Question::query();
 
+        // Si es conteo de fallos personales o globales
+        if (!empty($filters['failed_type'])) {
+            $failedQuery = ExamUserAnswer::query()->where('is_correct', false);
+            if ($filters['failed_type'] === 'personal') {
+                $failedQuery->where('user_id', auth()->id());
+            }
+            $failedQuestionIds = $failedQuery->pluck('question_id');
+            $query->whereIn('id', $failedQuestionIds);
+        }
+
+        if (!empty($filters['area_id'])) {
+            $area = Area::find($filters['area_id']);
             if (!$area) {
                 throw new \InvalidArgumentException("Área no encontrada: {$filters['area_id']}");
             }
-
-            $count = Question::whereHas('tipos', function ($tiposQuery) use ($filters) {
+            $query->whereHas('tipos', function ($tiposQuery) use ($filters) {
                 $tiposQuery->whereHas('category', function ($categoryQuery) use ($filters) {
                     $categoryQuery->where('area_id', $filters['area_id']);
                 });
-            })
-                ->where('approved', true)
-                ->count();
-
-            \Log::info('✅ Conteo por área completado', [
-                'area_id' => $filters['area_id'],
-                'area_name' => $area->name,
-                'total_questions' => $count
-            ]);
-
-            return [
-                'count' => $count,
-                'filters' => array_filter($filters),
-            ];
-
+            });
         } elseif (!empty($filters['category_id'])) {
-            // Contar preguntas por categoría usando relaciones
             $category = Category::find($filters['category_id']);
-
             if (!$category) {
                 throw new \InvalidArgumentException("Categoría no encontrada: {$filters['category_id']}");
             }
-
-            $count = Question::whereHas('tipos', function ($tiposQuery) use ($filters) {
+            $query->whereHas('tipos', function ($tiposQuery) use ($filters) {
                 $tiposQuery->where('category_id', $filters['category_id']);
-            })
-                ->where('approved', true)
-                ->count();
-
-            \Log::info('✅ Conteo por categoría completado', [
-                'category_id' => $filters['category_id'],
-                'category_name' => $category->name,
-                'total_questions' => $count
-            ]);
-
-            return [
-                'count' => $count,
-                'filters' => array_filter($filters),
-            ];
+            });
+        } else {
+            throw new \InvalidArgumentException('Se requiere area_id o category_id cuando se usa tipo');
         }
 
-        throw new \InvalidArgumentException('Se requiere area_id o category_id cuando se usa tipo');
+        $query->where('approved', true);
+
+        $count = $query->count();
+
+        return [
+            'count' => $count,
+            'filters' => array_filter($filters),
+        ];
     }
 
     private function countByTipoId(array $filters): array
@@ -325,7 +312,6 @@ class MedBankService
         if (empty($filters['tipo_id'])) {
             throw new \InvalidArgumentException('tipo_id es requerido');
         }
-
         // Buscar el tipo
         $tipo = Tipo::find($filters['tipo_id']);
 
@@ -333,32 +319,29 @@ class MedBankService
             throw new \InvalidArgumentException("Tipo no encontrado: {$filters['tipo_id']}");
         }
 
-        // Contar preguntas del tipo usando relaciones
-        $query = Question::whereHas('tipos', function ($tiposQuery) use ($filters) {
-            $tiposQuery->where('tipos.id', $filters['tipo_id']);
-        })->where('approved', true);
+        $count = Question::query()
+            ->where('approved', true)
+            ->whereHas('tipos', function ($tiposQuery) use ($filters) {
+                $tiposQuery->where('tipos.id', $filters['tipo_id']);
+            })
+            ->when(
+                isset($filters['failed_type']) && in_array($filters['failed_type'], ['personal-failed', 'global-failed']),
+                function ($q) use ($filters) {
+                    $q->join('exam_user_answers as eua', 'questions.id', '=', 'eua.question_id')
+                        ->where('eua.is_correct', false);
 
-        // Aplicar filtro de universidad si existe
-        if (!empty($filters['university_id'])) {
-            $universidad = Universidad::find($filters['university_id']);
-
-            if (!$universidad) {
-                throw new \InvalidArgumentException("Universidad no encontrada: {$filters['university_id']}");
-            }
-
-            $query->whereHas('universidades', function ($universidadesQuery) use ($filters) {
-                $universidadesQuery->where('universidades.id', $filters['university_id']);
-            });
-        }
-
-        $count = $query->count();
-
-        \Log::info('✅ Conteo por tipo completado', [
-            'tipo_id' => $filters['tipo_id'],
-            'tipo_name' => $tipo->name,
-            'university_id' => $filters['university_id'] ?? null,
-            'total_questions' => $count
-        ]);
+                    if ($filters['failed_type'] === 'personal-failed') {
+                        $q->where('eua.user_id', auth()->id());
+                    }
+                }
+            )
+            ->when(!empty($filters['university_id']), function ($q) use ($filters) {
+                $q->whereHas('universidades', function ($universidadesQuery) use ($filters) {
+                    $universidadesQuery->where('universidades.id', $filters['university_id']);
+                });
+            })
+            ->distinct()
+            ->count('questions.id');
 
         return [
             'count' => $count,
@@ -368,96 +351,149 @@ class MedBankService
 
     public function getExam($examId)
     {
-        return Exam::query()
-            ->with(['questions', 'questions.options', 'questions.optionsCorrectas'])
+        $exam = Exam::query()
+            ->with([
+                'questions',
+                'questions.options',
+                'questions.optionsCorrectas',
+                'aiQuestions.options',
+                'aiQuestions.optionsCorrectas'
+            ])
             ->findOrFail($examId);
+
+        // Si hay preguntas "reales", las mezclamos y devolvemos
+        if ($exam->questions->isNotEmpty()) {
+            $exam->setRelation('questions', $exam->questions->shuffle()->values());
+            $exam->questions->each(function ($question) {
+                $question->setRelation('options', $question->options->shuffle()->values());
+            });
+            // Para mantener compatibilidad, puedes dejar ai_questions vacío si lo prefieres
+            $exam->setRelation('aiQuestions', collect());
+        } // Si no hay preguntas "reales", usamos las AI
+        else if ($exam->aiQuestions->isNotEmpty()) {
+            $exam->setRelation('aiQuestions', $exam->aiQuestions->shuffle()->values());
+            $exam->aiQuestions->each(function ($question) {
+                $question->setRelation('options', $question->options->shuffle()->values());
+            });
+            // Para mantener compatibilidad, puedes dejar questions vacío
+            $exam->setRelation('questions', collect());
+        }
+
+        return $exam;
     }
 
-    public function resolveExam(mixed $examId, mixed $answers)
+    public function resolveExam(mixed $examId, mixed $answers, $ai = false)
     {
-        $userId = auth()->id();
-        $answers = collect($answers);
+        try {
+            DB::beginTransaction();
+            $userId = auth()->id();
+            $answers = collect($answers);
 
-        // 1. Obtener todas las preguntas del examen
-        $exam = Exam::query()->with('questions.options')->findOrFail($examId);
+            // 1. Selecciona la relación y modelo según el tipo de examen
+            $relation = $ai ? 'aiQuestions.options' : 'questions.options';
+            $questionKey = $ai ? 'aiQuestions' : 'questions';
+            $questionDate = $ai ? 'ai_question_id' : 'question_id';
+            $answerModel = $ai ? AiExamQuestion::class : ExamUserAnswer::class;
+            $answerWhere = $ai
+                ? fn($qid) => ['user_id' => $userId, 'exam_id' => $examId, 'question_id' => $qid]
+                : fn($qid) => ['user_id' => $userId, 'exam_id' => $examId, 'question_id' => $qid];
 
-        $correcciones = [];
-        $total = $exam->questions->count();
-        $aciertos = 0;
+            // 2. Carga el examen y sus preguntas
+            $exam = Exam::query()->with($relation)->findOrFail($examId);
 
-        foreach ($exam->questions as $pregunta) {
-            $qid = $pregunta->id;
-            $opcion_correcta = $pregunta->options->first(fn($opt) => $opt->is_correct);
-            $respuesta = $answers->firstWhere('question_id', $qid);
+            $correcciones = [];
+            $questions = $exam->{$questionKey};
+            $total = $questions->count();
+            $aciertos = 0;
 
-            $seleccionada = $respuesta['option_id'] ?? null;
-            $es_correcta = $seleccionada && $opcion_correcta && ($seleccionada == $opcion_correcta->id);
+            foreach ($answers as $answer) {
+                $correcta = false;
+                $pregunta = $questions->firstWhere('id', $answer[$questionDate])->loadMissing('optionsCorrectas');
+                if ($answer['option_id'] === $pregunta?->optionsCorrectas->first()?->id) {
+                    $aciertos++;
+                    $correcta = true;
+                }
+                if ($ai) {
+                    $model = AiExamQuestion::query()->updateOrCreate(
+                        [
+                            'user_id' => $userId,
+                            'exam_id' => $examId,
+                            'question_id' => $pregunta?->id,
+                        ],
+                        [
+                            'created_at' => now(),
+                        ]
+                    );
+                } else {
+                    $examUserAnswer = ExamUserAnswer::query()
+                        ->where('exam_id', $examId)
+                        ->where('user_id', $userId)
+                        ->where('question_id', $pregunta?->id)
+                        ->first();
+                    if (!$examUserAnswer) {
+                        $examUserAnswer = new ExamUserAnswer();
+                        $examUserAnswer->user_id = $userId;
+                        $examUserAnswer->exam_id = $examId;
+                        $examUserAnswer->question_id = $pregunta?->id;
+                        $examUserAnswer->fail_weight = 0; // Peso inicial de fallo
+                    } else {
+                        if ($correcta) {
+                            $examUserAnswer->fail_weight = max(0, $examUserAnswer->fail_weight - 1);
+                        } else {
+                            $examUserAnswer->fail_weight = $examUserAnswer->fail_weight + 1;
+                        }
+                        $examUserAnswer->is_correct = $correcta;
+                        $examUserAnswer->option_id = $pregunta?->optionsCorrectas->first()?->id;
+                        $examUserAnswer->save();
+                    }
+                }
+            }
 
-            $correcciones[$qid] = [
-                'correcta' => $opcion_correcta ? $opcion_correcta->id : null,
-                'seleccionada' => $seleccionada,
-                'es_correcta' => $es_correcta,
-            ];
-
-            if ($es_correcta) $aciertos++;
-
-            // Guardar o actualizar ExamUserAnswer
-            $examUserAnswer = ExamUserAnswer::query()->updateOrCreate(
+            // 3. Puntuación en base 100
+            $score = $total > 0 ? round(($aciertos / $total) * 100) : 0;
+            // 4. Guardar resultado global
+            ExamResult::query()->updateOrCreate(
                 [
                     'user_id' => $userId,
                     'exam_id' => $examId,
-                    'question_id' => $qid,
                 ],
                 [
-                    'option_id' => $seleccionada,
-                    'is_correct' => $es_correcta,
+                    'total_score' => $score,
                 ]
             );
-
-            // Actualizar fail_weight en ExamUserAnswer y en Question
-            if ($es_correcta) {
-                $examUserAnswer->fail_weight = max(0, $examUserAnswer->fail_weight - 1);
-                $pregunta->fail_weight = max(0, $pregunta->fail_weight - 1);
-            } else {
-                $examUserAnswer->fail_weight = $examUserAnswer->fail_weight + 1;
-                $pregunta->fail_weight = $pregunta->fail_weight + 1;
-            }
-            $examUserAnswer->save();
-            $pregunta->save();
-        }
-
-        // 3. Puntuación en base 100
-        $score = $total > 0 ? round(($aciertos / $total) * 100) : 0;
-
-        // 4. Guardar resultado global
-        ExamResult::query()->updateOrCreate(
-            [
-                'user_id' => $userId,
+            DB::commit();
+            // 6. Devuelve la corrección y el score
+            return [
+                'success' => true,
+                'score' => $score,
+                'aciertos' => $aciertos,
+                'total' => $total,
+                'correcciones' => $correcciones,
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd('Error al resolver el examen', [
                 'exam_id' => $examId,
-            ],
-            [
-                'total_score' => $score,
-            ]
-        );
-
-        // 5. (Opcional) Guardar en ExamTeam si usas equipos
-        if (method_exists(ExamTeam::class, 'create')) {
-            ExamTeam::query()->updateOrCreate(
-                [
-                    'team_id' => auth()->user()->current_team_id,
-                    'exam_id' => $examId,
-                ]
-            );
+                'answers' => $answers,
+                'ai' => $ai,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new \Exception('Error al resolver el examen: ' . $e->getMessage());
         }
+    }
 
-        // 6. Devuelve la corrección y el score
-        return [
-            'success' => true,
-            'score' => $score,
-            'aciertos' => $aciertos,
-            'total' => $total,
-            'correcciones' => $correcciones,
-        ];
+    public function generateExamAI(array $all)
+    {
+        $exam = $this->examsService->generateExam();
+        dd('all', $all);
+    }
+
+    public function generateArrayConfig(mixed $current_config, mixed $saved_configs = [])
+    {
+        return (!empty($saved_configs) && is_array($saved_configs))
+            ? array_merge($saved_configs, [$current_config])
+            : [$current_config];
     }
 
 }

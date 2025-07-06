@@ -2,7 +2,9 @@
 
 namespace App\Services\Api\MedBank\Factories;
 
+use App\Services\Api\MedBank\Strategies\AiExamGeneration;
 use App\Services\Api\MedBank\Strategies\FailedExamGenerationStrategy;
+use App\Services\Api\MedBank\Strategies\PDFExamGeneration;
 use App\Services\Api\MedBank\Strategies\StandardExamGenerationStrategy;
 
 class ExamGenerationStrategyFactory
@@ -11,8 +13,10 @@ class ExamGenerationStrategyFactory
     {
         return match ($type) {
             'standard' => new StandardExamGenerationStrategy(),
-            'failed' => new FailedExamGenerationStrategy(),
-            // agrega más tipos aquí
+            'personal-failed' => new FailedExamGenerationStrategy(true),
+            'global-failed' => new FailedExamGenerationStrategy(false),
+            'ai' => new AiExamGeneration(),
+            'pdf' => new PDFExamGeneration(),
             default => throw new \InvalidArgumentException("Tipo de examen no soportado: $type"),
         };
     }
