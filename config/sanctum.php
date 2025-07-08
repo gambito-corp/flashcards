@@ -47,7 +47,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => 30,
+    'refresh_token_expiration' => 90,
 
     /*
     |--------------------------------------------------------------------------

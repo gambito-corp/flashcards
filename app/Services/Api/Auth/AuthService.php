@@ -3,6 +3,8 @@
 namespace App\Services\Api\Auth;
 
 use App\Models\User;
+use D076\SanctumRefreshTokens\Models\PersonalRefreshToken as RefreshToken;
+use D076\SanctumRefreshTokens\Services\TokenService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,11 +31,18 @@ class AuthService
             }
 
             $user = Auth::user();
-            $token = $user->createToken('react-app')->plainTextToken;
+            // Revoca todos los tokens anteriores para sesión única
+            $user->tokens()->delete();
+
+            // Genera access y refresh token
+            $tokens = (new TokenService($user))->createTokens();
 
             return [
                 'success' => true,
-                'token' => $token,
+                'access_token' => $tokens->access_token,
+                'refresh_token' => $tokens->refresh_token,
+                'expires_in' => config('sanctum.expiration') * 60,
+                'refresh_expires_in' => config('sanctum.refresh_token_expiration') * 60,
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -59,6 +68,113 @@ class AuthService
             return [
                 'success' => false,
                 'error' => 'Error al iniciar sesión',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    public function register(array $data)
+    {
+        try {
+            DB::beginTransaction();
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => bcrypt($data['password']),
+                'telefono' => $data['telefono'] ?? null,
+                'pais' => $data['pais'] ?? null,
+            ]);
+            // Genera tokens al registrar
+            $tokens = (new TokenService($user))->createTokens();
+            $user->sendEmailVerificationNotification();
+            DB::commit();
+            return [
+                'success' => true,
+                'access_token' => $tokens['access_token'],
+                'refresh_token' => $tokens['refresh_token'],
+                'expires_in' => config('sanctum.expiration') * 60,
+                'refresh_expires_in' => config('sanctum.refresh_token_expiration') * 60,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'status' => 201
+            ];
+        } catch (Exception $e) {
+            DB::rollBack();
+            return [
+                'success' => false,
+                'error' => 'Error al registrar usuario',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    public function refreshTokens(string $refreshToken)
+    {
+        try {
+            $refreshTokenModel = RefreshToken::where('token', $refreshToken)->first();
+
+            if (!$refreshTokenModel || $refreshTokenModel->isExpired()) {
+                return [
+                    'success' => false,
+                    'error' => 'Refresh token inválido o expirado',
+                    'status' => 401
+                ];
+            }
+
+            $user = $refreshTokenModel->user;
+            // Revoca todos los tokens anteriores para sesión única
+            $user->tokens()->delete();
+
+            // Genera nuevos tokens
+            $tokens = (new TokenService($user))->createTokens();
+
+            // Invalida el refresh token viejo
+            $refreshTokenModel->delete();
+
+            return [
+                'success' => true,
+                'access_token' => $tokens['access_token'],
+                'refresh_token' => $tokens['refresh_token'],
+                'expires_in' => config('sanctum.expiration') * 60,
+                'refresh_expires_in' => config('sanctum.refresh_token_expiration') * 60,
+                'status' => 200
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Error al renovar token',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    public function logout($user)
+    {
+        try {
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'error' => 'Usuario no autenticado',
+                    'status' => 401
+                ];
+            }
+            // Revoca todos los tokens del usuario
+            $user->tokens()->delete();
+            return [
+                'success' => true,
+                'message' => 'Sesión cerrada correctamente',
+                'status' => 200
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Error al cerrar sesión',
                 'message' => $e->getMessage(),
                 'status' => 500
             ];
@@ -101,10 +217,9 @@ class AuthService
         }
     }
 
-    public function refreshToken()
+    public function resendVerificationEmail($user)
     {
         try {
-            $user = Auth::user();
             if (!$user) {
                 return [
                     'success' => false,
@@ -112,56 +227,50 @@ class AuthService
                     'status' => 401
                 ];
             }
-            $token = $user->createToken('react-app')->plainTextToken;
+            if ($user->hasVerifiedEmail()) {
+                return [
+                    'success' => true,
+                    'message' => 'El correo electrónico ya está verificado.',
+                    'status' => 200
+                ];
+            }
+            $user->sendEmailVerificationNotification();
             return [
                 'success' => true,
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
+                'message' => 'Correo electrónico de verificación enviado.',
                 'status' => 200
             ];
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'error' => 'Error al refrescar el token',
+                'error' => 'Error al reenviar correo electrónico de verificación',
                 'message' => $e->getMessage(),
                 'status' => 500
             ];
         }
     }
 
-    public function register(array $only)
+    public function forgotPassword(string $email)
     {
         try {
-            DB::beginTransaction();
-            $user = User::create([
-                'name' => $only['name'],
-                'email' => $only['email'],
-                'password' => bcrypt($only['password']),
-                'telefono' => $only['telefono'] ?? null,
-                'pais' => $only['pais'] ?? null,
-            ]);
-            $token = $user->createToken('react-app')->plainTextToken;
-            $user->sendEmailVerificationNotification();
-            DB::commit();
+            $user = User::where('email', $email)->first();
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'error' => 'Usuario no encontrado',
+                    'status' => 404
+                ];
+            }
+            $user->sendPasswordResetNotification($user->createToken('react-app')->plainTextToken);
             return [
                 'success' => true,
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
-                'status' => 201
+                'message' => 'Correo electrónico de restablecimiento de contraseña enviado.',
+                'status' => 200
             ];
         } catch (Exception $e) {
-            DB::rollBack();
             return [
                 'success' => false,
-                'error' => 'Error al registrar usuario',
+                'error' => 'Error al enviar correo electrónico de restablecimiento de contraseña',
                 'message' => $e->getMessage(),
                 'status' => 500
             ];
