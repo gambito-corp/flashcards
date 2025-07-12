@@ -31,6 +31,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        \Log::info('Register request data: ', $request->all());
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -79,5 +80,12 @@ class AuthController extends Controller
         ]);
         $result = $this->authService->forgotPassword($request->email);
         return response()->json($result, $result['status'] ?? 200);
+    }
+
+    public function me(Request $request)
+    {
+        \Log::info('Fetching authenticated user data', ['Request' => $request->header('Authorization')]);
+        $response = $this->authService->me();
+        return response()->json($response, 200);
     }
 }

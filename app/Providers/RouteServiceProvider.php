@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\Controllers\Api\Medbanks\MedbanksController;
 use App\Http\Controllers\Api\MedChat\MedChatController;
 use App\Http\Controllers\Api\Medflash\MedflashController;
+use App\Http\Controllers\Api\Pagos\PagosController;
 use App\Http\Controllers\Api\Questions\QuestionsController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -65,6 +66,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->name('medBank.')
                 ->controller(MedbanksController::class)
                 ->group(base_path('routes/Api/MedBank.php'));
+
+            Route::middleware(['api', 'auth:sanctum'])  // Array con corchetes
+            ->prefix('api/subscriptions')
+                ->name('subscriptions.')
+                ->controller(PagosController::class)
+                ->group(base_path('routes/Api/Pagos.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

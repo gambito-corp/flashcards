@@ -91,8 +91,8 @@ class AuthService
             DB::commit();
             return [
                 'success' => true,
-                'access_token' => $tokens['access_token'],
-                'refresh_token' => $tokens['refresh_token'],
+                'access_token' => $tokens->access_token,
+                'refresh_token' => $tokens->refresh_token,
                 'expires_in' => config('sanctum.expiration') * 60,
                 'refresh_expires_in' => config('sanctum.refresh_token_expiration') * 60,
                 'user' => [
@@ -271,6 +271,43 @@ class AuthService
             return [
                 'success' => false,
                 'error' => 'Error al enviar correo electrónico de restablecimiento de contraseña',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    public function me()
+    {
+        try {
+            $user = Auth::user();
+            \Log::info('User data retrieved: ', ['user' => $user]);
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'error' => 'Usuario no autenticado',
+                    'status' => 401
+                ];
+            }
+            return [
+                'success' => true,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'telefono' => $user->telefono,
+                    'pais' => $user->pais,
+                    'image' => $user->profile_photo_path,
+                    'email_verified_at' => $user->email_verified_at,
+                    'roles' => $user->roles->pluck('name')->toArray(),
+                    'is_pro' => $user->status,
+                ],
+                'status' => 200
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Error al obtener los datos del usuario',
                 'message' => $e->getMessage(),
                 'status' => 500
             ];

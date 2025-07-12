@@ -10,6 +10,7 @@ Diagrama1.dia.autosave
 .env.backup
 .env.production
 .phpunit.result.cache
+.mcp.local.json
 Homestead.json
 Homestead.yaml
 auth.json
