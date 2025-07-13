@@ -13,14 +13,15 @@ use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use MercadoPago\Client\Preapproval\PreapprovalClient;
 use MercadoPago\Client\PreapprovalPlan\PreapprovalPlanClient;
 use MercadoPago\Exceptions\MPExceptions;
+
+//use MercadoPago\Client\Preapproval\PreapprovalClient;
 
 class SubscriptionService
 {
     public function __construct(
-        protected PreapprovalClient     $preClient,
+//        protected PreapprovalClient     $preClient,
         protected PreapprovalPlanClient $planClient
     )
     {
