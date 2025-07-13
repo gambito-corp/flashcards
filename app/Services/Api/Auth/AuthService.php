@@ -84,6 +84,7 @@ class AuthService
                 'password' => bcrypt($data['password']),
                 'telefono' => $data['telefono'] ?? null,
                 'pais' => $data['pais'] ?? null,
+                'email_verified_at' => now(),
             ]);
             // Genera tokens al registrar
             $tokens = (new TokenService($user))->createTokens();
