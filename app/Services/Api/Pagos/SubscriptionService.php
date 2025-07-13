@@ -13,8 +13,9 @@ use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use MercadoPago\Client\PreapprovalPlan\PreapprovalPlanClient;
 use MercadoPago\Exceptions\MPExceptions;
+
+//use MercadoPago\Client\PreapprovalPlan\PreapprovalPlanClient;
 
 //use MercadoPago\Client\Preapproval\PreapprovalClient;
 
@@ -22,7 +23,7 @@ class SubscriptionService
 {
     public function __construct(
 //        protected PreapprovalClient     $preClient,
-        protected PreapprovalPlanClient $planClient
+//        protected PreapprovalPlanClient $planClient
     )
     {
         // MercadoPago\SDK::setAccessToken(config('services.mercadopago.token'));
