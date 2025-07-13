@@ -9,6 +9,6 @@ Route::get('/{subscription}', 'show');    // Detalle
 Route::delete('/{subscription}', 'destroy'); // Cancelar
 
 /* Webhook Mercado Pago ---------------------------------------------- */
-Route::post('mercadopago/webhook', 'webhook')
-    ->withoutMiddleware('auth:sanctum')          // evita la autenticación
-    ->name('mercadopago.webhook');
+//Route::post('mercadopago/webhook', 'webhook')
+//    ->withoutMiddleware('auth:sanctum')          // evita la autenticación
+//    ->name('mercadopago.webhook');
