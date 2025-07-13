@@ -7,7 +7,6 @@ use D076\SanctumRefreshTokens\Models\AuthenticatableUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
@@ -20,7 +19,6 @@ class User extends AuthenticatableUser
     use HasProfilePhoto;
     use HasTeams;
     use Notifiable;
-    use TwoFactorAuthenticatable;
     use softDeletes;
     use HasRoles;
 

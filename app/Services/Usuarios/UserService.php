@@ -12,13 +12,16 @@ class UserService
 {
 
 
-    public function __construct(){}
+    public function __construct()
+    {
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
-                'name'     => $data['name'],
-                'email'    => $data['email'],
+                'name' => $data['name'],
+                'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'current_team_id' => $data['teams'][0],
                 'status' => $data['is_premium']
@@ -50,7 +53,7 @@ class UserService
             if (isset($data['pwd_generate']) && $data['pwd_generate'] === true) {
                 $user->notify(new \App\Notifications\CustomVerifyEmail($data['password']));
             } else {
-                $user->sendEmailVerificationNotification();
+//                $user->sendEmailVerificationNotification();
             }
 
             return $user;
@@ -62,7 +65,7 @@ class UserService
         return DB::transaction(function () use ($data, $user) {
             // Actualiza los datos básicos del usuario
             $user->update([
-                'name'  => $data['name'],
+                'name' => $data['name'],
                 'email' => $data['email'],
                 'status' => $data['is_premium']
             ]);
