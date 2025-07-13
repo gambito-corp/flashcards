@@ -24,6 +24,7 @@ return [
         'http://localhost:3000',
         'http://localhost:8000',
         'https://react.medbystudents.com',
+        'https://doctormbs.medbystudents.com',
         'https://front.react.medbystudents.com',
     ],
     'allowed_headers' => ['*'],
