@@ -24,7 +24,8 @@ class UserService
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'current_team_id' => $data['teams'][0],
-                'status' => $data['is_premium']
+                'status' => $data['is_premium'],
+                'email_verified_at' => now(),
             ]);
 
             if ($data['is_premium'] == 1) {

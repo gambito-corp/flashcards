@@ -86,6 +86,10 @@ class AuthService
                 'pais' => $data['pais'] ?? null,
                 'email_verified_at' => now(),
             ]);
+            if ($user->email_verified_at === null) {
+                $user->email_verified_at = now();
+                $user->save();
+            }
             // Genera tokens al registrar
             $tokens = (new TokenService($user))->createTokens();
 //            $user->sendEmailVerificationNotification();

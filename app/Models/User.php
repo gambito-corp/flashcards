@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Notifications\CustomVerifyEmail;
 use D076\SanctumRefreshTokens\Models\AuthenticatableUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -81,7 +80,7 @@ class User extends AuthenticatableUser
 
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new CustomVerifyEmail);
+//        $this->notify(new CustomVerifyEmail);
     }
 
     public function teams()

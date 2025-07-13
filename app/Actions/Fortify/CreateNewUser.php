@@ -30,7 +30,8 @@ class CreateNewUser implements CreatesNewUsers
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
                 'current_team_id' => Team::query()->where('id', 1)->first()->id,
-                'status' => '0'
+                'status' => '0',
+                'email_verified_at' => now(),
             ]), function (User $user) {
                 $rol = Role::query()->where('name', 'user')->first();
                 $user->assignRole($rol);
