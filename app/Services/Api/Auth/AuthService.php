@@ -92,7 +92,6 @@ class AuthService
             }
             // Genera tokens al registrar
             $tokens = (new TokenService($user))->createTokens();
-//            $user->sendEmailVerificationNotification();
             DB::commit();
             return [
                 'success' => true,

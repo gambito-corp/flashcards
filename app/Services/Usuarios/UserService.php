@@ -18,6 +18,7 @@ class UserService
 
     public function create(array $data)
     {
+        dd($data);
         return DB::transaction(function () use ($data) {
             $user = User::create([
                 'name' => $data['name'],
@@ -51,11 +52,11 @@ class UserService
             }
             $subjectIds = array_keys($data['subjects']);
             $user->areas()->sync($subjectIds);
-            if (isset($data['pwd_generate']) && $data['pwd_generate'] === true) {
-                $user->notify(new \App\Notifications\CustomVerifyEmail($data['password']));
-            } else {
+//            if (isset($data['pwd_generate']) && $data['pwd_generate'] === true) {
+//                $user->notify(new \App\Notifications\CustomVerifyEmail($data['password']));
+//            } else {
 //                $user->sendEmailVerificationNotification();
-            }
+//            }
 
             return $user;
         });

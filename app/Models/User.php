@@ -78,11 +78,6 @@ class User extends AuthenticatableUser
         'profile_photo_url',
     ];
 
-    public function sendEmailVerificationNotification()
-    {
-//        $this->notify(new CustomVerifyEmail);
-    }
-
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'team_user')
