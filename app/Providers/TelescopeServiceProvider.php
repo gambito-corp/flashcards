@@ -64,7 +64,8 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         Log::info('------------------------------------------------------------------------------------------');
         Gate::define('viewTelescope', function () {
             $user = auth()->guard('sanctum')->user();   // o 'api'
-            return $user && $user->id === 1;
+            return $user->hasAnyRole(['admin', 'root']);
+
         });
     }
 }
