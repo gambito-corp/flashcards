@@ -31,6 +31,14 @@ class AuthService
             }
 
             $user = Auth::user();
+
+            if ($user->blocked_at !== null) {
+                return [
+                    'success' => false,
+                    'error' => 'Cuenta bloqueada',
+                    'status' => 403
+                ];
+            }
             // Revoca todos los tokens anteriores para sesión única
             $user->tokens()->delete();
 

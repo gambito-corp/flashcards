@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9da4452a6154091ead5a8c5de2f7a57f",
+    "content-hash": "2a078d02d377d69f53ed6ccbf773f3bc",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -339,6 +339,55 @@
                 }
             ],
             "time": "2023-12-11T17:09:12+00:00"
+        },
+        {
+            "name": "d076/sanctum-refresh-tokens",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/D076/sanctum-refresh-tokens.git",
+                "reference": "1fddd81c4163ecfe65e7d70124e528cf24f28e9e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/D076/sanctum-refresh-tokens/zipball/1fddd81c4163ecfe65e7d70124e528cf24f28e9e",
+                "reference": "1fddd81c4163ecfe65e7d70124e528cf24f28e9e",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^10",
+                "laravel/sanctum": "^3.3",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "D076\\SanctumRefreshTokens\\Providers\\SanctumServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "D076\\SanctumRefreshTokens\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dmitry Titov",
+                    "email": "dezmond076@gmail.com"
+                }
+            ],
+            "description": "Refresh token realization for laravel sanctum",
+            "support": {
+                "issues": "https://github.com/D076/sanctum-refresh-tokens/issues",
+                "source": "https://github.com/D076/sanctum-refresh-tokens/tree/v1.0.1"
+            },
+            "time": "2024-03-02T09:54:15+00:00"
         },
         {
             "name": "dasprid/enum",
@@ -1969,6 +2018,75 @@
                 "source": "https://github.com/laravel/serializable-closure"
             },
             "time": "2024-11-14T18:34:49+00:00"
+        },
+        {
+            "name": "laravel/telescope",
+            "version": "v5.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/telescope.git",
+                "reference": "fc0a8662682c0375b534033873debb780c003486"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/fc0a8662682c0375b534033873debb780c003486",
+                "reference": "fc0a8662682c0375b534033873debb780c003486",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "laravel/framework": "^8.37|^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.0",
+                "symfony/console": "^5.3|^6.0|^7.0",
+                "symfony/var-dumper": "^5.0|^6.0|^7.0"
+            },
+            "require-dev": {
+                "ext-gd": "*",
+                "guzzlehttp/guzzle": "^6.0|^7.0",
+                "laravel/octane": "^1.4|^2.0|dev-develop",
+                "orchestra/testbench": "^6.40|^7.37|^8.17|^9.0|^10.0",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^9.0|^10.5|^11.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Telescope\\TelescopeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Telescope\\": "src/",
+                    "Laravel\\Telescope\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                },
+                {
+                    "name": "Mohamed Said",
+                    "email": "mohamed@laravel.com"
+                }
+            ],
+            "description": "An elegant debug assistant for the Laravel framework.",
+            "keywords": [
+                "debugging",
+                "laravel",
+                "monitoring"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/telescope/issues",
+                "source": "https://github.com/laravel/telescope/tree/v5.10.0"
+            },
+            "time": "2025-07-07T14:47:19+00:00"
         },
         {
             "name": "laravel/tinker",

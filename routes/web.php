@@ -1,29 +1,34 @@
 <?php
 //
-//use App\Http\Controllers\Admin\AdminPreguntasController;
-//use App\Http\Controllers\Admin\AsignaturasController;
-//use App\Http\Controllers\Admin\CarrerasController;
-//use App\Http\Controllers\Admin\CategoriasController;
-//use App\Http\Controllers\Admin\ConfigController;
-//use App\Http\Controllers\Admin\RoleController;
-//use App\Http\Controllers\Admin\TiposController;
-//use App\Http\Controllers\Admin\UniversidadesController;
-//use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AdminPreguntasController;
+use App\Http\Controllers\Admin\AsignaturasController;
+use App\Http\Controllers\Admin\CarrerasController;
+use App\Http\Controllers\Admin\CategoriasController;
+use App\Http\Controllers\Admin\ConfigController;
+use App\Http\Controllers\Admin\MainController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\TiposController;
+use App\Http\Controllers\Admin\UniversidadesController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CustomLoginController;
+use Illuminate\Support\Facades\Route;
+
 //use App\Http\Controllers\Api\Auth\AuthController;
-//use App\Http\Controllers\CustomLoginController;
+
 //use App\Http\Controllers\ExamController;
 //use App\Http\Controllers\FlashcardController;
-//use App\Http\Controllers\HomeController;
+
 //use App\Http\Controllers\MedisearchController;
 //use App\Http\Controllers\MercadoPagoController;
 //use App\Http\Controllers\PreguntasController;
 //use App\Http\Controllers\WebhookController;
 //use App\Models\User;
-//use Illuminate\Support\Facades\Route;
+
 //
 //
 //Route::get('gettigPay/{productId}', [MercadoPagoController::class, 'gettigPay'])->name('gettigPay');
-////Route::redirect('/home', '/dashboard');
+
+
 ////if (config('app.env') === 'production') {
 ////    Route::get('/robots.txt', function () {
 ////        return response('User-agent: *' . PHP_EOL . 'Disallow: /', 200);
@@ -32,9 +37,53 @@
 ////} else {
 ////    Route::redirect('/', '/login');
 ////}
-//
-//Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
-//Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
+
+
+Route::middleware([
+    'auth:sanctum',
+    'admin.only',
+    config('jetstream.auth_session'),
+    'verified',
+    'blocked'
+])->group(callback: function () {
+    Route::get('/admin/dashboard', [MainController::class, 'index'])->name('admin.index');
+
+    Route::get('/admin', function () {
+        return redirect()->route('dashboard');
+    });
+
+    Route::get('/admin/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/admin/roles/create', [RoleController::class, 'create'])->name('roles.create');
+    Route::post('/admin/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/admin/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+
+    Route::get('/admin/config', [ConfigController::class, 'index'])->name('config.index');
+    Route::get('/admin/config/{config}/edit', [ConfigController::class, 'edit'])->name('config.edit');
+
+    Route::resource('usuarios', UserController::class)->names('usuarios')->middleware('role:root|admin');
+
+    Route::resource('universidades', UniversidadesController::class)->names('universidades')->middleware('role:root|admin');
+
+    Route::resource('carreras', CarrerasController::class)->names('carreras')->middleware('role:root|admin');
+
+    Route::resource('asignaturas', AsignaturasController::class)->names('asignaturas')->middleware('role:root|admin');
+
+    Route::resource('categorias', CategoriasController::class)->names('categorias')->middleware('role:root|admin');
+
+    Route::resource('tipos', TiposController::class)->names('tipos')->middleware('role:root|admin');
+
+    Route::resource('preguntas', AdminPreguntasController::class)->names('preguntas')->middleware('role:root|admin');
+});
+
+
+Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
+Route::post('/logout', function () {
+    auth()->logout();
+    session()->flush();
+    return redirect('/login');
+})->name('logout');
 //
 //Route::middleware([
 //    'auth:sanctum',
@@ -42,7 +91,6 @@
 //    config('jetstream.auth_session'),
 //    'verified',
 //])->group(callback: function () {
-//    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 //
 ////    Route::put('/current-team/{team}', [CurrentTeamController::class, 'update'])->name('current-team.updates');
 ////    /*PREGUNTAS*/

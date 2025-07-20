@@ -272,6 +272,7 @@ class MedbanksController extends Controller
 
     public function generateExam(string $type, Request $request)
     {
+        
         $strategy = ExamGenerationStrategyFactory::create($type);
         $exam = $strategy->generateExam($request->all());
         return response()->json([

@@ -10,7 +10,9 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
 
     <!-- Scripts -->
@@ -18,7 +20,7 @@
     <link rel="stylesheet" href="{{ asset('estilos.css') }}">
 
     <!-- Styles -->
-    <livewire:styles />
+    <livewire:styles/>
     @stack('styles')
     <style>
         .environment-indicator {
@@ -37,110 +39,9 @@
             font-size: 14px;
             letter-spacing: 1px;
             backdrop-filter: blur(2px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
     </style>
-    @if(config('app.env') == 'prod')
-        <script>
-            // Función para deshabilitar atajos de teclado específicos
-            function disableKeyShortcuts() {
-                document.addEventListener('keydown', (e) => {
-                    // Lista de keycodes que se deshabilitan: F12 (123), Windows/Meta izquierda (91) y derecha (92)
-                    // Además, se deshabilitan Ctrl+Shift+I (73) y Ctrl+Shift+J (74), y Ctrl+U (85)
-                    if (
-                        [123, 91, 92].includes(e.keyCode) ||
-                        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
-                        (e.ctrlKey && e.keyCode === 85)
-                    ) {
-                        e.preventDefault();
-                    }
-                });
-            }
-
-            // Función para deshabilitar el menú contextual (click derecho)
-            function disableContextMenu() {
-                document.addEventListener('contextmenu', (e) => e.preventDefault());
-            }
-
-            // Función para copiar un mensaje al portapapeles
-            function copyMessageToClipboard(message) {
-                const inputOculto = document.createElement('input');
-                inputOculto.value = message;
-                document.body.appendChild(inputOculto);
-                inputOculto.select();
-                document.execCommand("copy");
-                document.body.removeChild(inputOculto);
-            }
-
-            // Función para mostrar un overlay en pantalla con un mensaje
-            function showOverlay(message, duration = 3000) {
-                const overlay = document.createElement('div');
-                overlay.id = "screenshotOverlay";
-                Object.assign(overlay.style, {
-                    position: 'fixed',
-                    top: '0',
-                    left: '0',
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'black',
-                    opacity: '1',
-                    zIndex: '9999',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                });
-                overlay.innerHTML = `<p style="color: white; font-size: 24px;">${message}</p>`;
-                document.body.appendChild(overlay);
-
-                // Permitir quitar el overlay haciendo clic en él
-                overlay.addEventListener('click', () => overlay.remove());
-
-                // Remover el overlay automáticamente después del tiempo especificado
-                setTimeout(() => {
-                    const el = document.getElementById('screenshotOverlay');
-                    if (el) el.remove();
-                }, duration);
-            }
-
-            // Función para gestionar eventos de tecla al soltar (keyup)
-            function handleKeyUpEvent(e) {
-                // Detecta Print Screen (44) o Ctrl (17)
-                // También se verifica si se presionan combinaciones con Ctrl y teclas específicas
-                if (
-                    e.keyCode === 44 ||
-                    e.keyCode === 17 ||
-                    (e.ctrlKey && (e.keyCode === 123 || e.keyCode === 91 || e.keyCode === 92))
-                ) {
-                    const mensajePortapapeles = "Você não pode mais dar printscreen. Isto faz parte da nova medida de segurança do sistema.";
-                    const mensajeOverlay = "Print screen y teclas Windows desabilitadas. Haz click en la pantalla para desactivar este aviso.";
-
-                    // Copiar mensaje al portapapeles
-                    copyMessageToClipboard(mensajePortapapeles);
-                    // Mostrar overlay en pantalla
-                    showOverlay(mensajeOverlay, 3000);
-                }
-            }
-
-            // Función para agregar el listener de keyup
-            function addKeyUpListener() {
-                window.addEventListener("keyup", handleKeyUpEvent);
-            }
-
-            // Función para manejar el enfoque y desenfoque de la ventana
-            function addFocusBlurListeners() {
-                window.addEventListener("focus", () => document.body.style.display = "block");
-                window.addEventListener("blur", () => document.body.style.display = "none");
-            }
-
-            // Inicialización del script una vez que el DOM esté cargado
-            document.addEventListener("DOMContentLoaded", () => {
-                disableKeyShortcuts();
-                disableContextMenu();
-                addKeyUpListener();
-                addFocusBlurListeners();
-            });
-        </script>
-    @endif
 </head>
 <body class="font-sans antialiased">
 <!-- Texto flotante para entorno PRE -->
@@ -149,7 +50,7 @@
         ENTORNO PRE - AMBIENTE DE PRUEBAS
     </div>
 @endif
-<x-banner />
+<x-banner/>
 <div class="min-h-screen bg-[#f7f7f7] body-content">
     <livewire:nav-link/>
 
@@ -179,15 +80,19 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-footer text-white  z-10 footer-mbs flex flex-col  md:flex-row justify-between px-[20px] md:px-[50px] py-[35px] ">
+    <footer
+        class="bg-footer text-white  z-10 footer-mbs flex flex-col  md:flex-row justify-between px-[20px] md:px-[50px] py-[35px] ">
         <div class=" text-sm text-center mb-3 md:mb-0">
             © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Todos los derechos reservados.
         </div>
-        <div class="text-sm flex flex-col  md:flex-row gap-4 underline text-center"><a href="https://medbystudents.com/libro-de-reclamaciones/" target="_blank">Libro de reclamaciones</a><a href="https://medbystudents.com/politicas-de-privacidad/" target="_blank">Políticas de privacidad</a></div>
+        <div class="text-sm flex flex-col  md:flex-row gap-4 underline text-center"><a
+                href="https://medbystudents.com/libro-de-reclamaciones/" target="_blank">Libro de reclamaciones</a><a
+                href="https://medbystudents.com/politicas-de-privacidad/" target="_blank">Políticas de privacidad</a>
+        </div>
     </footer>
 </div>
 @stack('modals')
-<livewire:scripts />
+<livewire:scripts/>
 @stack('scripts')
 </body>
 </html>

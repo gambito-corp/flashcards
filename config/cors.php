@@ -16,7 +16,7 @@ return [
     */
 
     // config/cors.php - ✅ CONFIGURACIÓN CORRECTA
-    'paths' => ['api/*', 'auth/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'auth/*', 'sanctum/csrf-cookie', 'telescope*'],
     'allowed_methods' => ['*'],
     'allowed_origins' => [
         'http://front.flashcard.test',  // ✅ Tu frontend

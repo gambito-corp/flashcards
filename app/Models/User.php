@@ -122,5 +122,10 @@ class User extends AuthenticatableUser
         return $this->hasMany(ExamUserAnswer::class)->where('is_correct', true);
     }
 
+    public function is_admin()
+    {
+        return $this->hasRole('root') || $this->hasRole('admin');
+    }
+
 
 }
