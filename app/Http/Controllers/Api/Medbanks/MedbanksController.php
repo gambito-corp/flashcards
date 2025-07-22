@@ -169,6 +169,13 @@ class MedbanksController extends Controller
 
     public function processPdf(Request $request)
     {
+        if (!$request->hasFile('pdf')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se recibió el PDF (revisa tamaño y Content-Type)',
+            ], 422);
+        }
+
 
         try {
             $pdfFile = $request->file('pdf');

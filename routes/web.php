@@ -46,6 +46,7 @@ Route::middleware([
     'verified',
     'blocked'
 ])->group(callback: function () {
+    Route::get('admin/test', [MainController::class, 'test']);
     Route::get('/admin/dashboard', [MainController::class, 'index'])->name('admin.index');
 
     Route::get('/admin', function () {
