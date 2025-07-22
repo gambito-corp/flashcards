@@ -20,6 +20,7 @@ class ProcessPdfRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
             'pdf' => [
                 'required',
