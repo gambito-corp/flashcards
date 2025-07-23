@@ -5,6 +5,7 @@ namespace App\Services\Usuarios;
 
 use App\Models\Purchase;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
@@ -18,7 +19,6 @@ class UserService
 
     public function create(array $data)
     {
-        dd($data);
         return DB::transaction(function () use ($data) {
             $user = User::create([
                 'name' => $data['name'],
@@ -62,41 +62,45 @@ class UserService
         });
     }
 
-    public function update(array $data, User $user)
+    public function update(array $data, User $user): User
     {
         return DB::transaction(function () use ($data, $user) {
-            // Actualiza los datos básicos del usuario
+
+            /* ─── Datos básicos ───────────────────────────────────────────── */
             $user->update([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'status' => $data['is_premium']
+                'status' => (bool)($data['is_premium'] ?? false),
             ]);
 
-            if ($data['is_premium'] == 1) {
-                Purchase::create([
-                    'user_id' => $user->id,
-                    'product_id' => 2,
-                    'purchase_at' => now(),
-                ]);
+            /* ─── Registro / actualización de compra premium ─────────────── */
+            if (!empty($data['is_premium'])) {
+                Purchase::firstOrCreate(
+                    ['user_id' => $user->id, 'product_id' => 2],
+                    ['purchase_at' => now()]
+                );
             }
-            // Guarda la foto de perfil si se envía, o deja la existente
-            if (isset($data['profile_photo'])) {
+
+            /* ─── Foto de perfil ──────────────────────────────────────────── */
+            if (!empty($data['profile_photo'])) {
                 $path = $data['profile_photo']->store('avatars', 's3');
                 $user->update(['profile_photo_path' => $path]);
-            } else {
-                // Si no se envía nueva foto, se deja la actual o se establece null para usar el avatar por defecto
-                $user->update(['profile_photo_path' => $user->profile_photo_path ?? null]);
             }
 
-            // Sincroniza las relaciones
-            $user->teams()->sync($data['teams']);
-            $user->syncRoles($data['roles']);
+            /* ─── Sincronizar equipos ─────────────────────────────────────── */
+            $user->teams()->sync($data['teams'] ?? []);
 
-            // Para asignaturas, se espera que $data['subjects'] sea un array asociativo [subject_id => subject_name]
-            $subjectIds = array_keys($data['subjects']);
-            $user->areas()->sync($subjectIds);
+            /* ─── Sincronizar roles (ids → modelos Role) ──────────────────── */
+            $roleIds = Arr::wrap($data['roles'] ?? []);
+            $roles = Role::whereIn('id', $roleIds)->get();
+            $user->syncRoles($roles);
 
-            return $user;
+            /* ─── Sincronizar asignaturas/áreas ───────────────────────────── */
+            if (isset($data['subjects'])) {
+                $user->areas()->sync(array_keys($data['subjects']));
+            }
+
+            return $user->fresh(['roles', 'teams', 'areas']);
         });
     }
 

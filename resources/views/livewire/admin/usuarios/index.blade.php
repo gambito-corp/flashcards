@@ -3,7 +3,7 @@
         <!-- Contenedor del enlace -->
         <div class="flex items-center justify-end mb-4 mt gap-2">
             <!-- Enlace en lugar de botón -->
-            <a href="{{route('usuarios.create')}}"
+            <a href="{{route('admin.usuarios.create')}}"
                class="px-4 py-2 rounded text-white bg-green-500 hover:bg-green-600 flex items-center gap-2 button-add"
                title="Crear usuario"
             >

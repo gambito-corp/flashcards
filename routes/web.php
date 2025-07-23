@@ -62,8 +62,20 @@ Route::middleware([
     Route::get('/admin/config', [ConfigController::class, 'index'])->name('config.index');
     Route::get('/admin/config/{config}/edit', [ConfigController::class, 'edit'])->name('config.edit');
 
-    Route::resource('usuarios', UserController::class)->names('usuarios')->middleware('role:root|admin');
-    Route::get('usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
+    Route::prefix('usuarios')            // URL: /usuarios/…
+    ->name('admin.usuarios.')             // Nombres: usuarios.*
+    ->middleware('role:root|admin') // Sólo root y admin
+    ->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('create', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('{user}', [UserController::class, 'show'])->name('show');
+        Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
+    });
+//    Route::resource('usuarios', UserController::class)->names('usuarios')->middleware('role:root|admin');
+//    Route::get('usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
 
     Route::resource('universidades', UniversidadesController::class)->names('universidades')->middleware('role:root|admin');
 
@@ -78,7 +90,9 @@ Route::middleware([
     Route::resource('preguntas', AdminPreguntasController::class)->names('preguntas')->middleware('role:root|admin');
 });
 
-
+Route::get('', function () {
+    return redirect()->route('login');
+});
 Route::get('/login', [CustomLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [CustomLoginController::class, 'authenticate'])->name('login.custom');
 Route::post('/logout', function () {

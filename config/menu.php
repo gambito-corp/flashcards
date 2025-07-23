@@ -21,7 +21,7 @@ return [
     [
         'group' => 'admin',
         'name' => 'Usuarios',
-        'route' => 'usuarios.index',
+        'route' => 'admin.usuarios.index',
         'active' => 'admin.usuarios.index',
         'roles' => ['admin', 'root', 'colab'],
         'need_premium' => false
