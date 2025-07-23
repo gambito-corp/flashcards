@@ -275,6 +275,27 @@
                     </li>
                     <li class="nav-item">
                         <!-- BOTÓN DE LOGOUT -->
+                        <form method="GET" action="{{ route('dashboard') }}" class="ml-3 d-inline">
+                            @csrf
+                            <button type="submit"
+                                    class="btn btn-success d-flex align-items-center py-2"
+                                    title="Ir al Admin Dashboard">
+                                {{-- Icono de salida --}}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                     class="icon" fill="currentColor" width="20" height="20">
+                                    <path fill-rule="evenodd"
+                                          d="M7.25 3A2.25 2.25 0 005 5.25v3a.75.75 0 001.5 0v-3A.75.75 0 017.25 4.5h8.5A.75.75 0 0116.5 5.25v9.5a.75.75 0 01-.75.75h-8.5a.75.75 0 01-.75-.75v-3a.75.75 0 00-1.5 0v3A2.25 2.25 0 007.25 18h8.5A2.25 2.25 0 0018 15.75v-9.5A2.25 2.25 0 0015.75 4h-8.5z"
+                                          clip-rule="evenodd"/>
+                                    <path fill-rule="evenodd"
+                                          d="M11.47 6.22a.75.75 0 011.06 1.06L10.81 9H17a.75.75 0 010 1.5h-6.19l1.72 1.72a.75.75 0 11-1.06 1.06l-3-3a.75.75 0 010-1.06l3-3z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                                <span class="d-none d-md-inline ml-2">Dashboard</span>
+                            </button>
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <!-- BOTÓN DE LOGOUT -->
                         <form method="POST" action="{{ route('logout') }}" class="ml-3 d-inline">
                             @csrf
                             <button type="submit"
