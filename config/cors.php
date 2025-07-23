@@ -26,6 +26,7 @@ return [
         'https://react.medbystudents.com',
         'https://doctormbs.medbystudents.com',
         'https://front.react.medbystudents.com',
+        'https://pre.doctormbs.medbystudents.com'
     ],
     'allowed_headers' => ['*'],
     'supports_credentials' => true,
