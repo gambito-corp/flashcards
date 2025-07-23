@@ -74,4 +74,12 @@ return [
         'roles' => ['admin', 'root', 'colab'],
         'need_premium' => false
     ],
+    [
+        'group' => 'admin',
+        'name' => 'Telescope',
+        'route' => 'telescope',
+        'active' => 'telescope',
+        'roles' => ['admin', 'root', 'colab'],
+        'need_premium' => false
+    ],
 ];

@@ -275,7 +275,7 @@
                     </li>
                     <li class="nav-item">
                         <!-- BOTÓN DE LOGOUT -->
-                        <form method="GET" action="{{ route('dashboard') }}" class="ml-3 d-inline">
+                        <form method="GET" action="{{ route('admin.index') }}" class="ml-3 d-inline">
                             @csrf
                             <button type="submit"
                                     class="btn btn-success d-flex align-items-center py-2"
