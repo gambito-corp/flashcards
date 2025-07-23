@@ -63,6 +63,7 @@ Route::middleware([
     Route::get('/admin/config/{config}/edit', [ConfigController::class, 'edit'])->name('config.edit');
 
     Route::resource('usuarios', UserController::class)->names('usuarios')->middleware('role:root|admin');
+    Route::get('usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
 
     Route::resource('universidades', UniversidadesController::class)->names('universidades')->middleware('role:root|admin');
 
