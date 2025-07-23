@@ -175,7 +175,18 @@ class Index extends Component
             $originalTitle = $chat->title;
             if (strlen($originalTitle) > 20) {
                 $chat->title = substr($originalTitle, 0, 17) . '...';
-                $chat->save();
+                try {
+                    if ($chat->title) {
+                        $chat->title = $this->sanitizeTitle($chat->title);
+                    }
+                    $chat->save();
+                } catch (\Exception $e) {
+                    \Log::error('Error al guardar chat: ' . $e->getMessage());
+
+                    // Fallback: asignar título genérico
+                    $chat->title = 'Chat ' . $chat->created_at->format('Y-m-d H:i');
+                    $chat->save();
+                }
             }
             $diffDays = $now->diffInDays($chat->created_at);
 
@@ -427,6 +438,7 @@ class Index extends Component
         if ($isFirstMessage) {
             // Llama a tu servicio de IA para el título
             $titulo = $this->MBIAService->generateTitleFromQuestion($query);
+
             // Si la IA no responde, usa el inicio de la pregunta como fallback
             if (!$titulo['content']) {
                 $titulo = mb_strlen($query) > 20 ? mb_substr($query, 0, 17) . '...' : $query;
@@ -434,13 +446,26 @@ class Index extends Component
                 $titulo = $titulo['content'];
             }
 
-            // Actualiza el chat en DB
-            $this->chatService->updateTitle($this->activeChatId, $titulo, Auth::id());
+            // SANITIZAR EL TÍTULO ANTES DE GUARDAR
+            $titulo = $this->sanitizeTitle($titulo);
 
-            // Refresca el historial y el título activo en Livewire
-            $this->loadChatHistory();
-            $this->activeChatTitle = $titulo;
-            $this->groupChatsByAge();
+            try {
+                // Actualiza el chat en DB
+                $this->chatService->updateTitle($this->activeChatId, $titulo, Auth::id());
+
+                // Refresca el historial y el título activo en Livewire
+                $this->loadChatHistory();
+                $this->activeChatTitle = $titulo;
+                $this->groupChatsByAge();
+            } catch (\Exception $e) {
+                \Log::error('Error al actualizar título: ' . $e->getMessage());
+
+                // Fallback con título genérico
+                $tituloFallback = 'Chat ' . now()->format('Y-m-d H:i');
+                $this->chatService->updateTitle($this->activeChatId, $tituloFallback, Auth::id());
+                $this->activeChatTitle = $tituloFallback;
+                $this->groupChatsByAge();
+            }
         }
 
 
@@ -474,17 +499,18 @@ class Index extends Component
         if (isset($responseData['data']['resultados'])) {
             foreach ($responseData['data']['resultados'] as $item) {
                 if ($item['tipo'] === 'llm_response') {
-                    // Extrae referencias del HTML si existen
+                    // Limpiar la respuesta antes de mostrarla
                     $references = [];
                     if (preg_match('/<div class="referencias">(.*?)<\/div>/s', $item['respuesta'], $matches)) {
                         preg_match_all('/<li>(.*?)<\/li>/s', $matches[1], $refMatches);
                         $references = array_map('strip_tags', $refMatches[1] ?? []);
                     }
+                    $respuestaLimpia = $this->limpiarRespuestaHTML($item['respuesta']);
 
                     $this->messages[] = [
                         'is_new' => true,
                         'from' => 'bot',
-                        'text' => $item['respuesta'],
+                        'text' => $respuestaLimpia,
                         'references' => $references,
                     ];
                 } elseif ($item['tipo'] === 'articles' && !empty($item['articulos'])) {
@@ -556,4 +582,47 @@ class Index extends Component
         // Agrega un salto de línea al contenido
         $this->newMessage .= "\n";
     }
+
+    private function sanitizeTitle($title)
+    {
+        // Convertir a UTF-8 válido
+        $title = mb_convert_encoding($title, 'UTF-8', 'UTF-8');
+
+        // Remover caracteres problemáticos
+        $title = preg_replace('/[\x00-\x1F\x7F\xC2\xC3]/', '', $title);
+
+        // Reemplazar caracteres problemáticos específicos
+        $title = str_replace(['í', 'é', 'á', 'ó', 'ú', 'ñ'], ['i', 'e', 'a', 'o', 'u', 'n'], $title);
+
+        // Limitar longitud
+        if (mb_strlen($title) > 200) {
+            $title = mb_substr($title, 0, 197) . '...';
+        }
+
+        // Si queda vacío, usar fallback
+        if (empty(trim($title))) {
+            $title = 'Chat ' . now()->format('Y-m-d H:i');
+        }
+
+        return $title;
+    }
+
+    private function limpiarRespuestaHTML($respuesta)
+    {
+        // Eliminar bloques de código markdown (con y sin especificación de lenguaje)
+        $respuestaLimpia = preg_replace('/```html\n?/', '', $respuesta);
+        $respuestaLimpia = preg_replace('/```\n?/', '', $respuestaLimpia);
+
+        // Eliminar código inline si existe
+        $respuestaLimpia = preg_replace('/`([^`]+)`/', '$1', $respuestaLimpia);
+
+        // Limpiar saltos de línea excesivos
+        $respuestaLimpia = preg_replace('/\n\s*\n/', "\n", $respuestaLimpia);
+
+        // Eliminar espacios al inicio y final
+        $respuestaLimpia = trim($respuestaLimpia);
+
+        return $respuestaLimpia;
+    }
+
 }
