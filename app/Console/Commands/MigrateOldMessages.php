@@ -17,7 +17,6 @@ class MigrateOldMessages extends Command
     {
         $this->info('Iniciando migración de mensajes antiguos...');
 
-        // ✅ PRIMERO LIMPIAR MENSAJES INVÁLIDOS SI SE SOLICITA
         if ($this->option('clean')) {
             $this->cleanInvalidMessages();
         }

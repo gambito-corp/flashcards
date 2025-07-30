@@ -9,10 +9,8 @@
 namespace App\Services\Api\Pagos;
 
 use App\Models\Product;
-use App\Models\Subscription;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use MercadoPago\Exceptions\MPExceptions;
 
 //use MercadoPago\Client\PreapprovalPlan\PreapprovalPlanClient;
@@ -21,123 +19,61 @@ use MercadoPago\Exceptions\MPExceptions;
 
 class SubscriptionService
 {
-    public function __construct(
-//        protected PreapprovalClient     $preClient,
-//        protected PreapprovalPlanClient $planClient
-    )
+    protected $accessToken;
+
+    public function __construct()
     {
-        // MercadoPago\SDK::setAccessToken(config('services.mercadopago.token'));
+        $this->accessToken = config('services.mercadopago.access_token');
     }
 
-    /**
-     * Crea una suscripción con plan o sin plan.
-     */
-    public function createSubscription(
-        User  $user,
-        bool  $isPlan,
-        ?int  $productId = null,
-        array $planMeta = []
-    ): Subscription
+    // Obtener planes de suscripción
+    public function getPlanesSuscripcion(): array
     {
-        return DB::transaction(function () use ($user, $isPlan, $productId, $planMeta) {
-            if ($isPlan) {
-                $planId = $this->createOrGetPlan($planMeta);
-                $mpSub = $this->preClient->create([
-                    'preapproval_plan_id' => $planId,
-                    'payer_email' => $user->email,
-                    'card_token_id' => $planMeta['card_token'] ?? null,
-                    'reason' => $planMeta['plan_name']
-                ]);
-            } else {
-                $product = Product::findOrFail($productId);
-                $mpSub = $this->preClient->create([
-                    'reason' => $product->name,
-                    'auto_recurring' => [
-                        'transaction_amount' => (float)$product->price,
-                        'currency_id' => 'PEN',
-                        'frequency' => 1,
-                        'frequency_type' => $product->duration_days >= 180 ? 'months' : 'months',
-                    ],
-                    'back_url' => $product->url ?? config('app.url'),
-                    'payer_email' => $user->email,
-                ]);
-            }
+        return Product::query()->get()->toArray();
 
-            return Subscription::create([
-                'user_id' => $user->id,
-                'product_id' => $productId,
-                'mercadopago_id' => $mpSub->id,
-                'preapproval_plan_id' => $mpSub->preapproval_plan_id ?? null,
-                'status' => $mpSub->status,
-                'init_point' => $mpSub->init_point,
-                'frequency' => $mpSub->auto_recurring->frequency ?? 1,
-                'frequency_type' => $mpSub->auto_recurring->frequency_type ?? 'months',
-                'transaction_amount' => $mpSub->auto_recurring->transaction_amount ?? null,
-            ]);
-        });
     }
 
-    /**
-     * Crea (o reutiliza) un plan en Mercado Pago y devuelve el ID.
-     */
-    private function createOrGetPlan(array $meta): string
+    public function crearPlanSuscripcion(string $nombre, float $precio, int $frecuencia = 1, string $frecuenciaTipo = "months"): array
     {
-        // Si ya existe en BD lo devuelves, simplificado:
-        $plan = Subscription::where('plan_reference', $meta['plan_name'])->first();
-        if ($plan?->preapproval_plan_id) {
-            return $plan->preapproval_plan_id;
-        }
+        $data = [
+            "reason" => $nombre,
+            "auto_recurring" => [
+                "frequency" => $frecuencia,
+                "frequency_type" => $frecuenciaTipo,
+                "transaction_amount" => $precio,
+                "currency_id" => "PEN", // Cambia a tu moneda
+            ],
+            "back_url" => "https://front.flashcard.com/suscripcion-success", // Cambia esta URL por la tuya
+            "status" => "active"
+        ];
 
-        $mpPlan = $this->planClient->create([
-            'reason' => $meta['plan_name'],
-            'back_url' => config('app.url'),
-            'auto_recurring' => [
-                'frequency' => $meta['freq'],
-                'frequency_type' => 'months',
-                'transaction_amount' => $meta['amount'],
-                'currency_id' => 'PEN'
-            ]
-        ]);
-
-        // Persistir la referencia local si lo deseas
-        return $mpPlan->id;
+        $response = Http::withToken($this->accessToken)
+            ->post('https://api.mercadopago.com/preapproval_plan', $data);
+        // Puedes agregar manejo de errores. Por ahora devolvemos el JSON directo.
+        return $response->json();
     }
 
-    /**
-     * Cancela la suscripción en Mercado Pago y en BD.
-     */
-    public function cancelSubscription(Subscription $sub): bool
+    // Crear suscripción a un plan
+    public function crearSuscripcion($plan_id, $payer_email, $external_reference, $card_token_id): array
     {
-        try {
-            $this->preClient->update($sub->mercadopago_id, ['status' => 'cancelled']);
-            $sub->update(['status' => 'cancelled']);
-            return true;
-        } catch (MPExceptions $e) {
-            Log::error('[MP] Error al cancelar suscripción', ['id' => $sub->id, 'error' => $e->getMessage()]);
-            return false;
-        }
+        $product = Product::query()
+            ->where('id', $plan_id)
+            ->first();
+        $data = [
+            "preapproval_plan_id" => $product->mp_preapproval_plan_id,
+            "payer_email" => $payer_email,
+            "external_reference" => $external_reference,
+            "card_token_id" => $card_token_id,
+        ];
+
+        $resp = Http::withToken($this->accessToken)
+            ->post('https://api.mercadopago.com/preapproval', $data);
+        \Log::info('Respuesta de Mercado Pago al crear suscripción:', $resp->json());
+        return $resp->json();
     }
 
-    /**
-     * Procesa eventos del webhook y actualiza la suscripción.
-     */
-    public function handleWebhook(array $payload): bool
+    public function handle(Request $request)
     {
-        if (($payload['type'] ?? '') !== 'preapproval') {
-            return false;
-        }
 
-        $sub = Subscription::where('mercadopago_id', $payload['data']['id'])->first();
-        if (!$sub) {
-            return false;
-        }
-
-        $sub->update(['status' => $payload['action']]);
-        return true;
-    }
-
-    public function getPlans()
-    {
-        return Product::whereNotNull('url')->get();
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends Model
 {
     use SoftDeletes;
+
     // Especificamos la tabla (opcional si el nombre sigue la convención plural)
     protected $table = 'products';
 
@@ -18,7 +19,8 @@ class Product extends Model
         'duration_days',
         'description',
         'referencia',
-        'url'
+        'url',
+        'mp_preapproval_plan_id'
     ];
 
     /**

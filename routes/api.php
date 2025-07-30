@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 //Route::post('conversation/{id}', [MedisearchController::class, 'conversation']);
 
+Route::post('mp/webhook', [\App\Http\Controllers\Api\Pagos\PagosController::class, 'handle']);   // notificación
 
 // Rutas para el menú (requieren autenticación web)
 Route::middleware('auth:sanctum')->group(function () {
@@ -30,6 +31,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/menu', [MenuController::class, 'getMenu']);
     Route::get('/teams', [MenuController::class, 'getTeams']);
     Route::post('/teams/switch', [MenuController::class, 'switchTeam']);
+
+    Route::post('subscriptions/checkout', [\App\Http\Controllers\Api\Pagos\PagosController::class, 'createPreference'])
+        ->middleware('auth:sanctum');
 //    //Flashcards
 //    Route::get('/flashcard/', [FlashcardController::class, 'index']);
 //    Route::get('/flashcard/{id}', [FlashcardController::class, 'show'])->where('id', '[0-9]+');

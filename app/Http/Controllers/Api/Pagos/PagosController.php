@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Api\Pagos;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Pagos\Subscription\StoreSubscriptionRequest;
-use App\Http\Resources\Api\Pagos\SubscriptionResource;
-use App\Models\Subscription;
+use App\Models\Product;
+use App\Models\Purchase;
 use App\Services\Api\Pagos\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
-use MercadoPago\Exceptions\MPApiException;
+use Illuminate\Support\Facades\Http;
 
 class PagosController extends Controller
 {
@@ -20,144 +17,142 @@ class PagosController extends Controller
 
     public function __construct(SubscriptionService $subscriptionService)
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('auth:sanctum')->except([
+            'crearPlan',
+            'crearSuscripcion',
+            'handle',
+        ]);
         $this->subscriptionService = $subscriptionService;
     }
 
 
-    /**
-     * GET /api/subscriptions/plans
-     * Lista los planes de suscripción disponibles.
-     *
-     * @return Response
-     */
-    public function plans(): Response
+    public function plans()
     {
-        $plans = $this->subscriptionService->getPlans();
-
-        return response($plans, 200);
+        return $this->subscriptionService->getPlanesSuscripcion();
     }
 
-    /**
-     * GET /api/subscriptions
-     * Lista las suscripciones activas del usuario autenticado.
-     *
-     * @return Response
-     */
-    public function index(): Response
+    public function crearPlan(Request $request)
     {
-        $user = auth()->user();
-        $subs = Subscription::where('user_id', $user->id)->latest()->get();
+        $validated = $request->validate([
+            'nombre' => 'required|string',
+            'precio' => 'required|numeric|min:1',
+            'frecuencia' => 'sometimes|integer|min:1',
+            'frecuencia_tipo' => 'sometimes|string|in:months,days,years',
+            'description' => 'sometimes|string',
+            'referencia' => 'sometimes|string',
+            'url' => 'sometimes|url',
+            'duration_days' => 'sometimes|integer|min:1',
+        ]);
 
-        return response(SubscriptionResource::collection($subs), 200);
-    }
+        $planData = $this->subscriptionService->crearPlanSuscripcion(
+            $validated['nombre'],
+            $validated['precio'],
+            $validated['frecuencia'] ?? 1,
+            $validated['frecuencia_tipo'] ?? 'months'
+        );
 
-    /**
-     * POST /api/subscriptions
-     * Crea una suscripción (con plan o sin plan).
-     *
-     * @param StoreSubscriptionRequest $request
-     * @return Response
-     */
-    public function store(StoreSubscriptionRequest $request): Response
-    {
-        try {
-            $user = $request->user();
-
-            // Service layer decide qué flujo usar según el payload
-            $subscription = $this->subscriptionService->createSubscription(
-                user: $user,
-                isPlan: $request->boolean('use_plan'),
-                productId: $request->input('product_id'),
-                planMeta: $request->only(['plan_name', 'freq', 'amount'])
-            );
-
-            return response(new SubscriptionResource($subscription), 201);
-        } catch (MPApiException $e) {
-
-            // 🔎 1. Datos crudos que envió Mercado Pago
-            Log::error('[MP] createSubscription error', [
-                'status' => $e->getApiResponse()->getStatusCode(),
-                'contents' => $e->getApiResponse()->getContent()    // JSON completo
-            ]);
-
-            // 🔎 2. Muestra algo legible en desarrollo
-            throw new \RuntimeException(
-                $e->getApiResponse()->getContent()['message']
-                ?? 'Error API Mercado Pago'
-            );
-        } catch (ValidationException $e) {
-            return response([
-                'success' => false,
-                'message' => 'Datos inválidos',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Throwable $e) {
-            Log::error('[MP] Error al crear suscripción', ['error' => $e->getMessage()]);
-            return response([
-                'success' => false,
-                'message' => 'Error interno'
-            ], 500);
-        }
-    }
-
-    /**
-     * GET /api/subscriptions/{id}
-     * Muestra detalles de una suscripción.
-     */
-    public function show(Subscription $subscription): Response
-    {
-        $this->authorize('view', $subscription);
-
-        return response(new SubscriptionResource($subscription), 200);
-    }
-
-    /**
-     * DELETE /api/subscriptions/{id}
-     * Cancela una suscripción.
-     */
-    public function destroy(Subscription $subscription): Response
-    {
-        $this->authorize('delete', $subscription);
-
-        $canceled = $this->subscriptionService->cancelSubscription($subscription);
-
-        return response([
-            'success' => $canceled,
-            'message' => $canceled
-                ? 'Suscripción cancelada'
-                : 'No se pudo cancelar'
-        ], $canceled ? 200 : 500);
-    }
-
-    /**
-     * POST /api/mercadopago/webhook
-     * Webhook: procesa eventos de Mercado Pago.
-     */
-    public function webhook(Request $request)
-    {
-        // 1. Verificar firma (opcional, recomendado)
-        $secret = env('MP_SECRET_KEY');           // tu clave secreta de MP
-        $sent = $request->header('x-signature'); // llega como hmac sha256
-
-        if ($secret && !hash_equals(
-                $sent ?? '',
-                hash_hmac('sha256', $request->getContent(), $secret)
-            )) {
-            return response('firma inválida', 403);
+        if (!isset($planData['id'])) {
+            return response()->json(['error' => 'No se pudo crear el plan en Mercado Pago'], 500);
         }
 
-        // 2. Procesar evento
-        $type = $request->input('type');   // payment | preapproval
-        $action = $request->input('action'); // payment.created | preapproval.authorized …
+        // Guardar o actualizar producto local con el id que devuelve Mercado Pago
+        $product = Product::updateOrCreate(
+            ['name' => $validated['nombre']], // condición para encontrar
+            [
+                'price' => $validated['precio'],
+                'duration_days' => $validated['duration_days'] ?? 30,
+                'description' => $validated['description'] ?? null,
+                'referencia' => $validated['referencia'] ?? null,
+                'url' => $planData['init_point'] ?? null,
+                'mp_preapproval_plan_id' => $planData['id'], // guarda el id real Mercado Pago
+            ]
+        );
 
-        match ("{$type}.{$action}") {
-            'preapproval.authorized' => $this->handleAuthorized($request),
-            'payment.created' => $this->handlePayment($request),
-            default => null
-        };
-
-        // 3. Devolver 200 para que MP no reintente
-        return response('ok', 200);
+        return response()->json([
+            'mensaje' => 'Plan creado y guardado correctamente',
+            'plan_local_id' => $product->id,
+            'mp_preapproval_plan_id' => $planData['id'],
+            'detalle' => $planData,
+        ]);
     }
+
+
+    public function crearSuscripcion(Request $request): Response
+    {
+        $validated = $request->validate([
+            'plan_id' => 'required',
+            'payer_email' => 'required|email',
+            'external_reference' => 'required|int|exists:users,id',
+            'card_token_id' => 'required|string|max:255',
+        ]);
+
+        $subscription = $this->subscriptionService->crearSuscripcion(
+            $validated['plan_id'],
+            $validated['payer_email'],
+            $validated['external_reference'] ?? null,
+            $validated['card_token_id']
+        );
+        return response($subscription, 201);
+    }
+
+    public function handle(Request $request)
+    {
+        \Log::info('Webhook MercadoPago recibido:', $request->all());
+
+        $type = $request->input('type');
+        $preapprovalId = $request->input('data.id');
+
+        if ($type === 'subscription_preapproval' && $preapprovalId) {
+            $accessToken = config('services.mercadopago.access_token');
+            $response = Http::withToken($accessToken)
+                ->get("https://api.mercadopago.com/preapproval/{$preapprovalId}");
+
+            $preapproval = $response->json();
+
+            \Log::info('Detalles Completos del preapproval:', $preapproval);
+
+            $usuarioId = $preapproval['external_reference'] ?? null;
+
+            $planPrice = $preapproval['auto_recurring']['transaction_amount'] ?? null;
+            $plan = \App\Models\Product::query()
+                ->where('price', $planPrice)
+                ->first();
+
+            \Log::info('External Reference recibido del preapproval:', ['usuario' => $usuarioId]);
+
+            if ($usuarioId) {
+                $usuario = \App\Models\User::query()->where('id', $usuarioId)->first();
+
+                if ($usuario) {
+                    $usuario->status = true;
+                    $usuario->premium_at = now();
+                    $usuario->save();
+
+                    $compra = Purchase::query()
+                        ->create(
+                            [
+                                'user_id' => $usuario->id,
+                                'product_id' => $plan->id ?? null,
+                                'purchased_at' => now(),
+                                'preapproval' => $preapproval,
+                                'preapproval_id' => $preapprovalId,
+                                'status' => $preapproval['status'] ?? 'authorized',
+                                'payer_id' => $preapproval['payer_id'] ?? null,
+                                'external_reference' => $usuarioId,
+                                'init_point' => $preapproval['init_point'] ?? null,
+                            ]
+                        );
+                    \Log::info("Suscripción activada para usuario ID {$usuario->id} con preapproval_id {$preapprovalId}");
+                } else {
+                    \Log::warning("No se encontró usuario con ID {$usuarioId}");
+                }
+            } else {
+                \Log::warning("No se encontró external_reference en la suscripción {$preapprovalId}");
+            }
+        }
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+
 }
