@@ -109,7 +109,7 @@ class PagosController extends Controller
 
             $preapproval = $response->json();
 
-            \Log::info('Detalles Completos del preapproval:', $preapproval);
+            \Log::error('Detalles Completos del preapproval:', $preapproval);
 
             $usuarioId = $preapproval['external_reference'] ?? null;
 
