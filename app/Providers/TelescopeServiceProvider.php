@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
@@ -57,15 +56,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         $user = auth()->guard('sanctum')->user();   // o 'api'
-//        $user1 = auth()->guard('api')->user();   // o 'api'
-        Log::info('------------------------------------------------------------------------------------------');
-        Log::info('User ID: ' . ($user ? $user->id : 'No user authenticated'));
-//        Log::info('User1 ID: ' . ($user1 ? $user1->id : 'No user authenticated'));
-        Log::info('------------------------------------------------------------------------------------------');
         Gate::define('viewTelescope', function () {
             $user = auth()->guard('sanctum')->user();   // o 'api'
             return $user->hasAnyRole(['admin', 'root']);
-
         });
     }
 }

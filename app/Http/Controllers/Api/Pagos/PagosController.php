@@ -97,7 +97,7 @@ class PagosController extends Controller
 
     public function handle(Request $request)
     {
-        \Log::info('Webhook MercadoPago recibido:', $request->all());
+        \Log::error('Webhook MercadoPago recibido:', $request->all());
 
         $type = $request->input('type');
         $preapprovalId = $request->input('data.id');
