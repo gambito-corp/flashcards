@@ -47,7 +47,7 @@ class Chat
             $messages = $this->prepareMessages($systemPrompt, $question, $conversationHistory);
             switch ($searchType) {
                 case 'deep_research':
-                    $model = 'gpt-4.1-2025-04-14';
+                    $model = 'o3-deep-research-2025-06-26';
                     $maxTokens = 32768;
                     config('openai.http_client_options.timeout', 600); // Aseguramos que el timeout sea de 10 minutos
                     break;
@@ -57,7 +57,7 @@ class Chat
                     config('openai.http_client_options.timeout', 30); // Aseguramos que el timeout sea de 30 segundos
                     break;
                 default:
-                    $model = 'gpt-4.1-mini-2025-04-14';
+                    $model = 'o3-deep-research-2025-06-26';
                     $maxTokens = 5000;
                     config('openai.http_client_options.timeout', 120); // Aseguramos que el timeout sea de 120 segundos
                     break;
