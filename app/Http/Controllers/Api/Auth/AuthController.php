@@ -82,6 +82,17 @@ class AuthController extends Controller
         return response()->json($result, $result['status'] ?? 200);
     }
 
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+        $result = $this->authService->resetPassword($request->only('token', 'email', 'password'));
+        return response()->json($result, $result['status'] ?? 200);
+    }
+
     public function me(Request $request)
     {
         \Log::info('Fetching authenticated user data', ['Request' => $request->header('Authorization')]);

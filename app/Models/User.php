@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordCustom;
 use D076\SanctumRefreshTokens\Models\AuthenticatableUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,7 +46,7 @@ class User extends AuthenticatableUser
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new \App\Notifications\CustomResetPassword($token));
+        $this->notify(new ResetPasswordCustom($token, $this->email));
     }
 
     /**

@@ -32,5 +32,9 @@ return [
         'headers' => [
             'OpenAI-Beta' => 'assistants=v2'
         ]
-    ]
+    ],
+    'models' => [
+        'default' => env('OPENAI_DEFAULT_MODEL', 'gpt-4.1-nano-2025-04-14'),
+        'advanced' => env('OPENAI_ADVANCED_MODEL', 'gpt-4.1-nano-2025-04-14'),
+    ],
 ];

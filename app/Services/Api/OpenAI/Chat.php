@@ -32,7 +32,6 @@ class Chat
                 $pubmedArticles = $this->pubmedService->searchArticles($pubmedSearchQuery, $filters, $searchType);
             }
             $systemPrompt = $this->getMedicalSystemPrompt();
-
             if ($searchType === 'deep_research' && !empty($pubmedArticles)) {
                 $systemPrompt .= "\n\n**ARTÍCULOS CIENTÍFICOS DISPONIBLES:**\n";
                 $limitedArticles = array_slice($pubmedArticles, 0, 10);
@@ -47,17 +46,17 @@ class Chat
             $messages = $this->prepareMessages($systemPrompt, $question, $conversationHistory);
             switch ($searchType) {
                 case 'deep_research':
-                    $model = 'o3-deep-research-2025-06-26';
+                    $model = config('openai.advanced_model', 'gpt-4.1-nano-2025-04-14');
                     $maxTokens = 32768;
                     config('openai.http_client_options.timeout', 600); // Aseguramos que el timeout sea de 10 minutos
                     break;
                 case 'simple':
-                    $model = 'gpt-4.1-nano-2025-04-14';
+                    $model = config('openai.default_model', 'gpt-4.1-nano-2025-04-14');
                     $maxTokens = 2500;
                     config('openai.http_client_options.timeout', 30); // Aseguramos que el timeout sea de 30 segundos
                     break;
                 default:
-                    $model = 'o3-deep-research-2025-06-26';
+                    $model = config('openai.advanced_model', 'gpt-4.1-nano-2025-04-14');
                     $maxTokens = 5000;
                     config('openai.http_client_options.timeout', 120); // Aseguramos que el timeout sea de 120 segundos
                     break;
